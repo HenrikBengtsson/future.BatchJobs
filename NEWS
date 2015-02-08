@@ -1,0 +1,7 @@
+Package: async
+==============
+
+Version: 0.1.0 [2015-02-07]
+o First prototype of an old idea of asynchronous evaluations with 
+  delayed assignments.
+o Created.
