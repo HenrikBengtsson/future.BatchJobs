@@ -1,5 +1,6 @@
-library("async")
-library("R.utils")
+R.utils::use()
+use("async")
+
 oopts <- options(warn=1, "async::debug"=FALSE)
 
 message("** Delayed non-asynchronous evaluation")

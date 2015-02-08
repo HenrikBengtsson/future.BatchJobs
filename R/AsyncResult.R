@@ -6,20 +6,41 @@ setConstructorS3("AsyncResult", function(reg, id=1L, ...) {
 })
 
 
+#' Retrieves the value of of the asynchronously evaluated expression
+#'
+#' @param ... Arguments passed to S3 method.
+#'
+#' @return The value of the evaluated expression.
+#' If an error occurs, an informative Exception is thrown.
+#'
 #' @export
-#' @export await
+await <- function(...) NULL; rm("await")
+
+
+#' Retrieves the value of of the asynchronously evaluated expression
+#'
+#' @param task The asynchronously task
+#' @param cleanup If TRUE, the registry is completely removed upon
+#' success, otherwise not.
+#' @param maxTries The number of polls before giving up.
+#' @param interval The number of seconds to wait between polls.
+#' @param ... Not used.
+#'
+#' @return The value of the evaluated expression.
+#' If an error occurs, an informative Exception is thrown.
+#'
 #' @importFrom R.methodsS3 throw
 #' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getStatus getErrorMessages loadResult
 await.AsyncResult <- function(...) NULL; rm("await.AsyncResult")
-setMethodS3("await", "AsyncResult", function(object, cleanup=FALSE, maxTries=10L, interval=getOption("async::pollinterval", 1.0), timeout=+Inf, ...) {
+setMethodS3("await", "AsyncResult", function(task, cleanup=FALSE, maxTries=10L, interval=getOption("async::pollinterval", 1.0), ...) {
   throw <- R.methodsS3::throw
 
   debug <- getOption("async::debug", FALSE)
   if (debug) mprintf("Polling...")
 
-  reg <- object$reg
-  id <- object$id
+  reg <- task$reg
+  id <- task$id
 
   finished <- FALSE
   status <- NULL
@@ -53,7 +74,7 @@ setMethodS3("await", "AsyncResult", function(object, cleanup=FALSE, maxTries=10L
       res <- loadResult(reg, id=id)
     }
   } else {
-    throw(sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: %s", times, interval, reg))
+    throw(sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: %s", tries, interval, reg))
   }
 
   ## Cleanup

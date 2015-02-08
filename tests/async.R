@@ -1,4 +1,6 @@
-library("async")
+R.utils::use()
+use("async")
+
 oopts <- options(warn=1, "async::debug"=FALSE)
 
 task1 <- async({ print("Starting"); y <- 2; print("Finished"); y })

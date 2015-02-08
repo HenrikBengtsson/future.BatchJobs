@@ -1,10 +1,14 @@
-# Operator for delayed assignments while evaluating
-# the statement in the background/in parallel.
+#' Delayed asynchroneous assignment
+#'
+#' Operator for delayed assignments while evaluating
+#' the statement in the background/in parallel.
+#'
 #' @export
 #' @importFrom R.utils mprint
-`%<-|%` <- function(x, y, envir=parent.frame()) {
+`%<-|%` <- function(x, value) {
   name <- as.character(substitute(x))
-  expr <- substitute(y)
+  expr <- substitute(value)
+  envir <- parent.frame(1)
 
   debug <- getOption("async::debug", FALSE)
 
@@ -15,16 +19,19 @@
 
   if (debug) mprint(env$job)
 
-  delayedAssign(name, await(job), eval.env=env, assign.env=envir)
+  delayedAssign(name, await(env$job), eval.env=env, assign.env=envir)
 }
 
+#' Void delayed asynchroneous assignment
+#'
 #' @export
-`%<-||%` <- function(x, y, envir=parent.frame()) NA
+`%<-||%` <- function(x, value) NA
 
-
-# Operator for delayed assignments
+#' Delayed non-asynchroneous assignment
+#'
 #' @export
-`%<-%` <- function(x, y, envir=parent.frame()) {
+`%<-%` <- function(x, value) {
   name <- as.character(substitute(x))
-  delayedAssign(name, y, assign.env=envir)
+  envir <- parent.frame(1)
+  delayedAssign(name, value, assign.env=envir)
 }

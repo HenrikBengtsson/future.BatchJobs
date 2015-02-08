@@ -1,4 +1,10 @@
-# Start a asynchronous job and return an AsyncResult object.
+#' Evaluate an expression asynchronously
+#'
+#' @param expr The R expression to be evaluated
+#' @param envir The environment in which to expression should be evaluated.
+#'
+#' @return An AsyncResult
+#'
 #' @export
 #' @importFrom R.utils mcat mstr mprint mprintf
 #' @importFrom BatchJobs batchMap submitJobs
