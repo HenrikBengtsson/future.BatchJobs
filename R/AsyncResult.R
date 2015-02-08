@@ -1,9 +1,6 @@
-#' @importFrom R.oo setConstructorS3
-#' @importFrom R.methodsS3 setMethodS3
-#' @importFrom R.oo extend
-setConstructorS3("AsyncResult", function(reg, id=1L, ...) {
-  extend(list(reg=reg, id=id, ...), "AsyncResult")
-})
+AsyncResult <- function(reg, id=1L, ...) {
+  structure(list(reg=reg, id=id, ...), class=c("AsyncResult", "list"))
+}
 
 
 #' Retrieves the value of of the asynchronously evaluated expression
@@ -14,7 +11,7 @@ setConstructorS3("AsyncResult", function(reg, id=1L, ...) {
 #' If an error occurs, an informative Exception is thrown.
 #'
 #' @export
-await <- function(...) NULL; rm("await")
+await <- function(...) UseMethod("await")
 
 
 #' Retrieves the value of of the asynchronously evaluated expression
@@ -29,11 +26,11 @@ await <- function(...) NULL; rm("await")
 #' @return The value of the evaluated expression.
 #' If an error occurs, an informative Exception is thrown.
 #'
+#' @export
 #' @importFrom R.methodsS3 throw
 #' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getStatus getErrorMessages loadResult
-await.AsyncResult <- function(...) NULL; rm("await.AsyncResult")
-setMethodS3("await", "AsyncResult", function(task, cleanup=FALSE, maxTries=10L, interval=getOption("async::pollinterval", 1.0), ...) {
+await.AsyncResult <- function(task, cleanup=FALSE, maxTries=10L, interval=getOption("async::pollinterval", 1.0), ...) {
   throw <- R.methodsS3::throw
 
   debug <- getOption("async::debug", FALSE)
@@ -83,4 +80,4 @@ setMethodS3("await", "AsyncResult", function(task, cleanup=FALSE, maxTries=10L, 
   }
 
   res
-}) # await()
+} # await()
