@@ -53,5 +53,5 @@ async <- function(expr, envir=parent.frame()) {
   if (debug) mprintf("Submitted job #%d\n", id)
 
 
-  AsyncResult(reg=reg, id=id)
+  AsyncTask(expr, reg=reg, id=id)
 } # async()

@@ -19,7 +19,7 @@
 
   if (debug) mprint(env$job)
 
-  delayedAssign(name, await(env$job), eval.env=env, assign.env=envir)
+  delayedAssign(name, await(env$job, cleanup=TRUE), eval.env=env, assign.env=envir)
 }
 
 #' Void delayed asynchroneous assignment
