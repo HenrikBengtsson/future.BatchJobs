@@ -4,17 +4,19 @@
 \alias{batchEval}
 \title{A batch map function for R expressions}
 \usage{
-batchEval(reg, exprs, envir = parent.frame(), globals = TRUE, ...)
+batchEval(reg, exprs, globals = TRUE, envir = parent.frame(), ...)
 }
 \arguments{
 \item{reg}{A Registry.}
 
 \item{exprs}{A list of R expressions.}
 
-\item{envir}{The environment where to search for globals.}
-
 \item{globals}{A named list of R objects to be loaded by each job.
 If TRUE, globals are automatically searched for.}
+
+\item{envir}{The environment where to search for globals.}
+
+\item{...}{Additional arguments passed to \code{batchMap()}.}
 }
 \value{
 Job IDs.

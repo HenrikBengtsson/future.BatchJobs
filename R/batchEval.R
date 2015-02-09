@@ -9,12 +9,13 @@
 #' @param globals A named list of R objects to be loaded by each job.
 #'        If TRUE, globals are automatically searched for.
 #' @param envir The environment where to search for globals.
+#' @param ... Additional arguments passed to \code{batchMap()}.
 #'
 #' @return Job IDs.
 #'
 #' @export
 #' @importFrom BatchJobs batchExport batchMap
-batchEval <- function(reg, exprs, envir=parent.frame(), globals=TRUE, ...) {
+batchEval <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
   ## Identify globals?
   if (isTRUE(globals)) {
     globals <- getGlobals(exprs, envir=envir, unlist=TRUE)

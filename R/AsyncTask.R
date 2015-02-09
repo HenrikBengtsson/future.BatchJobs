@@ -1,21 +1,57 @@
-#' A asynchroneous task
+#' Create an asynchroneous task
 #'
-#' @param expr A R expression.
-#' @param reg A BatchJob Registry
-#' @param id A BatchJob Registry ID.
-#' @param ... Not used.
+#' @param expr The R expression to be evaluated
+#' @param envir The environment in which global environment
+#' should be located.
 #'
 #' @return An AsyncTask object
 #'
+#' @aliases async
 #' @export
-AsyncTask <- function(expr=NULL, reg=NA, id=1L, ...) {
-  exprT <- substitute(expr)
+#' @export async
+#' @importFrom R.utils mcat mstr mprint mprintf
+#' @importFrom BatchJobs batchMap submitJobs
+AsyncTask <- function(expr=NULL, envir=parent.frame()) {
+  # Argument 'expr':
+  expr <- substitute(expr)
+
+  # Argument 'envir':
+  if (!is.environment(envir))
+    throw("Argument 'envir' is not a list: ", class(envir)[1L])
+
+
+  debug <- getOption("async::debug", FALSE)
+
+  if (!debug) {
+    options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+  }
+
+  if (debug) { mcat("Expression:\n"); mprint(expr) }
+
+  ## Create temporary registry
+  reg <- tempRegistry()
+  if (debug) mprint(reg)
+
+  ## Create job
+  id <- batchEval(reg, exprs=list(expr), globals=TRUE, envir=envir)
+  if (debug) mprintf("Created job #%d\n", id)
+
+  ## Setup return value
   obj <- list(
-    expr=exprT,
+    expr=expr,
     backend=list(reg=reg, id=id)
   )
-  structure(obj, class=c("AsyncTask"))
+  obj <- structure(obj, class=c("AsyncTask"))
+
+  ## Submit job
+  submitJobs(reg, ids=id)
+  if (debug) mprintf("Submitted job #%d\n", id)
+
+  obj
 }
+
+async <- AsyncTask
+
 
 #' Print an AsyncTask
 #'
@@ -46,6 +82,7 @@ print.AsyncTask <- function(x, ...) {
 #'
 #' @return A character vector.
 #'
+#' @aliases finished value error
 #' @export
 #' @export finished
 #' @export value
@@ -140,7 +177,7 @@ await <- function(...) UseMethod("await")
 #' @export
 #' @importFrom R.methodsS3 throw
 #' @importFrom R.utils mprint mprintf mstr
-#' @importFrom BatchJobs getStatus getErrorMessages loadResult
+#' @importFrom BatchJobs getStatus getErrorMessages loadResult removeRegistry
 await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTries", 10L), interval=getOption("async::interval", 1.0), ...) {
   throw <- R.methodsS3::throw
 

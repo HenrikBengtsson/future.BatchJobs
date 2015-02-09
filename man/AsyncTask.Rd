@@ -2,23 +2,21 @@
 % Please edit documentation in R/AsyncTask.R
 \name{AsyncTask}
 \alias{AsyncTask}
-\title{A asynchroneous task}
+\alias{async}
+\title{Create an asynchroneous task}
 \usage{
-AsyncTask(expr = NULL, reg = NA, id = 1L, ...)
+AsyncTask(expr = NULL, envir = parent.frame())
 }
 \arguments{
-\item{expr}{A R expression.}
+\item{expr}{The R expression to be evaluated}
 
-\item{reg}{A BatchJob Registry}
-
-\item{id}{A BatchJob Registry ID.}
-
-\item{...}{Not used.}
+\item{envir}{The environment in which global environment
+should be located.}
 }
 \value{
 An AsyncTask object
 }
 \description{
-A asynchroneous task
+Create an asynchroneous task
 }
 

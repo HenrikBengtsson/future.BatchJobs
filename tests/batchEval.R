@@ -4,7 +4,7 @@ use("BatchJobs")
 
 oopts <- options(warn=1, "async::debug"=TRUE)
 
-reg <- tempRegistry()
+reg <- async:::tempRegistry()
 
 a <- 1
 exprs <- list(
