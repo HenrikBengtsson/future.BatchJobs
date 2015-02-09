@@ -57,7 +57,12 @@ y %<=% { b <- a*3.14; b }
 ```
 will result in `y` being assigned `6.28`.
 
-_Footnote_: (*) Details: Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize (and often write to file which then a compute node reads back). The global environments are identified using code inspection, cf. the [codetools] package.
+If a global variable is one that is assigned by another asynchroneous expression, then the new asynchroneous expression will wait for the former to complete before (**) being evaluated.
+
+
+_Footnotes_:  
+(*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize (and often write to file which then a compute node reads back). The global environments are identified using code inspection, cf. the [codetools] package.  
+(**) There is currently no lazy-evaluation mechanism for global variables from asynchroneous evaluations.  However, theoretically, one could imagine that parts of an asynchroneous expression can be evaluated while the required one is still being evaluated.
 
 
 ## Availability
