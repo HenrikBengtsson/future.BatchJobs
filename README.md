@@ -96,7 +96,7 @@ Error: Not a valid variable name for delayed assignments: x[[1]]
 This is because the assignment relies on what is referred to as a _delayed assigment_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.  This is also very much like the limitations on what can be assigned via `assign()`.
 
 
-### Backend configuration
+## Configuration of backends
 The asynchroneous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using the `backend()` function.  Examples:
 
 * `backend()` - (default) use `"multicore-1"` iff available, otherwise `"interactive"`
@@ -104,7 +104,7 @@ The asynchroneous evaluation done by the [async] package uses the [BatchJobs] pa
 * `backend("local")` - non-parallel processing in a separate R process.
 * `backend("interactive")` - non-parallel processing in the current R session.
 
-#### Multi-core processing
+### Multi-core processing
 Multi-core processing is when multiple R processes are used (instead of the
 default single-thread single-process R session we are all used to).
 Note that `multicore` processing is not available on Windows (this is a
