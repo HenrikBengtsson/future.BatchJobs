@@ -1,5 +1,6 @@
 cluster.functions <- local({
-  how <- c("interactive", "local", "rscript", "multirscript", "multicore")[3]
+  hows <- c("interactive", "local", "rscript", "multirscript", "multicore")
+  how <- if (.Platform$OS == "windows") "local" else "multicore"
   if (how == "interactive") {
     makeClusterFunctionsInteractive()
   } else if (how == "local") {
