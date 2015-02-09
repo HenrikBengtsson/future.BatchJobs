@@ -30,7 +30,7 @@ multi-core system:
 ```
 
 
-## Evaluation is done in a "local" environment
+### Evaluation is done in a "local" environment
 Each _asynchroneous expression_ is evaluated in its own unique _asynchroneous environment_, which is different from the calling environment.  The only way to transfer information from the asynchroneous environment to the calling environment, is via the (return) value, just as when functions are called and their values are returned.   In other words,
 
 ```r
@@ -63,6 +63,12 @@ If a global variable is one that is assigned by another asynchroneous expression
 _Footnotes_:  
 (\*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize (and often write to file which then a compute node reads back). The global environments are identified using code inspection, cf. the [codetools] package.  
 (\*\*) There is currently no lazy-evaluation mechanism for global variables from asynchroneous evaluations.  However, theoretically, one could imagine that parts of an asynchroneous expression can be evaluated while the required one is still being evaluated.
+
+
+## Limitations
+The `%<=%` assignment can only be use to assign variables to environments.  It is not possible to assign an asynchroneous expression to, say, a list element.  This is because part of the assignment is what is referred to as a _delayed assignent_, which can only be used to assign stand-alone variables, cf. help("delayedAssign").
+
+
 
 
 ## Availability
