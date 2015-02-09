@@ -4,7 +4,7 @@
 \alias{\%<-\%}
 \title{Delayed non-asynchroneous assignment}
 \usage{
-\%\%(x) <- value
+x %<-% value
 }
 \description{
 Delayed non-asynchroneous assignment

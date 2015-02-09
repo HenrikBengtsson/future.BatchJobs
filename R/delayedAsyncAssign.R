@@ -39,6 +39,8 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
 
 #' Delayed non-asynchroneous assignment
 #'
+#' @usage x %<-% value
+#'
 #' @export
 `%<-%` <- function(x, value) {
   name <- as.character(substitute(x))
