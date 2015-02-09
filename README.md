@@ -29,7 +29,7 @@ approximately 5 seconds to complete:
 ```
 
 
-## Evaluation is done in "local" environment
+## Evaluation is done in a "local" environment
 Note that each asynchroneous expression is evaluated in its own unique _asynchroneous environment_, which is different from the calling environment.  The only way to transfer information from the "asynchroneous environment" to the calling environment, is via the (return) value, just as when functions are called.   In other words,
 
 ```r
@@ -56,7 +56,7 @@ v2 %<=% { x <- a*3.14; x }
 ```
 will result in `v2` being assigned `6.28`.
 
-(*) Details: Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by identify which variables in the asynchroneous expression are global and copy them from the calling environment to the asynchroneous environment (using serialization).  The global environments are identified using code inspection, cf. the 'codetools' package.
+(*) Details: Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by identify which variables in the asynchroneous expression are global and copy them from the calling environment to the asynchroneous environment (using serialization).  The global environments are identified using code inspection, cf. the [codetools] package.
 
 
 ## Availability
@@ -69,10 +69,46 @@ source('http://callr.org/install#HenrikBengtsson/async')
 ## Appendix
 
 ### Configuration of backend for parallel / distributed processing
-The asynchroneous evaluation done by the 'async' package uses the
-'BatchJob' package as a backend for distributing the computations
-either in parallel to multiple cores or distribute them to multiple
-machines or on to a cluster.
+The asynchroneous evaluation done by the [async] package uses the
+[BatchJobs] package as a backend for effectuating the computations.
+The default BatchJobs setup is to evaluate all expression in the
+current R session.
+
+In order to perform parallel computations, a `.BatchJobs.R` 
+configuration file is required, which can reside either in
+the current directory or the user's home directory
+(this file is _not_ needed on compute nodes).
+
+Below are some examples of `.BatchJobs.R` configuration scripts.
+
+#### Interactive non-parallel processing (default)
+```r
+cluster.functions <- makeClusterFunctionsInteractive()
+```
+
+#### Non-interactive non-parallel processing (via Rscript)
+```r
+cluster.functions <- async::makeClusterFunctionsLocal()
+```
+
+#### Parallel multi-core processing (on local machine)
+```r
+cluster.functions <- makeClusterFunctionsMulticore(
+  ncpus=parallel::detectCores()
+)
+```
+
+#### Parallel multi-computer processing (on known machine)
+```r
+cluster.functions <- makeClusterFunctionsSSH(
+  makeSSHWorker(nodename="n6", max.jobs=2),
+  makeSSHWorker(nodename="n8"),
+  makeSSHWorker(nodename="n12")
+)
+```
+
+For further details and examples on how to configure BatchJobs,
+see the [BatchJobs configuration] wiki page.
 
 
 ### Software quality
@@ -86,3 +122,8 @@ machines or on to a cluster.
   src='https://coveralls.io/repos/HenrikBengtsson/async/badge.png?branch=develop'
   alt='Coverage Status' /></a>
 
+
+[async]: https://github.com/UCSF-CBC/async/
+[BatchJobs]: http://cran.r-project.org/package=BatchJobs
+[BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
+[codetools]: cran.r-project.org/package=codetools
