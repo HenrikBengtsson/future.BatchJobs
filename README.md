@@ -114,7 +114,8 @@ The default BatchJobs setup is to evaluate all expression in the
 current R session. In order to perform parallel computations, 
 a `.BatchJobs.R` configuration file is required, which can reside
 either in the current directory or the user's home directory
-(this file is _not_ needed on compute nodes).
+(this file is only needed on compute nodes if nested asynchroneous
+calls should also use the same configuration).
 
 Below are some examples of `.BatchJobs.R` configuration scripts.
 
