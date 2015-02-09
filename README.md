@@ -43,7 +43,7 @@ is effectively equivalent to
 x %<=% local({ a <- 3.14 })
 ```
 
-I both cases _asynchroneous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchroneous expression, so there is no need to explicitly "return" `a`.  This is the value that will be assigned to variable `x` in the calling environment.  This is also how function calls work.
+I both cases _asynchroneous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchroneous expression, which therefore also the value "returned" (in R there is no need to "return" values; it's always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  This is also how function calls work.
 
 As a matter of fact, it is _not_ possible to for an asynchroneous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchrenous environment.
 
