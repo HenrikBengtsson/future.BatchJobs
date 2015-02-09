@@ -4,7 +4,7 @@
 \alias{await.AsyncTask}
 \title{Retrieves the value of of the asynchronously evaluated expression}
 \usage{
-\method{await}{AsyncTask}(obj, cleanup = FALSE,
+\method{await}{AsyncTask}(obj, cleanup = TRUE,
   maxTries = getOption("async::maxTries", 10L),
   interval = getOption("async::interval", 1), ...)
 }

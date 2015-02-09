@@ -141,7 +141,7 @@ await <- function(...) UseMethod("await")
 #' @importFrom R.methodsS3 throw
 #' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getStatus getErrorMessages loadResult
-await.AsyncTask <- function(obj, cleanup=FALSE, maxTries=getOption("async::maxTries", 10L), interval=getOption("async::interval", 1.0), ...) {
+await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTries", 10L), interval=getOption("async::interval", 1.0), ...) {
   throw <- R.methodsS3::throw
 
   debug <- getOption("async::debug", FALSE)
