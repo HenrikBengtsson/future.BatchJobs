@@ -1,16 +1,15 @@
-if (.Platform$OS != "windows") {
-  cluster.functions = makeClusterFunctionsMulticore(
-    ncpus=parallel::detectCores()
-  );
-} else {
-  cluster.functions = makeClusterFunctionsLocal()
-#  max.concurrent.jobs = parallel::detectCores()
-}
-
-
-###########################################################################
-# HISTORY:
-# 2013-08-26
-# o Added makeClusterFunctionsRscript().
-# o Created.
-###########################################################################
+cluster.functions <- local({
+  how <- c("interactive", "local", "rscript", "multirscript", "multicore")[3]
+  if (how == "interactive") {
+    makeClusterFunctionsInteractive()
+  } else if (how == "local") {
+    makeClusterFunctionsLocal()
+  } else if (how == "rscript") {
+    async:::makeClusterFunctionsRscript(parallel=FALSE)
+  } else if (how == "multirscript") {
+    async:::makeClusterFunctionsRscript(parallel=TRUE)
+  } else if (how == "multicore") {
+    ncpus <- parallel::detectCores()
+    makeClusterFunctionsMulticore(ncpus=ncpus)
+  }
+})
