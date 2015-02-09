@@ -96,6 +96,29 @@ Error: Not a valid variable name for delayed assignments: x[[1]]
 This is because the assignment relies on what is referred to as a _delayed assigment_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.  This is also very much like the limitations on what can be assigned via `assign()`.
 
 
+### Backend configuration
+The asynchroneous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using the `backend()` function.  Examples:
+
+* `backend()` - (default) use `"multicore-1"` iff available, otherwise `"interactive"`
+* `backend("multicore")` - parallel processin using all available cores on the local machine.
+* `backend("local")` - non-parallel processing in a separate R process.
+* `backend("interactive")` - non-parallel processing in the current R session.
+
+#### Multi-core processing
+Multi-core processing is when multiple R processes are used (instead of the
+default single-thread single-process R session we are all used to).
+Note that `multicore` processing is not available on Windows (this is a
+limitation of the R core package `parallel`).
+When specifying `backend("multicore")`, all available cores are used on the
+machine.  For heavy computations, this might render the machine very slow and
+useless for other things.  To avoid this, one can specify how many cores to
+"spare", e.g. `backend("multicore=-2")` will use all but two cores.
+Note how the default (see above) is `backend("multicore=-1")`.
+As an alternative, it is also possible to specify the exact number of cores
+to be used, e.g. `backend("multicore=3")`.
+
+For more complicated backends (e.g. clusters), one has to use BatchJobs
+specific configurations, which is explained in the Appendix.
 
 
 ## Availability
@@ -108,12 +131,12 @@ source('http://callr.org/install#HenrikBengtsson/async')
 ## Appendix
 
 ### Configuration of backend for parallel / distributed processing
-The asynchroneous evaluation done by the [async] package uses the
-[BatchJobs] package as a backend for effectuating the computations.
-The default BatchJobs setup is to evaluate all expression in the
-current R session. In order to perform parallel computations, 
-a `.BatchJobs.R` configuration file is required, which can reside
-either in the current directory or the user's home directory
+Basic backends can be configured using the `backend()` function.
+For full control, or for more complicated backends such as clusters,
+one can use the configuration options available from the BatchJobs
+package.  In summary, this type of configuration is done via a
+`.BatchJobs.R` configuration file, that can reside in either the 
+current directory or the user's home directory
 (this file is only needed on compute nodes if nested asynchroneous
 calls should also use the same configuration).
 
