@@ -107,7 +107,7 @@ cluster.functions <- makeClusterFunctionsSSH(
 )
 ```
 
-#### Distributed processing (on cluster)
+#### Distributed processing (on a Torque/PBS cluster)
 ```r
 cluster.functions <- local({
   file <- system.file(package="async", "config", "pbs.tmpl")
