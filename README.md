@@ -108,7 +108,7 @@ The asynchroneous evaluation done by the [async] package uses the [BatchJobs] pa
 ### Multi-core processing
 Multi-core processing is when multiple R processes are used (instead of the
 default single-thread single-process R session we are all used to).
-Note that `multicore` processing is not available on Windows (this is a
+Note that multi-core processing is not available on Windows (this is a
 limitation of the R core package `parallel`).
 When specifying `backend("multicore")`, all available cores are used on the
 machine.  For heavy computations, this might render the machine very slow and
