@@ -25,14 +25,34 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
   delayedAssign(name, await(env$job, cleanup=TRUE), eval.env=env, assign.env=assign.env)
 }
 
+.asAssignName <- function(name) {
+  if (is.symbol(name)) {
+    name <- deparse(name)
+  } else {
+    n <- length(name)
+    name <- deparse(name)
+    if (n == 0L) {
+      stop("Not a valid variable name: ", name)
+    } else if (n > 1L) {
+      stop("Not a valid variable name. Delayed assignment can only be done to a non-subsetted variable: ", name)
+    }
+    if (!grepl("^[.a-zA-Z]", name)) {
+      stop("Not a valid variable name: ", name)
+    }
+  }
+  name
+}
+
 `%<=%` <- function(x, value) {
-  name <- as.character(substitute(x))
+  name <- substitute(x)
+  name <- .asAssignName(name)
   expr <- substitute(value)
   delayedAsyncAssign(name, expr, assign.env=parent.frame(1))
 }
 
 `%=>%` <- function(x, value) {
-  name <- as.character(substitute(value))
+  name <- substitute(x)
+  name <- .asAssignName(name)
   expr <- substitute(x)
   delayedAsyncAssign(name, expr, assign.env=parent.frame(1))
 }
@@ -43,7 +63,8 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
 #'
 #' @export
 `%<-%` <- function(x, value) {
-  name <- as.character(substitute(x))
+  name <- substitute(x)
+  name <- .asAssignName(name)
   expr <- substitute(value)
   call <- substitute(local(a), list(a=expr))
   envir <- parent.frame(1)
