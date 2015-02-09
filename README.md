@@ -100,7 +100,8 @@ This is because the assignment relies on what is referred to as a _delayed assig
 The asynchroneous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using the `backend()` function.  Examples:
 
 * `backend()` - (default) use `"multicore-1"` iff available, otherwise `"interactive"`
-* `backend("multicore")` - parallel processin using all available cores on the local machine.
+* `backend("multicore")` - parallel processing using all available cores on the local machine.
+* `backend("multicore-1")` - parallel processing using all but one of the available cores on the local machine.
 * `backend("local")` - non-parallel processing in a separate R process.
 * `backend("interactive")` - non-parallel processing in the current R session.
 
