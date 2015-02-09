@@ -61,7 +61,7 @@ If a global variable is one that is assigned by another asynchroneous expression
 ```r
 a %<=% { Sys.sleep(7); runif(1) }
 b %<=% { Sys.sleep(2); rnorm(1) }
-c %<=% { Sys.sleep(2); x <- a*b; x }
+c %<=% { x <- a*b; Sys.sleep(2); sqrt(x) }
 ```
 the third asynchroneous expression will not be evaluated until `a` and `b` have taken their values.
 
