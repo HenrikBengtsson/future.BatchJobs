@@ -98,7 +98,7 @@ cluster.functions <- makeClusterFunctionsMulticore(
 )
 ```
 
-#### Parallel multi-computer processing (on known machine)
+#### Distributed processing (on known machines)
 ```r
 cluster.functions <- makeClusterFunctionsSSH(
   makeSSHWorker(nodename="n6", max.jobs=2),
@@ -106,6 +106,16 @@ cluster.functions <- makeClusterFunctionsSSH(
   makeSSHWorker(nodename="n12")
 )
 ```
+
+#### Distributed processing (on cluster)
+```r
+cluster.functions <- makeClusterFunctionsSSH(
+  makeSSHWorker(nodename="n6", max.jobs=2),
+  makeSSHWorker(nodename="n8"),
+  makeSSHWorker(nodename="n12")
+)
+```
+
 
 For further details and examples on how to configure BatchJobs,
 see the [BatchJobs configuration] wiki page.
