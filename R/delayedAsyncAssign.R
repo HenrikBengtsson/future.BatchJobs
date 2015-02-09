@@ -30,14 +30,15 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
     name <- deparse(name)
   } else {
     n <- length(name)
-    name <- deparse(name)
+    name <- paste(deparse(name), collapse="")
     if (n == 0L) {
-      stop("Not a valid variable name: ", name)
+      stop("Not a valid variable name: ", name, call.=FALSE)
     } else if (n > 1L) {
-      stop("Not a valid variable name. Delayed assignment can only be done to a non-subsetted variable: ", name)
+      stop("Not a valid variable name for delayed assignments: ", name, call.=FALSE)
     }
+    str(name)
     if (!grepl("^[.a-zA-Z]", name)) {
-      stop("Not a valid variable name: ", name)
+      stop("Not a valid variable name: ", name, call.=FALSE)
     }
   }
   name
