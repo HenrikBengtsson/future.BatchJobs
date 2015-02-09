@@ -1,5 +1,10 @@
 R.utils::use()
 use("async")
+
+## Attach BatchJobs to make it simple, but technically we
+## should be able to do by just importing the functions needed.
+## Note: As of BatchJobs 1.5, makeRegistry() will attach
+## BatchJobs anyways if not already done.
 use("BatchJobs")
 
 oopts <- options(warn=1, "async::debug"=TRUE)
