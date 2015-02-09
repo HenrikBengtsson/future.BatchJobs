@@ -43,14 +43,14 @@ is effectively equivalent to
 x %<=% local({ a <- 3.14 })
 ```
 
-I both cases _asynchroneous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchroneous expression, which therefore also the value "returned" (in R there is no need to "return" values; it's always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  This is also how function calls work.
+I both cases _asynchroneous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchroneous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.
 
-As a matter of fact, it is _not_ possible for an asynchroneous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchrenous environment.
+As a matter of fact, it is _not_ possible for an asynchroneous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchroneous environment.
 
 
 ### Global variables
 
-Although the following expression is evaluated in an asynchroneous environment, which is separate from the calling one, the asynchroneous environment "inherits"(*) all "global" variables in the calling environment and its parents.  For example,
+Although the following expression is evaluated in an asynchroneous environment - separated from the calling one - the asynchroneous environment "inherits"(*) any "global" variables in the calling environment and its parents.  For example,
 ```r
 a <- 2
 y %<=% { b <- a*3.14; b }
@@ -63,23 +63,23 @@ a %<=% { Sys.sleep(7); runif(1) }
 b %<=% { Sys.sleep(2); rnorm(1) }
 y %<=% { Sys.sleep(2); c <- a*b; c }
 ```
-the third asynchroneous expression cannot be evaluated until `a` and `b` have taken their values.
+the third asynchroneous expression will not be evaluated until `a` and `b` have taken their values.
 
 
 _Footnotes_:  
-(\*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize (and often write to file which then a compute node reads back). The global environments are identified using code inspection, cf. the [codetools] package.  
-(\*\*) There is currently no lazy-evaluation mechanism for global variables from asynchroneous evaluations.  However, theoretically, one could imagine that parts of an asynchroneous expression can be evaluated while the required one is still being evaluated.
+(\*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize.  Seralized objects may also be write to file which then a compute node reads back. The global environments are identified using code inspection, cf. the [codetools] package.  
+(\*\*) There is currently no lazy-evaluation mechanism for global variables from asynchroneous evaluations.  However, theoretically, one could imagine that parts of an asynchroneous expression can be evaluated while the required one is still being evaluated.  However, the current implementation is such that the asynchroneous evaluation will not be _initiated_ until all global variables can be resolved.
 
 
 ## Limitations
-The `%<=%` assignment can only be use to assign variables to environments.  It is not possible to assign an asynchroneous expression to, say, a list element.  If tried, an informative error will be generated, e.g.
+The `%<=%` assignment can only be used to assign variables to environments.  It is not possible to assign the value of an asynchroneous expression to, say, a list element.  If tried, an informative error will be generated, e.g.
 
 ```r
 > x[[1]] %<=% { 1 }
 Error: Not a valid variable name for delayed assignments: x[[1]]
 ```
 
-This is because the assignment relies on what is referred to as a _delayed assignent_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.
+This is because the assignment relies on what is referred to as a _delayed assigment_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.
 
 
 
