@@ -109,11 +109,10 @@ cluster.functions <- makeClusterFunctionsSSH(
 
 #### Distributed processing (on cluster)
 ```r
-cluster.functions <- makeClusterFunctionsSSH(
-  makeSSHWorker(nodename="n6", max.jobs=2),
-  makeSSHWorker(nodename="n8"),
-  makeSSHWorker(nodename="n12")
-)
+cluster.functions <- local({
+  file <- system.file(package="async", "config", "pbs.tmpl")
+  makeClusterFunctionsTorque(file)
+})
 ```
 
 
