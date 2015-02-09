@@ -1,4 +1,4 @@
-#' Delayed asynchroneous assignment
+#' Delayed asynchroneous evaluation
 #'
 #' Operator for delayed assignments while evaluating
 #' the statement in the background/in parallel.
@@ -37,13 +37,15 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
   delayedAsyncAssign(name, expr, assign.env=parent.frame(1))
 }
 
-#' Delayed non-asynchroneous assignment
+#' Delayed synchroneous evaluation
 #'
 #' @usage x %<-% value
 #'
 #' @export
 `%<-%` <- function(x, value) {
   name <- as.character(substitute(x))
+  expr <- substitute(value)
+  call <- substitute(local(a), list(a=expr))
   envir <- parent.frame(1)
-  delayedAssign(name, value, assign.env=envir)
+  delayedAssign(name, eval(call, envir=envir), assign.env=envir)
 }

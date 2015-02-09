@@ -4,7 +4,7 @@
 \alias{\%<=\%}
 \alias{\%=>\%}
 \alias{delayedAsyncAssign}
-\title{Delayed asynchroneous assignment}
+\title{Delayed asynchroneous evaluation}
 \usage{
 delayedAsyncAssign(name, expr, assign.env = parent.frame(1))
 }

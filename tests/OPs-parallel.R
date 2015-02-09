@@ -3,22 +3,29 @@ use("async")
 
 oopts <- options(warn=1, "async::debug"=FALSE)
 
+rm(list=intersect(c("x", "y"), ls()))
+
+
 message("** Delayed non-asynchronous evaluation")
-x %<-% { print("Starting"); y <- 1; print("Finished"); y }
-mprintf("x=%s\n", x)
-stopifnot(x == 1)
+v0 %<-% { print("Starting"); y <- 1; print("Finished"); y }
+mprintf("v0=%s\n", v0)
+stopifnot(v0 == 1)
+stopifnot(!exists("y"))
 
 
 message("** Delayed asynchronous evaluation without globals")
 v1 %<=% { x <- 1 }
+stopifnot(!exists("x"))
 
 message("** Delayed asynchronous evaluation with globals")
 a <- 2
 v2 %<=% { x <- a }
+stopifnot(!exists("x"))
 
 message("** Delayed asynchronous evaluation with errors")
 ## Test that async() works when there are errors
 v3 %<=% ({ x <- 3; stop("Woops!"); x })
+stopifnot(!exists("x"))
 
 message("** Delayed asynchronous evaluation with progress bar (~5s)")
 v4 %<=% {

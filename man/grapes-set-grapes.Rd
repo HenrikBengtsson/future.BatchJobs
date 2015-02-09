@@ -2,11 +2,11 @@
 % Please edit documentation in R/delayedAsyncAssign.R
 \name{\%<-\%}
 \alias{\%<-\%}
-\title{Delayed non-asynchroneous assignment}
+\title{Delayed synchroneous evaluation}
 \usage{
 x %<-% value
 }
 \description{
-Delayed non-asynchroneous assignment
+Delayed synchroneous evaluation
 }
 
