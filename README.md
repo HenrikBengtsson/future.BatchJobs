@@ -61,7 +61,7 @@ If a global variable is one that is assigned by another asynchroneous expression
 ```r
 a %<=% { Sys.sleep(7); runif(1) }
 b %<=% { Sys.sleep(2); rnorm(1) }
-c %<=% { x <- a*b; Sys.sleep(2); sqrt(x) }
+c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
 the third asynchroneous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchroneous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).
