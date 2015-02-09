@@ -1,7 +1,13 @@
 R.utils::use()
 use("async")
 
-oopts <- options(warn=1, "async::debug"=FALSE)
+oopts <- options(warn=1, "async::debug"=TRUE)
+
+a <- 1
+t1 <- async({ x <- a })
+print(t1)
+
+stop("XXX")
 
 task1 <- async({ print("Starting"); y <- 2; print("Finished"); y })
 print(task1)

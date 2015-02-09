@@ -1,3 +1,5 @@
+#' @export
+#'
 #' @importFrom R.utils tempvar
 #' @importFrom BatchJobs makeRegistry
 tempRegistry <- local({

@@ -7,7 +7,7 @@ message("** Delayed non-asynchronous evaluation")
 x %<-% { print("Starting"); a <- 1; print("Finished"); a }
 
 message("** Delayed asynchronous evaluation #1")
-y %<-|% {
+y %<-||% {
   library("R.utils")
   mprintf("Processing: ")
   for (ii in 1:10) { mprintf("."); Sys.sleep(1) }
@@ -16,7 +16,7 @@ y %<-|% {
 }
 
 message("** Delayed asynchronous evaluation #2")
-z %<-|% { print("Starting"); b <- 2; print("Finished"); b }
+z %<-||% { print("Starting"); b <- 2; print("Finished"); b }
 
 message("** Collecting results")
 mprintf("x=%s\n", x)
