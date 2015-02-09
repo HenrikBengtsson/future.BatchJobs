@@ -30,7 +30,7 @@ multi-core system:
 ```
 
 
-## Evaluation is done in a "local" environment
+### Evaluation is done in a "local" environment
 Each _asynchroneous expression_ is evaluated in its own unique _asynchroneous environment_, which is different from the calling environment.  The only way to transfer information from the asynchroneous environment to the calling environment, is via the (return) value, just as when functions are called and their values are returned.   In other words,
 
 ```r
@@ -57,12 +57,32 @@ y %<=% { b <- a*3.14; b }
 ```
 will result in `y` being assigned `6.28`.
 
-If a global variable is one that is assigned by another asynchroneous expression, then the new asynchroneous expression will wait for the former to complete before (**) being evaluated.
+If a global variable is one that is assigned by another asynchroneous expression, then the new asynchroneous expression will wait for the former to complete before (**) being evaluated.  For example, in
+```r
+a %<=% { Sys.sleep(7); runif(1) }
+b %<=% { Sys.sleep(2); rnorm(1) }
+y %<=% { Sys.sleep(2); c <- a*b; c }
+```
+the third asynchroneous expression cannot be evaluated until `a` and `b` have taken their values.
 
 
 _Footnotes_:  
 (\*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize (and often write to file which then a compute node reads back). The global environments are identified using code inspection, cf. the [codetools] package.  
 (\*\*) There is currently no lazy-evaluation mechanism for global variables from asynchroneous evaluations.  However, theoretically, one could imagine that parts of an asynchroneous expression can be evaluated while the required one is still being evaluated.
+
+
+## Limitations
+The `%<=%` assignment can only be use to assign variables to environments.  It is not possible to assign an asynchroneous expression to, say, a list element.  If tried, an informative error will be generated, e.g.
+
+```r
+> x[[1]] %<=% { 1 }
+Error in .asAssignName(name) :
+  Not a valid variable name for delayed assignments: x[[1]]
+```
+
+This is because the assignment relies on what is referred to as a _delayed assignent_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.
+
+
 
 
 ## Availability
@@ -78,21 +98,19 @@ source('http://callr.org/install#HenrikBengtsson/async')
 The asynchroneous evaluation done by the [async] package uses the
 [BatchJobs] package as a backend for effectuating the computations.
 The default BatchJobs setup is to evaluate all expression in the
-current R session.
-
-In order to perform parallel computations, a `.BatchJobs.R` 
-configuration file is required, which can reside either in
-the current directory or the user's home directory
+current R session. In order to perform parallel computations, 
+a `.BatchJobs.R` configuration file is required, which can reside
+either in the current directory or the user's home directory
 (this file is _not_ needed on compute nodes).
 
 Below are some examples of `.BatchJobs.R` configuration scripts.
 
-#### Interactive non-parallel processing (default)
+#### Non-parallel interactive processing (default)
 ```r
 cluster.functions <- makeClusterFunctionsInteractive()
 ```
 
-#### Non-interactive non-parallel processing (via Rscript)
+#### Non-parallel non-interactive processing (via Rscript)
 ```r
 cluster.functions <- async::makeClusterFunctionsLocal()
 ```
