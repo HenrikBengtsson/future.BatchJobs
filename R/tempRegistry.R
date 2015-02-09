@@ -17,7 +17,6 @@ makeClusterFunctionsRscript <- function(parallel=FALSE) {
             stdout = log.file,
             stderr = log.file,
             wait = !parallel)
-    message("Submitted job!")
     makeSubmitJobResult(status = 0L, batch.job.id = "cfLocal")
   }
 
