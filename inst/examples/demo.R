@@ -4,41 +4,68 @@ use("async")
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Sequential evaluation
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-v1 <- { x <- 1 }
+t0 <- Sys.time()
+
+v1 <- {
+  cat("Calculation #1: ")
+  for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
+  cat(" [100%]\n")
+  1
+}
 
 a <- 2
-v2 <- { x <- a }
+v2 <- {
+  cat("Calculation #2: ")
+  for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
+  cat(" [100%]\n")
+  a
+}
 
 v3 <- {
-  library("R.utils")
-  mprintf("Processing: ")
-  for (ii in 1:10) { mprintf("."); Sys.sleep(0.5) }
-  mprintf(" [100%%]\n")
+  cat("Calculation #3: ")
+  for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
+  cat(" [100%]\n")
   3
 }
 
 mprintf("v1=%s\n", v1)
 mprintf("v2=%s\n", v2)
 mprintf("v3=%s\n", v3)
+
+mprintf("Total time: %.1f s\n", Sys.time() - t0)
 
 
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Asynchroneous evaluation
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-v1 %<-||% { x <- 1 }
+t0 <- Sys.time()
+
+v1 %<-||% {
+  cat("Calculation #1: ")
+  for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
+  cat(" [100%]\n")
+  1
+}
 
 a <- 2
-v2 %<-||% { x <- a }
+v2 %<-||% {
+  cat("Calculation #2: ")
+  for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
+  cat(" [100%]\n")
+  a
+}
 
 v3 %<-||% {
-  library("R.utils")
-  mprintf("Processing: ")
-  for (ii in 1:10) { mprintf("."); Sys.sleep(0.5) }
-  mprintf(" [100%%]\n")
+  cat("Calculation #3: ")
+  for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
+  cat(" [100%]\n")
   3
 }
 
 mprintf("v1=%s\n", v1)
 mprintf("v2=%s\n", v2)
 mprintf("v3=%s\n", v3)
+
+mprintf("Total time: %.1f s\n", Sys.time() - t0)
+
