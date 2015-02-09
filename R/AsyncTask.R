@@ -28,6 +28,13 @@ AsyncTask <- function(expr=NULL, envir=parent.frame()) {
 
   if (debug) { mcat("Expression:\n"); mprint(expr) }
 
+  ## Inject loading of 'async' in case of nested asynchroneous evaluation
+  expr <- substitute({
+    R.utils::use("async")
+    a
+  }, list(a=expr))
+  if (debug) { mcat("Expression (injected):\n"); mprint(expr) }
+
   ## Create temporary registry
   reg <- tempRegistry()
   if (debug) mprint(reg)
