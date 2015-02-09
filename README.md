@@ -82,7 +82,7 @@ c %<=% {
 }
 d <- runif(1)
 ```
-This will evaluate the expression for `c` ansynchroneous such that `d` will be assigned almost momentarily.  In turn, the value for `c` will be resolved when _nested ansynchroneous expressions_ for local variables `a` and `b` have been evaluated.
+This will evaluate the expression for `c` ansynchroneously such that `d` is assigned almost momentarily.  In turn, the value for `c` will be resolved when _nested ansynchroneous expressions_ for local variables `a` and `b` have been evaluated.
 
 
 ## Limitations
