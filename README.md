@@ -64,12 +64,25 @@ b %<=% { Sys.sleep(2); rnorm(1) }
 c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
-the third asynchroneous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchroneous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).
+the third asynchroneous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchroneous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).  This pause can be avoided using nested asynchronous evaluation (see Section below).
 
 
 _Footnotes_:  
 (\*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize.  Seralized objects may also be write to file which then a compute node reads back. The global environments are identified using code inspection, cf. the [codetools] package.  
 (\*\*) There is currently no lazy-evaluation mechanism for global variables from asynchroneous evaluations.  However, theoretically, one could imagine that parts of an asynchroneous expression can be evaluated while the required one is still being evaluated.  However, the current implementation is such that the asynchroneous evaluation will not be _initiated_ until all global variables can be resolved.
+
+
+## Nested ansynchroneous evaluation
+It is possible to nest multiple levels of ansynchroneous evaluations, e.g.
+```r
+c %<=% {
+  a %<=% { Sys.sleep(7); runif(1) }
+  b %<=% { Sys.sleep(2); rnorm(1) }
+  x <- a*b; Sys.sleep(2); abs(x)
+}
+d <- runif(1)
+```
+This will evaluate the expression for `c` ansynchroneous such that `d` will be assigned almost momentarily.  In turn, the value for `c` will be resolved when _nested ansynchroneous expressions_ for local variables `a` and `b` have been evaluated.
 
 
 ## Limitations
