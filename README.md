@@ -93,7 +93,7 @@ The `%<=%` assignment can only be used to assign variables to environments.  It 
 Error: Not a valid variable name for delayed assignments: x[[1]]
 ```
 
-This is because the assignment relies on what is referred to as a _delayed assigment_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.
+This is because the assignment relies on what is referred to as a _delayed assigment_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.  This is also very much like the limitations on what can be assigned via `assign()`.
 
 
 
