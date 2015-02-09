@@ -5,8 +5,8 @@
 \title{Retrieves the value of of the asynchronously evaluated expression}
 \usage{
 \method{await}{AsyncTask}(obj, cleanup = TRUE,
-  maxTries = getOption("async::maxTries", 10L),
-  interval = getOption("async::interval", 1), ...)
+  maxTries = getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES",
+  1000)), delta = getOption("async::interval", 1), alpha = 1.01, ...)
 }
 \arguments{
 \item{obj}{The asynchronously task}
@@ -16,7 +16,10 @@ success, otherwise not.}
 
 \item{maxTries}{The number of polls before giving up.}
 
-\item{interval}{The number of seconds to wait between polls.}
+\item{delta}{The number of seconds to wait the first time.}
+
+\item{alpha}{A factor to scale up the waiting time in each iteration
+such that the waiting time in the k:th iteration is \code{alpha^k*delta}.}
 
 \item{...}{Not used.}
 }
