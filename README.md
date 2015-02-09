@@ -22,6 +22,17 @@ approximately 5 seconds to complete:
 
 ```r
 > library(async)
+> x <- async({ Sys.sleep(5); 3.14 })
+> y <- async({ Sys.sleep(5); 2.71 })
+> z <- x + y
+[1] 5.85
+```
+
+For simplicitly, the 'async' package introduces the `%<=%` operator
+which allows as to write the above as:
+
+```r
+> library(async)
 > x %<=% { Sys.sleep(5); 3.14 }
 > y %<=% { Sys.sleep(5); 2.71 }
 > z <- x + y
