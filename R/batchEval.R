@@ -49,6 +49,12 @@ batchEval <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
       addRegistryPackages(reg, packages=pkgs)
     }
 
+    ## BatchJobs::batchExport() validated names of globals using
+    ## checkmate::assertList(more.args, names="strict") which doesn't
+    ## like names such as "{", although they should be valid indeed.
+    keep <- grep("^[.a-zA-Z]", names(globals))
+    globals <- globals[keep]
+
     batchExport(reg, li=globals)
   }
   rm(list=c("globals")) # Not needed anymore

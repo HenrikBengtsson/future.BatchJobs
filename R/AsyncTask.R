@@ -28,12 +28,12 @@ AsyncTask <- function(expr=NULL, envir=parent.frame()) {
 
   if (debug) { mcat("Expression:\n"); mprint(expr) }
 
-  ## Inject loading of 'async' in case of nested asynchroneous evaluation
-  expr <- substitute({
-    R.utils::use("async")
-    a
-  }, list(a=expr))
-  if (debug) { mcat("Expression (injected):\n"); mprint(expr) }
+##  ## Inject loading of 'async' in case of nested asynchroneous evaluation
+##  expr <- substitute({
+##    R.utils::use("async")
+##    a
+##  }, list(a=expr))
+##  if (debug) { mcat("Expression (injected):\n"); mprint(expr) }
 
   ## Create temporary registry
   reg <- tempRegistry()
@@ -191,7 +191,7 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
   throw <- R.methodsS3::throw
 
   maxTries <- as.integer(maxTries)
-  
+
   debug <- getOption("async::debug", FALSE)
   if (debug) mprintf("Polling...")
 
