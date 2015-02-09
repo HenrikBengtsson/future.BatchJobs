@@ -8,8 +8,7 @@ expressions in a parallel or distributed fashion such that the
 "observed" total time for computing all values is less that if the
 expressions would be evaluated synchroneously (sequentially).
 
-For instance, the following synchroneous evaluation will take
-approximately 10dseconds to compute:
+For instance, the following evaluation, which is synchroneous, takes approximately 10 seconds to complete:
 
 ```r
 > x <- { Sys.sleep(5); 3.14 }
@@ -18,8 +17,8 @@ approximately 10dseconds to compute:
 [1] 5.85
 ```
 
-whereas the follwing _asynchroneous_ evaluation will only take
-approximately 5 seconds to compute:
+whereas the follwing _asynchroneous_ evaluation only takes
+approximately 5 seconds to complete:
 
 ```r
 > library(async)
