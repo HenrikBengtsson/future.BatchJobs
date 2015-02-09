@@ -20,8 +20,36 @@ batchEval <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
   if (isTRUE(globals)) {
     globals <- getGlobals(exprs, envir=envir, unlist=TRUE)
   }
+
+  pkgsNeeded <- NULL
   if (is.list(globals) && length(globals) > 0L) {
-   batchExport(reg, li=globals)
+    ## Scan 'globals' for which packages needs to be loaded.
+    ## This information is in the environment name of the objects.
+    pkgs <- sapply(globals, FUN=function(obj) {
+      environmentName(environment(obj))
+    })
+    pkgs <- sort(unique(pkgs))
+    pkgs <- pkgs[nchar(pkgs) > 0L]
+    if (length(pkgs) > 0L) {
+      pd <- lapply(pkgs, FUN=packageDescription, encoding=NA)
+      # Drop unknown package with a warning (should not happen, but)
+      unknown <- pkgs[sapply(pd, FUN=function(x) !is.list(x) && is.na(x))]
+      if (length(unknown) > 0L) {
+        pd <- pd[!unknown]
+        pkgs <- pkgs[!unknown]
+        warning("Detected globals in environments/namespaces that refer to unknown packages, which are ignored: ", paste(sQuote(unknown), collapse=", "))
+      }
+      basePkgs <- sapply(pd, FUN=function(x) {
+          !is.null(x$Priority) && x$Priority == "base"
+      })
+      pkgs <- pkgs[!basePkgs]
+    }
+
+    if (length(pkgs) > 0L) {
+      addRegistryPackages(reg, packages=pkgs)
+    }
+
+    batchExport(reg, li=globals)
   }
   rm(list=c("globals")) # Not needed anymore
 
