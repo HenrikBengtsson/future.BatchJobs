@@ -84,21 +84,19 @@ source('http://callr.org/install#HenrikBengtsson/async')
 The asynchroneous evaluation done by the [async] package uses the
 [BatchJobs] package as a backend for effectuating the computations.
 The default BatchJobs setup is to evaluate all expression in the
-current R session.
-
-In order to perform parallel computations, a `.BatchJobs.R` 
-configuration file is required, which can reside either in
-the current directory or the user's home directory
+current R session. In order to perform parallel computations, 
+a `.BatchJobs.R` configuration file is required, which can reside
+either in the current directory or the user's home directory
 (this file is _not_ needed on compute nodes).
 
 Below are some examples of `.BatchJobs.R` configuration scripts.
 
-#### Interactive non-parallel processing (default)
+#### Non-parallel interactive processing (default)
 ```r
 cluster.functions <- makeClusterFunctionsInteractive()
 ```
 
-#### Non-interactive non-parallel processing (via Rscript)
+#### Non-parallel non-interactive processing (via Rscript)
 ```r
 cluster.functions <- async::makeClusterFunctionsLocal()
 ```
