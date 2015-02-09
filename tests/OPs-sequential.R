@@ -10,18 +10,18 @@ stopifnot(x == 1)
 
 
 message("** Delayed asynchronous evaluation without globals")
-v1 %<-||% { x <- 1 }
+v1 %<=% { x <- 1 }
 
 message("** Delayed asynchronous evaluation with globals")
 a <- 2
-v2 %<-||% { x <- a }
+v2 %<=% { x <- a }
 
 message("** Delayed asynchronous evaluation with errors")
 ## Test that async() works when there are errors
-v3 %<-||% ({ x <- 3; stop("Woops!"); x })
+v3 %<=% ({ x <- 3; stop("Woops!"); x })
 
 message("** Delayed asynchronous evaluation with progress bar (~5s)")
-v4 %<-||% {
+v4 %<=% {
   library("R.utils")
   mprintf("Processing: ")
   for (ii in 1:10) { mprintf("."); Sys.sleep(0.5) }
