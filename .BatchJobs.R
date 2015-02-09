@@ -1,16 +1,23 @@
 cluster.functions <- local({
-  hows <- c("interactive", "local", "rscript", "multirscript", "multicore")
-  how <- if (.Platform$OS == "windows") "local" else "multicore"
-  if (how == "interactive") {
+  backend <- if (.Platform$OS == "windows") "local" else "multicore"
+  backend <- Sys.getenv("R_ASYNC_BACKEND", backend)
+  if (backend == "interactive") {
     makeClusterFunctionsInteractive()
-  } else if (how == "local") {
+  } else if (backend == "local") {
     makeClusterFunctionsLocal()
-  } else if (how == "rscript") {
+  } else if (backend == "rscript") {
     async:::makeClusterFunctionsRscript(parallel=FALSE)
-  } else if (how == "multirscript") {
+  } else if (backend == "multirscript") {
     async:::makeClusterFunctionsRscript(parallel=TRUE)
-  } else if (how == "multicore") {
+  } else if (backend == "multicore") {
     ncpus <- parallel::detectCores()
     makeClusterFunctionsMulticore(ncpus=ncpus)
+  } else if (backend == "torque") {
+    paths <- c(".", "~", system.file(package="async", "config"))
+    tmpl <- file.path(paths, "pbs.tmpl")
+    tmpl <- tmpl[file_test("-f", tmpl)]
+    makeClusterFunctionsTorque(tmpl)
+  } else {
+    stop("Unknown backend: ", backend)
   }
 })
