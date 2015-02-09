@@ -72,7 +72,15 @@ _Footnotes_:
 
 
 ## Limitations
-The `%<=%` assignment can only be use to assign variables to environments.  It is not possible to assign an asynchroneous expression to, say, a list element.  This is because part of the assignment is what is referred to as a _delayed assignent_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.
+The `%<=%` assignment can only be use to assign variables to environments.  It is not possible to assign an asynchroneous expression to, say, a list element.  If tried, an informative error will be generated, e.g.
+
+```r
+> x[[1]] %<=% { 1 }
+Error in .asAssignName(name) :
+  Not a valid variable name for delayed assignments: x[[1]]
+```
+
+This is because the assignment relies on what is referred to as a _delayed assignent_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.
 
 
 
