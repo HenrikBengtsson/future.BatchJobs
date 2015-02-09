@@ -30,4 +30,4 @@ README[.]md
 ^[.]test
 ^[.]check
 ^[.]BatchJobs.R
-
+^async[0-9]+-files

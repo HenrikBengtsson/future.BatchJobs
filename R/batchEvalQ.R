@@ -13,9 +13,13 @@
 #'
 #' @return Job IDs.
 #'
+#' @seealso This function is \pkg{BatchJobs}'s analogy to
+#' \code{parallel::clusterEvalQ()} and \code{parallel::clusterExport()}
+#' if globals are passed along as well.
+#'
 #' @export
-#' @importFrom BatchJobs batchExport batchMap
-batchEval <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
+#' @importFrom BatchJobs batchExport batchMap addRegistryPackages
+batchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
   ## Identify globals?
   if (isTRUE(globals)) {
     globals <- getGlobals(exprs, envir=envir, unlist=TRUE)
@@ -63,4 +67,4 @@ batchEval <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
     eval(expr, envir=envir)
   }
   ids <- batchMap(reg, fun=fun, exprs, ...)
-} # batchEval()
+} # batchEvalQ()

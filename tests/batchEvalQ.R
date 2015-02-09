@@ -12,7 +12,7 @@ exprs <- list(
   B = substitute({ Sys.sleep(5); y <- 0.2 }),
   B = substitute({ Sys.sleep(5); z <- a+0.3 })
 )
-ids <- batchEval(reg, exprs=exprs)
+ids <- batchEvalQ(reg, exprs=exprs)
 mprint(ids)
 
 res <- submitJobs(reg, ids=ids)
