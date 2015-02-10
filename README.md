@@ -31,7 +31,7 @@ multi-core system:
 
 
 ### Evaluation is done in a "local" environment
-Each _asynchronous expression_ is evaluated in its own unique _asynchronous environment_, which is different from the calling environment.  The only way to transfer information from the asynchronous environment to the calling environment, is via the (return) value, just as when functions are called and their values are returned.   In other words,
+Each _asynchronous expression_ is evaluated in its own unique _asynchronous environment_, which is different from the calling environment.  The only way to transfer information from the asynchronous environment to the calling environment is via the (return) value, just as when functions are called and their values are returned.   In other words,
 
 ```r
 x %<=% { a <- 3.14 }
@@ -43,7 +43,7 @@ is effectively equivalent to
 x %<=% local({ a <- 3.14 })
 ```
 
-I both cases _asynchronous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchronous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  Asynchronous variable `a` is gone for ever.  As a matter of fact, it is _not_ possible for an asynchronous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchronous environment.
+I both cases _asynchronous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchronous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  Asynchronous variable `a` is gone forever.  As a matter of fact, it is _not_ possible for an asynchronous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchronous environment.
 
 
 ### Global variables
@@ -53,7 +53,7 @@ Although the following expression is evaluated in an asynchronous environment - 
 a <- 2
 y %<=% { b <- a*3.14; b }
 ```
-will result in `y` being assigned `6.28`.
+results in `y` being assigned `6.28`.
 
 If a global variable is one that is assigned by another asynchronous expression, then dependent asynchronous expressions will wait for the former to complete in order to resolve the global variables.  For example, in
 ```r
@@ -98,7 +98,7 @@ This will evaluate the expression for `c` asynchronously such that `d` is assign
 
 
 ## Other types of asynchronous assignments
-The `%<=%` assignment operator can _not_ be used in all cases where regular `<-` assignment operator can be used.  This is because `%<=%` assignments are _delayed assignment_, cf. `help("delayedAssign")`.  As shown above, `%<=%` can be used for assignment of (asynchronous) values to variables (formally symbols).  It can also be use to assign to variables in _environments_.  For example,
+The `%<=%` assignment operator _cannot_ be used in all cases where regular `<-` assignment operator can be used.  This is because `%<=%` assignments are _delayed assignment_, cf. `help("delayedAssign")`.  As shown above, `%<=%` can be used for assignment of (asynchronous) values to variables (formally symbols).  It can also be use to assign to variables in _environments_.  For example,
 ```r
 > env <- new.env()
 > env$a %<=% { 1 }
@@ -150,8 +150,8 @@ limitation of the R core package `parallel`).
 When specifying `backend("multicore")`, all available cores are used on the
 machine.  For heavy computations, this might render the machine very slow and
 useless for other things.  To avoid this, one can specify how many cores to
-"spare", e.g. `backend("multicore=-2")` will use all but two cores.
-Note how the default (see above) is `backend("multicore=-1")`.
+"spare", e.g. `backend("multicore-2")` will use all but two cores.
+Note how the default (see above) is `backend("multicore-1")`.
 As an alternative, it is also possible to specify the exact number of cores
 to be used, e.g. `backend("multicore=3")`.
 
@@ -211,7 +211,7 @@ Basic backends can be configured using the `backend()` function.
 For full control, or for more complicated backends such as clusters,
 one can use the configuration options available from the BatchJobs
 package.  In summary, this type of configuration is done via a
-`.BatchJobs.R` configuration file, that can reside in either the
+`.BatchJobs.R` configuration file that can reside in either the
 current directory or the user's home directory
 (this file is only needed on compute nodes if nested asynchronous
 calls should also use the same configuration).  These settings
