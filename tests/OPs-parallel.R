@@ -3,8 +3,9 @@ use("async")
 
 oopts <- options(warn=1, "async::debug"=FALSE)
 
-rm(list=intersect(c("x", "y"), ls()))
+backend("interactive")
 
+rm(list=intersect(c("x", "y"), ls()))
 
 message("** Delayed non-asynchronous evaluation")
 v0 %<-% { print("Starting"); y <- 1; print("Finished"); y }
@@ -29,7 +30,6 @@ stopifnot(!exists("x"))
 
 message("** Delayed asynchronous evaluation with progress bar (~5s)")
 v4 %<=% {
-  library("R.utils")
   mprintf("Processing: ")
   for (ii in 1:10) { mprintf("."); Sys.sleep(0.5) }
   mprintf(" [100%%]\n")
