@@ -72,6 +72,10 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
   delayedAssign(name, eval(call, envir=envir), assign.env=envir)
 }
 
+#' Evaluate asynchroneous expression on a specific backend
+#'
+#' @usage x %<-% { expr } %backend% backend
+#'
 #' @export
 #' @importFrom R.utils mprintf
 `%backend%` <- function(x, y) {

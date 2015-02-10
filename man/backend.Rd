@@ -11,7 +11,9 @@ backend(what = c(".BatchJobs.R", "multicore-1", "multicore", "interactive",
 \item{what}{A character vector of preferred backend to be used.}
 
 \item{...}{Named character arguments specifying custom aliases
-           for character sets of backends.}
+for character sets of backends.}
+
+\item{quietly}{If TRUE, messages are supressed.}
 }
 \value{
 Returns the name of the backend used.

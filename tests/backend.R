@@ -5,10 +5,11 @@ oopts <- options(warn=1, "async::debug"=FALSE)
 
 ## Display current backend() used
 obackend <- backend("?")
-print(obackend)
+printf("Original backend: %s\n", obackend)
 
 ## Use interactive backend
 backend("interactive")
+printf("Current backend: %s\n", backend("?"))
 
 a <- 3.14
 x %<=% { a }
@@ -17,6 +18,7 @@ stopifnot(x == a)
 
 ## Use 'multicore', if available, otherwise 'local'
 backend(c("multicore", "local"))
+printf("Current backend: %s\n", backend("?"))
 
 y %<=% { 2*a }
 printf("y=%g\n", y)
@@ -25,7 +27,9 @@ stopifnot(y == 2*a)
 
 ## Switch back to the orginal settings
 backend(obackend)
-stopifnot(backend("?") == obackend)
+printf("Current backend: %s\n", backend("?"))
+if (!"covr" %in% loadedNamespaces())
+  stopifnot(backend("?") == obackend)
 
 z %<=% { y / 2 }
 printf("z=%g\n", z)
@@ -34,6 +38,7 @@ stopifnot(z == x)
 
 ## Create a backend aliases
 backend("spare"=c("multicore-2", "local"))
+printf("Current backend: %s\n", backend("?"))
 
 x %<=% { y / 2 } %backend% "interactive"
 y %<=% { 2*a } %backend% "local"
@@ -47,8 +52,11 @@ stopifnot(z == x)
 
 
 ## Assert that the original backend is still in use
-stopifnot(backend("?") == obackend)
+printf("Current backend: %s\n", backend("?"))
+if (!"covr" %in% loadedNamespaces())
+  stopifnot(backend("?") == obackend)
 
-## Undo options
+## Undo everything
+backend(obackend)
+printf("Backend was reset to: %s\n", backend("?"))
 options(oopts)
-

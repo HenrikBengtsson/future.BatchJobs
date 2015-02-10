@@ -3,6 +3,7 @@
 #' @param what A character vector of preferred backend to be used.
 #' @param ... Named character arguments specifying custom aliases
 #'            for character sets of backends.
+#' @param quietly If TRUE, messages are supressed.
 #'
 #' @return Returns the name of the backend used.
 #'
@@ -61,7 +62,6 @@ backend <- local({
     ## Expand aliases
     if (length(aliases) > 0L) {
       names <- names(aliases)
-      str(aliases)
       what <- lapply(what, FUN=function(what) {
         if (what %in% names) aliases[[what]] else what
       })
