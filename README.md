@@ -156,16 +156,15 @@ backend("cluster")
 ```
 
 
-### Specifying backend per asynchroneous evaluation [TODO]
-_The following is not implemented:_
-
+### Specifying backend per asynchroneous evaluation
+Asynchroneous expressions are processed by the default backend as given by `backend("?")`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
 ```r
-a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore"
+a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore-2"
 b %<=% { Sys.sleep(2); rnorm(1) } %backend% "cluster"
 c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
-
+In this case expression `a` will be processed by the `multicore-2` backend, expression `c` by the `cluster` backend, and expression `c` by the default backend.
 
 
 ## Availability
