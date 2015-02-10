@@ -5,10 +5,13 @@
 \title{Switch backend to be used for asynchronous processing}
 \usage{
 backend(what = c(".BatchJobs.R", "multicore-1", "multicore", "interactive",
-  "local", "rscript"))
+  "local", "rscript"), ...)
 }
 \arguments{
 \item{what}{A character vector of preferred backend to be used.}
+
+\item{...}{Named character arguments specifying custom aliases
+           for character sets of backends.}
 }
 \value{
 Returns the name of the backend used.

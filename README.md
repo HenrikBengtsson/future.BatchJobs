@@ -109,12 +109,14 @@ The asynchroneous evaluation done by the [async] package uses the [BatchJobs] pa
 * `backend("local")` - non-parallel processing in a separate R process.
 * `backend("interactive")` - non-parallel processing in the
    current R session.
+* `backend(".BatchJobs.R")` - use `.BatchJobs.R` configuration file.
 
 It is possible to specify a set of possible backends,
 e.g. `backend(c("multicore", "interactive")`.  The first
-available/supported backend will be used.  If none works,
-the fallback is to always use the `"interactive"` backend
-which is available on all systems.
+available/supported backend will be used.
+
+If none of the requested backends work/are supported, the fallback is
+always to use the `"interactive"` which is available on all systems.
 
 
 ### Multi-core processing
@@ -138,14 +140,31 @@ The default is to use such configuration files, if available.  To
 explicitly use such backend configurations, use `backend(".BatchJobs.R")`.
 
 
+### Backend aliases
+It is possible create aliases to favorite sets of backends.  For instance,
+```r
+backend(cluster=c(".BatchJobs.R", "multicore", "local"))
+```
+creates backend alias `"cluster"` using whatever BatchJobs
+configuration file is available with fallbacks to `"multicore"`
+and `"local"`.  After setting an alias it can be specified as:
+```r
+backend("cluster")
+```
+
+
 ### Specifying backend per asynchroneous evaluation [TODO]
+_The following is not implemented:_
+
 ```r
 a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore"
 b %<=% { Sys.sleep(2); rnorm(1) } %backend% ".BatchJobs.R"
 c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
-
 ```
+
+TODO: Add support for custom aliases, e.g. `backend("cluster")` to
+mean `backend(".BatchJobs.R")`.
 
 
 ## Availability
