@@ -85,15 +85,23 @@ d <- runif(1)
 This will evaluate the expression for `c` ansynchroneously such that `d` is assigned almost momentarily.  In turn, the value for `c` will be resolved when _nested ansynchroneous expressions_ for local variables `a` and `b` have been evaluated.
 
 
-## Limitations
-The `%<=%` assignment can only be used to assign variables to environments.  It is not possible to assign the value of an asynchroneous expression to, say, a list element.  If tried, an informative error will be generated, e.g.
-
+## Other types of asynchroneous assignments
+The `%<=%` assignment operator can _not_ be used in all cases where regular `<-` assignment operator can be used.  This is because `%<=%` assignments are _delayed assigment_, cf. `help("delayedAssign")`.  As shown above, `%<=%` can be used for assignment of (asynchroneous) values to variables (formally symbols).  It can also be use to assign to variables in _environments_.  For example,
 ```r
+> env <- new.env()
+> env$a %<=% { 1 }
+> env[["b"]] %<=% { 2 }
+> name <- "c"
+> env[[name]] %<=% { 3 }
+```
+
+### Limitations
+The limitations of delayed asynchroneous assignments are the same as the limitations that `assign()` has, i.e. you can assign to variables and you can specify the target environment.  This means that you, for instance, cannot assign to an element of a vector, matrix, list or a data.frame.  If tried, an informative error will be generated, e.g.
+```r
+> x <- list()
 > x[[1]] %<=% { 1 }
 Error: Not a valid variable name for delayed assignments: x[[1]]
 ```
-
-This is because the assignment relies on what is referred to as a _delayed assigment_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.  This is also very much like the limitations on what can be assigned via `assign()`.
 
 
 ## Choosing backend
