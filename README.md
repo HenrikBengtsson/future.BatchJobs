@@ -141,7 +141,7 @@ explicitly use such backend configurations, use `backend(".BatchJobs.R")`.
 
 
 ### Backend aliases
-It is possible create aliases to favorite sets of backends.  For instance,
+It is possible to create aliases for favorite sets of backends.  For instance,
 ```r
 backend(cluster=c(".BatchJobs.R", "multicore", "local"))
 ```
