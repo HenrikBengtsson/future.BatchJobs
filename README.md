@@ -158,13 +158,11 @@ _The following is not implemented:_
 
 ```r
 a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore"
-b %<=% { Sys.sleep(2); rnorm(1) } %backend% ".BatchJobs.R"
+b %<=% { Sys.sleep(2); rnorm(1) } %backend% "cluster"
 c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
 
-TODO: Add support for custom aliases, e.g. `backend("cluster")` to
-mean `backend(".BatchJobs.R")`.
 
 
 ## Availability
