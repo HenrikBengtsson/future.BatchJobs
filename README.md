@@ -1,14 +1,14 @@
-# R package async - Asynchroneous evaluation
+# R package async - Asynchronous evaluation
 
 Copyright Henrik Bengtsson, 2015
 
-## Asynchroneous evaluation
-_Asynchroneous evaluation_ is a method for evaluting multiple R
+## Asynchronous evaluation
+_Asynchronous evaluation_ is a method for evaluating multiple R
 expressions in, typically, a parallel or distributed fashion such that
 the "observed" total time for computing all values is less that if
-the expressions would be evaluated synchroneously (sequentially).
+the expressions would be evaluated synchronously (sequentially).
 
-For instance, the following evaluation, which is synchroneous, takes about 10 seconds to complete:
+For instance, the following evaluation, which is synchronous, takes about 10 seconds to complete:
 
 ```r
 > x <- { Sys.sleep(5); 3.14 }
@@ -17,7 +17,7 @@ For instance, the following evaluation, which is synchroneous, takes about 10 se
 [1] 5.85
 ```
 
-whereas the follwing _asynchroneous_ evaluation only takes
+whereas the following _asynchronous_ evaluation only takes
 about 5 seconds to complete when done on a
 multi-core system:
 
@@ -31,7 +31,7 @@ multi-core system:
 
 
 ### Evaluation is done in a "local" environment
-Each _asynchroneous expression_ is evaluated in its own unique _asynchroneous environment_, which is different from the calling environment.  The only way to transfer information from the asynchroneous environment to the calling environment, is via the (return) value, just as when functions are called and their values are returned.   In other words,
+Each _asynchronous expression_ is evaluated in its own unique _asynchronous environment_, which is different from the calling environment.  The only way to transfer information from the asynchronous environment to the calling environment, is via the (return) value, just as when functions are called and their values are returned.   In other words,
 
 ```r
 x %<=% { a <- 3.14 }
@@ -43,35 +43,49 @@ is effectively equivalent to
 x %<=% local({ a <- 3.14 })
 ```
 
-I both cases _asynchroneous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchroneous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  Asynchroneous variable `a` is gone for ever.  As a matter of fact, it is _not_ possible for an asynchroneous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchroneous environment.
+I both cases _asynchronous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchronous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  Asynchronous variable `a` is gone for ever.  As a matter of fact, it is _not_ possible for an asynchronous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchronous environment.
 
 
 ### Global variables
 
-Although the following expression is evaluated in an asynchroneous environment - separated from the calling one - the asynchroneous environment "inherits"(*) any "global" variables in the calling environment and its parents.  For example,
+Although the following expression is evaluated in an asynchronous environment - separated from the calling one - the asynchronous environment "inherits"(*) any "global" variables in the calling environment and its parents.  For example,
 ```r
 a <- 2
 y %<=% { b <- a*3.14; b }
 ```
 will result in `y` being assigned `6.28`.
 
-If a global variable is one that is assigned by another asynchroneous expression, then dependent asynchroneous expressions will wait for the former to complete in order to resolve the global variables.  For example, in
+If a global variable is one that is assigned by another asynchronous expression, then dependent asynchronous expressions will wait for the former to complete in order to resolve the global variables.  For example, in
 ```r
 a %<=% { Sys.sleep(7); runif(1) }
 b %<=% { Sys.sleep(2); rnorm(1) }
 c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
-the third asynchroneous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchroneous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).  This pause can be avoided using nested asynchronous evaluation (see Section below).
+the third asynchronous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchronous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).  This pause can be avoided using nested asynchronous evaluation (see Section below).
 
 
-_Footnotes_:
-(\*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize.  Seralized objects may also be write to file which then a compute node reads back. The global environments are identified using code inspection, cf. the [codetools] package.
-(\*\*) There is currently no lazy-evaluation mechanism for global variables from asynchroneous evaluations.  However, theoretically, one could imagine that parts of an asynchroneous expression can be evaluated while the required one is still being evaluated.  However, the current implementation is such that the asynchroneous evaluation will not be _initiated_ until all global variables can be resolved.
+_Footnotes_:  
+(\*) Since the asynchronous environment may be in a separate R session
+on a physically different machine, the "inheritance" of "global"
+variables is achieved by first identifying which variables in the
+asynchronous expression are global and then copy them from the calling
+environment to the asynchronous environment (using serialization).
+This has to be taken into consideration when working with large
+objects, which can take a substantial time to serialize.  Serialized
+objects may also be written to file which then a compute node reads
+back in. The global environments are identified using code inspection,
+cf. the [codetools] package.  
+(\*\*) There is currently no lazy-evaluation mechanism for global
+variables from asynchronous evaluations.  However, theoretically, one
+could imagine that parts of an asynchronous expression can be
+evaluated while the required one is still being evaluated.  However,
+the current implementation is such that the asynchronous evaluation
+will not be _initiated_ until all global variables can be resolved. 
 
 
-## Nested ansynchroneous evaluation
-It is possible to nest multiple levels of ansynchroneous evaluations, e.g.
+## Nested asynchronous evaluation
+It is possible to nest multiple levels of asynchronous evaluations, e.g.
 ```r
 c %<=% {
   a %<=% { Sys.sleep(7); runif(1) }
@@ -80,11 +94,11 @@ c %<=% {
 }
 d <- runif(1)
 ```
-This will evaluate the expression for `c` ansynchroneously such that `d` is assigned almost momentarily.  In turn, the value for `c` will be resolved when _nested ansynchroneous expressions_ for local variables `a` and `b` have been evaluated.
+This will evaluate the expression for `c` asynchronously such that `d` is assigned almost momentarily.  In turn, the value for `c` will be resolved when _nested asynchronous expressions_ for local variables `a` and `b` have been evaluated.
 
 
-## Other types of asynchroneous assignments
-The `%<=%` assignment operator can _not_ be used in all cases where regular `<-` assignment operator can be used.  This is because `%<=%` assignments are _delayed assigment_, cf. `help("delayedAssign")`.  As shown above, `%<=%` can be used for assignment of (asynchroneous) values to variables (formally symbols).  It can also be use to assign to variables in _environments_.  For example,
+## Other types of asynchronous assignments
+The `%<=%` assignment operator can _not_ be used in all cases where regular `<-` assignment operator can be used.  This is because `%<=%` assignments are _delayed assignment_, cf. `help("delayedAssign")`.  As shown above, `%<=%` can be used for assignment of (asynchronous) values to variables (formally symbols).  It can also be use to assign to variables in _environments_.  For example,
 ```r
 > env <- new.env()
 > env$a %<=% { 1 }
@@ -94,7 +108,7 @@ The `%<=%` assignment operator can _not_ be used in all cases where regular `<-`
 ```
 
 ### Limitations
-The limitations of delayed asynchroneous assignments are the same as the limitations that `assign()` has, i.e. you can assign to variables and you can specify the target environment.  This means that you, for instance, cannot assign to an element of a vector, matrix, list or a data.frame.  If tried, an informative error will be generated, e.g.
+The limitations of delayed asynchronous assignments are the same as the limitations that `assign()` has, i.e. you can assign to variables and you can specify the target environment.  This means that you, for instance, cannot assign to an element of a vector, matrix, list or a data.frame.  If tried, an informative error will be generated, e.g.
 ```r
 > x <- list()
 > x[[1]] %<=% { 1 }
@@ -103,7 +117,7 @@ Error: Not a valid variable name for delayed assignments: x[[1]]
 
 
 ## Choosing backend
-The asynchroneous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using the `backend()` function.  Examples:
+The asynchronous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using the `backend()` function.  Examples:
 
 * `backend()` - use `.BatchJobs.R` configuration file, if available.
    If not, use `"multicore-1"` if supported,
@@ -162,8 +176,8 @@ backend("cluster")
 ```
 
 
-### Evaluate asynchroneous expression on specific backend
-Asynchroneous expressions are processed by the default backend as given by `backend("?")`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
+### Evaluate asynchronous expression on specific backend
+Asynchronous expressions are processed by the default backend as given by `backend("?")`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
 ```r
 a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore-2"
 b %<=% { Sys.sleep(2); rnorm(1) } %backend% "cluster"
@@ -172,7 +186,7 @@ d <- runif(1)
 ```
 In this case expression `a` will be processed by the `multicore-2` backend, expression `c` by the `cluster` backend, and expression `c` by the default backend.
 
-Backend specifications can also be used in nested asynchroneous evaluations:
+Backend specifications can also be used in nested asynchronous evaluations:
 ```r
 backend("cluster")
 a %<=% { Sys.sleep(7); runif(1) }
@@ -199,7 +213,7 @@ one can use the configuration options available from the BatchJobs
 package.  In summary, this type of configuration is done via a
 `.BatchJobs.R` configuration file, that can reside in either the
 current directory or the user's home directory
-(this file is only needed on compute nodes if nested asynchroneous
+(this file is only needed on compute nodes if nested asynchronous
 calls should also use the same configuration).  These settings
 are used by default if available.  They also be explicitly specified
 by `backend(".BatchJobs.R")`.
