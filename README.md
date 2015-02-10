@@ -202,9 +202,7 @@ cluster.functions <- async::makeClusterFunctionsLocal()
 
 #### Parallel multi-core processing (on local machine)
 ```r
-cluster.functions <- makeClusterFunctionsMulticore(
-  ncpus=parallel::detectCores()
-)
+cluster.functions <- makeClusterFunctionsMulticore()
 ```
 
 #### Distributed processing (on known machines)
