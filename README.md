@@ -8,7 +8,7 @@ expressions in, typically, a parallel or distributed fashion such that
 the "observed" total time for computing all values is less that if
 the expressions would be evaluated synchroneously (sequentially).
 
-For instance, the following evaluation, which is synchroneous, takes approximately 10 seconds to complete:
+For instance, the following evaluation, which is synchroneous, takes about 10 seconds to complete:
 
 ```r
 > x <- { Sys.sleep(5); 3.14 }
@@ -18,7 +18,7 @@ For instance, the following evaluation, which is synchroneous, takes approximate
 ```
 
 whereas the follwing _asynchroneous_ evaluation only takes
-approximately 5 seconds to complete when done on a
+about 5 seconds to complete when done on a
 multi-core system:
 
 ```r
@@ -43,9 +43,7 @@ is effectively equivalent to
 x %<=% local({ a <- 3.14 })
 ```
 
-I both cases _asynchroneous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchroneous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.
-
-As a matter of fact, it is _not_ possible for an asynchroneous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchroneous environment.
+I both cases _asynchroneous variable_ 'a' with be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchroneous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  Asynchroneous variable `a` is gone for ever.  As a matter of fact, it is _not_ possible for an asynchroneous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchroneous environment.
 
 
 ### Global variables
@@ -206,24 +204,7 @@ calls should also use the same configuration).  These settings
 are used by default if available.  They also be explicitly specified
 by `backend(".BatchJobs.R")`.
 
-Below are some examples of `.BatchJobs.R` configuration scripts.
-
-#### Non-parallel interactive processing (default)
-```r
-cluster.functions <- makeClusterFunctionsInteractive()
-```
-
-#### Non-parallel non-interactive processing (via Rscript)
-```r
-cluster.functions <- async::makeClusterFunctionsLocal()
-```
-
-#### Parallel multi-core processing (on local machine)
-```r
-cluster.functions <- makeClusterFunctionsMulticore()
-```
-
-#### Distributed processing (on known machines)
+For example, to configure BatchJobs to distribute computations on a set of known machines (for which you have ssh access), let the `.BatchJobs.R` file contain:
 ```r
 cluster.functions <- makeClusterFunctionsSSH(
   makeSSHWorker(nodename="n6", max.jobs=2),
@@ -232,14 +213,14 @@ cluster.functions <- makeClusterFunctionsSSH(
 )
 ```
 
-#### Distributed processing (on a Torque/PBS cluster)
+To use a more formal cluster system with a Torque/PBS job queue mechanism, use:
 ```r
 cluster.functions <- local({
-  file <- system.file(package="async", "config", "pbs.tmpl")
-  makeClusterFunctionsTorque(file)
+  tmpl <- system.file(package="async", "config", "pbs.tmpl")
+  makeClusterFunctionsTorque(tmpl)
 })
 ```
-
+where the "tmpl" file is a [brew]-embedded PBS script template.
 
 For further details and examples on how to configure BatchJobs,
 see the [BatchJobs configuration] wiki page.
@@ -258,6 +239,7 @@ see the [BatchJobs configuration] wiki page.
 
 
 [async]: https://github.com/UCSF-CBC/async/
+[brew]: http://cran.r-project.org/package=brew
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 [codetools]: cran.r-project.org/package=codetools
