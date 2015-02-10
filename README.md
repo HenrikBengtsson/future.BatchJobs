@@ -166,6 +166,16 @@ d <- runif(1)
 ```
 In this case expression `a` will be processed by the `multicore-2` backend, expression `c` by the `cluster` backend, and expression `c` by the default backend.
 
+Backend specifications can also be used in nested asynchroneous evaluations:
+```r
+backend("cluster")
+a %<=% { Sys.sleep(7); runif(1) }
+c %<=% {
+  b %<=% { Sys.sleep(2); rnorm(1) } %backend% "multicore=2"
+  x <- a*b; Sys.sleep(2); abs(x)
+}
+d <- runif(1)
+```
 
 ## Availability
 This package is only available via GitHub.  Install in R as:
