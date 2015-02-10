@@ -107,6 +107,7 @@ error <- function(...) UseMethod("error")
 #' @return A character vector.
 #'
 #' @export
+#' @importFrom BatchJobs getStatus
 status.AsyncTask <- function(obj, ...) {
   backend <- obj$backend
   reg <- backend$reg
@@ -186,7 +187,7 @@ await <- function(...) UseMethod("await")
 #' @export
 #' @importFrom R.methodsS3 throw
 #' @importFrom R.utils mprint mprintf mstr
-#' @importFrom BatchJobs getStatus getErrorMessages loadResult removeRegistry
+#' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   throw <- R.methodsS3::throw
 
