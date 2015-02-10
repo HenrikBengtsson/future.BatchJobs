@@ -157,8 +157,8 @@ to be used, e.g. `backend("multicore=3")`.
 
 
 ### Advanced configuration
-For more complicated backends (e.g. clusters), one has to use BatchJobs
-specific configuration files, which is explained in the Appendix.
+For more complicated backends (e.g. clusters), one has to use
+BatchJobs-specific configuration files as explained in the Appendix.
 The default is to use such configuration files, if available.  To
 explicitly use such backend configurations, use `backend(".BatchJobs.R")`.
 
