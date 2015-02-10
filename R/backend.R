@@ -13,15 +13,29 @@
 #' @export
 #' @importFrom parallel detectCores
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
+#' @importFrom R.utils use
 backend <- local({
   aliases = list()
+  last = NULL
 
   function(what=c(".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript"), ...) {
+    ## Attach BatchJobs here, because it will attach itself later
+    ## anyways and then it will load its own default settings and
+    ## override whatever settings we use here.
+    use("BatchJobs")
+
     ## Imported functions
     ns <- getNamespace("BatchJobs")
     getBatchJobsConf <- get("getBatchJobsConf", mode="function", envir=ns)
     assignConf <- get("assignConf", mode="function", envir=ns)
     readConfs <- get("readConfs", mode="function", envir=ns)
+
+
+    ## What was the last backend assigned?
+    if (is.null(what) || identical(what, NA) || identical(what, "?")) {
+      return(last)
+    }
+
 
     ## Set custom aliases?
     custom <- list(...)
@@ -138,6 +152,9 @@ backend <- local({
 
     ## Use it?
     assignConf(conf)
+
+    ## Record last used
+    last <<- what
 
     what
   }

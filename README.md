@@ -118,6 +118,9 @@ available/supported backend will be used.
 If none of the requested backends work/are supported, the fallback is
 always to use the `"interactive"` which is available on all systems.
 
+To see what the most recently set backend was, use `backend("?")`.
+
+
 
 ### Multi-core processing
 Multi-core processing is when multiple R processes are used (instead of the
