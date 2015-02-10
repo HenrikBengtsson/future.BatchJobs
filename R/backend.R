@@ -95,6 +95,8 @@ backend <- local({
 
     if (what == ".BatchJobs.R") {
       readConfs()
+      ## Record last used
+      last <<- what
       return(what)
     }
 
