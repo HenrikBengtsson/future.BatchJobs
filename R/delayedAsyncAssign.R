@@ -25,37 +25,87 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
   delayedAssign(name, await(env$job, cleanup=TRUE), eval.env=env, assign.env=assign.env)
 }
 
-.asAssignName <- function(name) {
-  if (is.symbol(name)) {
-    name <- deparse(name)
+.asAssignTarget <- function(expr, envir=parent.frame()) {
+  res <- list(envir=envir, name=NULL)
+
+  if (is.symbol(expr)) {
+    ## Assignment to variable specified as a symbol
+    name <- deparse(expr)
+    res$name <- name
   } else {
-    n <- length(name)
-    name <- paste(deparse(name), collapse="")
-    if (n == 0L) {
-      stop("Not a valid variable name: ", name, call.=FALSE)
-    } else if (n > 1L) {
+    n <- length(expr)
+    name <- paste(deparse(expr), collapse="")
+    if (n != 1L && n != 3L) {
       stop("Not a valid variable name for delayed assignments: ", name, call.=FALSE)
     }
-    str(name)
-    if (!grepl("^[.a-zA-Z]", name)) {
-      stop("Not a valid variable name: ", name, call.=FALSE)
+
+    if (n == 1L) {
+      ## Assignment to a variable name
+      if (!grepl("^[.a-zA-Z]", name)) {
+        stop("Not a valid variable name: ", name, call.=FALSE)
+      }
+      res$name <- name
+    } else if (n == 3L) {
+      ## Assignment to enviroment via $ and [[
+      op <- expr[[1]]
+      if (op == "$" || op == "[[") {
+        ## Subset
+        idx <- expr[[3]]
+        if (is.symbol(idx)) {
+          idx <- deparse(idx)
+          if (op == "[[") {
+            if (!exists(idx, envir=envir, inherits=TRUE)) {
+              stop(sprintf("Object %s not found: %s", sQuote(idx), name), call.=FALSE)
+            }
+            idx <- get(idx, envir=envir, inherits=TRUE)
+          }
+        }
+        if (is.character(idx)) {
+        } else {
+          stop(sprintf("Invalid subset %s: %s", sQuote(deparse(idx)), name), call.=FALSE)
+        }
+        res$name <- idx
+
+        ## Target
+        objname <- deparse(expr[[2]])
+        if (!exists(objname, envir=envir, inherits=TRUE)) {
+          stop(sprintf("Object %s not found: %s", sQuote(objname), name), call.=FALSE)
+        }
+        obj <- get(objname, envir=envir, inherits=TRUE)
+        if (is.environment(obj)) {
+        } else {
+          stop(sprintf("Delayed assignments can not be done to a %s; only to variables and environments: %s", sQuote(mode(obj)), name), call.=FALSE)
+        }
+        res$envir <- obj
+      } else {
+        stop("Not a valid target for delayed assignments: ", name, call.=FALSE)
+      }
     }
   }
-  name
+
+  ## Sanity check
+  stopifnot(is.environment(res$envir))
+  stopifnot(is.character(res$name))
+
+  res
 }
 
 `%<=%` <- function(x, value) {
-  name <- substitute(x)
-  name <- .asAssignName(name)
+  envir <- parent.frame(1)
+  target <- .asAssignTarget(substitute(x), envir=envir)
+  assign.env <- target$envir
+  name <- target$name
   expr <- substitute(value)
-  delayedAsyncAssign(name, expr, assign.env=parent.frame(1))
+  delayedAsyncAssign(name, expr, assign.env=assign.env)
 }
 
 `%=>%` <- function(x, value) {
-  name <- substitute(x)
-  name <- .asAssignName(name)
+  envir <- parent.frame(1)
+  target <- .asAssignTarget(substitute(x), envir=envir)
+  assign.env <- target$envir
+  name <- target$name
   expr <- substitute(x)
-  delayedAsyncAssign(name, expr, assign.env=parent.frame(1))
+  delayedAsyncAssign(name, expr, assign.env=assign.env)
 }
 
 #' Delayed synchroneous evaluation
@@ -64,12 +114,13 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
 #'
 #' @export
 `%<-%` <- function(x, value) {
-  name <- substitute(x)
-  name <- .asAssignName(name)
+  envir <- parent.frame(1)
+  target <- .asAssignTarget(substitute(x), envir=envir)
+  assign.env <- target$envir
+  name <- target$name
   expr <- substitute(value)
   call <- substitute(local(a), list(a=expr))
-  envir <- parent.frame(1)
-  delayedAssign(name, eval(call, envir=envir), assign.env=envir)
+  delayedAssign(name, eval(call, envir=envir), assign.env=assign.env)
 }
 
 #' Evaluate asynchroneous expression on a specific backend
@@ -92,4 +143,3 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
 
   eval(lhs, envir=envir)
 }
-
