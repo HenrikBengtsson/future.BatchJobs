@@ -18,7 +18,7 @@ backend <- local({
   aliases = list()
   last = NULL
 
-  function(what=c(".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript"), ...) {
+  function(what=c(".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript"), ..., quietly=TRUE) {
     ## Attach BatchJobs here, because it will attach itself later
     ## anyways and then it will load its own default settings and
     ## override whatever settings we use here.
@@ -94,7 +94,11 @@ backend <- local({
     }
 
     if (what == ".BatchJobs.R") {
-      readConfs()
+      if (quietly) {
+        suppressPackageStartupMessages(readConfs())
+      } else {
+        readConfs()
+      }
       ## Record last used
       last <<- what
       return(what)
@@ -213,4 +217,3 @@ hasUserClusterFunctions <- function(debug=FALSE) {
 
   exists("cluster.functions", mode="list", envir=config)
 }
-

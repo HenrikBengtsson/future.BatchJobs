@@ -71,3 +71,21 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
   envir <- parent.frame(1)
   delayedAssign(name, eval(call, envir=envir), assign.env=envir)
 }
+
+#' @export
+#' @importFrom R.utils mprintf
+`%backend%` <- function(x, y) {
+  lhs <- substitute(x)
+  backend <- y
+  envir <- parent.frame(1)
+
+  ## Temporary use a different backend
+  obackend <- backend("?")
+  on.exit(backend(obackend, quietly=TRUE))
+  what <- backend(backend)
+##  mprintf("Using backend: '%s'\n", what)
+##  mprintf("Previous backend: '%s'\n", obackend)
+
+  eval(lhs, envir=envir)
+}
+
