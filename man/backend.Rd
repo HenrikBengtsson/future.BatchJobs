@@ -4,8 +4,8 @@
 \alias{backend}
 \title{Switch backend to be used for asynchronous processing}
 \usage{
-backend(what = c("multicore-1", "multicore", "interactive", "local",
-  "rscript"))
+backend(what = c(".BatchJobs.R", "multicore-1", "multicore", "interactive",
+  "local", "rscript"))
 }
 \arguments{
 \item{what}{A character vector of preferred backend to be used.}

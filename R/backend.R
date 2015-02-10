@@ -11,21 +11,29 @@
 #' @export
 #' @importFrom parallel detectCores
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
-backend <- function(what=c("multicore-1", "multicore", "interactive", "local", "rscript")) {
+backend <- function(what=c(".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript")) {
   ## Imported functions
   ns <- getNamespace("BatchJobs")
   getBatchJobsConf <- get("getBatchJobsConf", mode="function", envir=ns)
   assignConf <- get("assignConf", mode="function", envir=ns)
+  readConfs <- get("readConfs", mode="function", envir=ns)
+
+  explicit_what <- !missing(what)
 
   dropped <- NULL
+
+  ## Is .BatchJobs.R configuration available?
+  if (length(what) > 0L && what[1L] == ".BatchJobs.R") {
+    if (!hasUserClusterFunctions()) {
+      dropped <- c(dropped, what[1L])
+      what <- what[-1L]
+    }
+  }
+
   ## Multicore processing is not supported on Windows :(
   if (.Platform$OS == "windows") {
-    if (!missing(what)) {
-      if (any(grepl("^multicore", what))) {
-        dropped <- grep("^multicore", what, value=TRUE)
-      }
-    }
-    what <- grep("^multicore", what, invert=TRUE, value=TRUE)
+    dropped <- c(dropped, grep("^multicore", what, value=TRUE))
+    what <- setdiff(what, dropped)
   }
 
   ## Always fall back to using the 'interactive' configuration
@@ -35,12 +43,16 @@ backend <- function(what=c("multicore-1", "multicore", "interactive", "local", "
   what <- what[1L]
 
   ## Inform about dropped requests?
-  if (length(dropped) > 0L) {
-    warning(sprintf("Some of the preferred backends (%s) are not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS, sQuote(what)))
+  if (length(dropped) > 0L && explicit_what) {
+    warning(sprintf("Some of the preferred backends (%s) are either not available or not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS, sQuote(what)))
+  }
+
+  if (what == ".BatchJobs.R") {
+    readConfs()
+    return(what)
   }
 
   conf <- getBatchJobsConf()
-
   if (grepl("^multicore", what)) {
     ncpus0 <- detectCores()
     if (grepl("^multicore=", what)) {
@@ -130,12 +142,16 @@ makeClusterFunctionsRscript <- function(parallel=FALSE) {
 
 # Check whether user specifies 'cluster.functions' in one of
 # the .BatchJobs.R files that BatchJobs loads.
-hasUserClusterFunctions <- function() {
+#
+#' @importFrom R.utils mprint
+hasUserClusterFunctions <- function(debug=FALSE) {
   ns <- getNamespace("BatchJobs")
   findConfigs <- get("findConfigs", mode="function", envir=ns)
   sourceConfFiles <- get("sourceConfFiles", mode="function", envir=ns)
 
   pathnames <- findConfigs()
+  pathnames <- pathnames[basename(pathnames) != "BatchJobs_global_config.R"]
+  if (debug) mprint(pathnames)
 
   suppressPackageStartupMessages({
     config <- sourceConfFiles(pathnames)

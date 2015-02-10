@@ -18,7 +18,7 @@ For instance, the following evaluation, which is synchroneous, takes approximate
 ```
 
 whereas the follwing _asynchroneous_ evaluation only takes
-approximately 5 seconds to complete when done on a 
+approximately 5 seconds to complete when done on a
 multi-core system:
 
 ```r
@@ -67,8 +67,8 @@ d <- runif(1)
 the third asynchroneous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchroneous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).  This pause can be avoided using nested asynchronous evaluation (see Section below).
 
 
-_Footnotes_:  
-(\*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize.  Seralized objects may also be write to file which then a compute node reads back. The global environments are identified using code inspection, cf. the [codetools] package.  
+_Footnotes_:
+(\*) Since the asynchroneous environment may be in a separate R session on a physically different machine, the "inheritance" of "global" variables is achieved by first identifying which variables in the asynchroneous expression are global and then copy them from the calling environment to the asynchroneous environment (using serialization).  This has to be taken into consideration when working with large objects, which can take a substational time to serialize.  Seralized objects may also be write to file which then a compute node reads back. The global environments are identified using code inspection, cf. the [codetools] package.
 (\*\*) There is currently no lazy-evaluation mechanism for global variables from asynchroneous evaluations.  However, theoretically, one could imagine that parts of an asynchroneous expression can be evaluated while the required one is still being evaluated.  However, the current implementation is such that the asynchroneous evaluation will not be _initiated_ until all global variables can be resolved.
 
 
@@ -96,14 +96,26 @@ Error: Not a valid variable name for delayed assignments: x[[1]]
 This is because the assignment relies on what is referred to as a _delayed assigment_, which can only be used to assign stand-alone variables, cf. `help("delayedAssign")`.  This is also very much like the limitations on what can be assigned via `assign()`.
 
 
-## Configuration of backends
+## Choosing backend
 The asynchroneous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using the `backend()` function.  Examples:
 
-* `backend()` - (default) use `"multicore-1"` iff available, otherwise `"interactive"`
-* `backend("multicore")` - parallel processing using all available cores on the local machine.
-* `backend("multicore-1")` - parallel processing using all but one of the available cores on the local machine.
+* `backend()` - use `.BatchJobs.R` configuration file, if available.
+   If not, use `"multicore-1"` if supported,
+   otherwise `"interactive"`
+* `backend("multicore")` - parallel processing using all available
+   cores on the local machine.
+* `backend("multicore-1")` - parallel processing using all but one
+   of the available cores on the local machine.
 * `backend("local")` - non-parallel processing in a separate R process.
-* `backend("interactive")` - non-parallel processing in the current R session.
+* `backend("interactive")` - non-parallel processing in the
+   current R session.
+
+It is possible to specify a set of possible backends,
+e.g. `backend(c("multicore", "interactive")`.  The first
+available/supported backend will be used.  If none works,
+the fallback is to always use the `"interactive"` backend
+which is available on all systems.
+
 
 ### Multi-core processing
 Multi-core processing is when multiple R processes are used (instead of the
@@ -118,8 +130,22 @@ Note how the default (see above) is `backend("multicore=-1")`.
 As an alternative, it is also possible to specify the exact number of cores
 to be used, e.g. `backend("multicore=3")`.
 
+
+### Advanced configuration
 For more complicated backends (e.g. clusters), one has to use BatchJobs
-specific configurations, which is explained in the Appendix.
+specific configuration files, which is explained in the Appendix.
+The default is to use such configuration files, if available.  To
+explicitly use such backend configurations, use `backend(".BatchJobs.R")`.
+
+
+### Specifying backend per asynchroneous evaluation [TODO]
+```r
+a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore"
+b %<=% { Sys.sleep(2); rnorm(1) } %backend% ".BatchJobs.R"
+c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
+d <- runif(1)
+
+```
 
 
 ## Availability
@@ -136,10 +162,12 @@ Basic backends can be configured using the `backend()` function.
 For full control, or for more complicated backends such as clusters,
 one can use the configuration options available from the BatchJobs
 package.  In summary, this type of configuration is done via a
-`.BatchJobs.R` configuration file, that can reside in either the 
+`.BatchJobs.R` configuration file, that can reside in either the
 current directory or the user's home directory
 (this file is only needed on compute nodes if nested asynchroneous
-calls should also use the same configuration).
+calls should also use the same configuration).  These settings
+are used by default if available.  They also be explicitly specified
+by `backend(".BatchJobs.R")`.
 
 Below are some examples of `.BatchJobs.R` configuration scripts.
 
