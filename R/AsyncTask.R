@@ -262,7 +262,6 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
       throw("BatchJobExpiration: ", msg)
     }
   } else {
-    if (debug) { assign("reg_expired", reg, envir=globalenv()) }
     throw(sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir))
   }
 
