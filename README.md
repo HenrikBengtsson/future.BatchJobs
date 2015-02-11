@@ -65,7 +65,7 @@ d <- runif(1)
 the third asynchronous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchronous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).  This pause can be avoided using nested asynchronous evaluation (see Section below).
 
 
-_Footnotes_:  
+_Footnotes_:
 (\*) Since the asynchronous environment may be in a separate R session
 on a physically different machine, the "inheritance" of "global"
 variables is achieved by first identifying which variables in the
@@ -75,13 +75,13 @@ This has to be taken into consideration when working with large
 objects, which can take a substantial time to serialize.  Serialized
 objects may also be written to file which then a compute node reads
 back in. The global environments are identified using code inspection,
-cf. the [codetools] package.  
+cf. the [codetools] package.
 (\*\*) There is currently no lazy-evaluation mechanism for global
 variables from asynchronous evaluations.  However, theoretically, one
 could imagine that parts of an asynchronous expression can be
 evaluated while the required one is still being evaluated.  However,
 the current implementation is such that the asynchronous evaluation
-will not be _initiated_ until all global variables can be resolved. 
+will not be _initiated_ until all global variables can be resolved.
 
 
 ## Nested asynchronous evaluation
@@ -113,6 +113,40 @@ The limitations of delayed asynchronous assignments are the same as the limitati
 > x <- list()
 > x[[1]] %<=% { 1 }
 Error: Not a valid variable name for delayed assignments: x[[1]]
+```
+
+## Exception handling
+If an error occurs during the evaluation of an asynchronous
+expression, that error is thrown when the asynchronous value is
+retrieved.  For example:
+```r
+> e %<=% { stop("Woops!") }
+> 1+2
+[1] 3
+> e
+Error: BatchJobError: 'Error in eval(expr, envir = envir) : Woops! '
+```
+This error is rethrown each time `e` is retrieved, so it is not
+possible to "inspect" `e` any further.  In order to troubleshoot an
+error, one can use the `task()` function to retrieve the underlying
+asynchroneous "task" object, e.g.
+```r
+> task(e)
+AsyncTask:
+Expression:
+  {
+      stop("Woops!")
+  }
+Status: 'error', 'started', 'submitted'
+Error: 'Error in eval(expr, envir = envir) : Woops! '
+Backend:
+Job registry:  async1189072551
+  Number of jobs:  1
+  Files dir: T:/async1189072551-files
+  Work dir: T:/
+  Multiple result files: FALSE
+  Seed: 544948890
+  Required packages: BatchJobs
 ```
 
 

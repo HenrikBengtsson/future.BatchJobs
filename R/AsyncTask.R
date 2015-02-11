@@ -46,6 +46,7 @@ AsyncTask <- function(expr=NULL, envir=parent.frame()) {
   ## Setup return value
   obj <- list(
     expr=expr,
+    envir=envir,
     backend=list(reg=reg, id=id)
   )
   obj <- structure(obj, class=c("AsyncTask"))
@@ -170,6 +171,13 @@ error.AsyncTask <- function(obj, ...) {
 #' @export
 await <- function(...) UseMethod("await")
 
+record <- function(...) UseMethod("record")
+
+record.AsyncTask <- function(task, name) {
+  name <- sprintf("%s.task", name)
+  assign(name, task, envir=task$envir)
+}
+
 
 #' Retrieves the value of of the asynchronously evaluated expression
 #'
@@ -210,7 +218,7 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
   final_state <- NULL
   final_state_prev <- NULL
   finish_states <- c("done", "error", "expired")
-  
+
   stat <- NULL
   tries <- 1L
   interval <- delta
@@ -255,14 +263,17 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
       res <- value(obj)
     } else if ("error" %in% stat) {
       cleanup <- FALSE
-      throw("BatchJobError: ", error(obj))
+      msg <- sprintf("BatchJobError: %s", error(obj))
+      stop(msg, call.=FALSE)
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
-      msg <- sprintf("Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      throw("BatchJobExpiration: ", msg)
+      msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
+      stop(msg, call.=FALSE)
     }
   } else {
-    throw(sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir))
+    cleanup <- FALSE
+    msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
+    stop(msg, call.=FALSE)
   }
 
   ## Cleanup?
@@ -287,3 +298,18 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
   if (inherits(y, "AsyncTask")) y <- await(y)
   x & y
 }
+
+#' Get an asynchroneous expression
+#'
+#' @param var the asynchroneous variable.
+#' @param envir the environment where to search from.
+#' @param inherits Search parent frames or not.
+#'
+#' @return An AsyncTask object
+#'
+#' @export
+task <- function(var, envir=parent.frame(), inherits=TRUE) {
+  name <- sprintf("%s.task", deparse(substitute(var)))
+  get(name, mode="list", envir=envir, inherits=inherits)
+}
+
