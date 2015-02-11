@@ -130,7 +130,7 @@ This error is rethrown each time `e` is retrieved, so it is not
 possible to "inspect" `e` any further using standard R functions such
 as `print()` and `str()`.
 In order to troubleshoot an error, one can use the `inspect()` function
-to retrieve the underlying asynchroneous "inspect" object, e.g.
+to retrieve the underlying asynchroneous "task" object, e.g.
 ```r
 > inspect(e)
 AsyncTask:
@@ -232,12 +232,53 @@ c %<=% {
 d <- runif(1)
 ```
 
+
 ## Availability
 This package is only available via GitHub.  Install in R as:
 
 ```s
 source('http://callr.org/install#HenrikBengtsson/async')
 ```
+
+## Future directions
+If it would be possible to abstract the [BatchJobs] Registry layer
+even further such that the job registry can be distributed on
+disconnected file systems and synchronized via serialization, say,
+over ssh, then one can image to do things such as:
+```r
+# The world at your R prompt
+tcga %<=% {
+  backend("cluster")
+
+  a %<=% {
+    doCRMAv2("BreastCancer", chipType="GenomeWideSNP_6")
+  }
+
+  b %<=% {
+    doCRMAv2("ProstateCancer", chipType="Mapping250K_Nsp")
+  }
+
+  list(a=a, b=b)
+} %backend% "Amazon Web Services"
+
+hapmap %<=% {
+  backend("cluster")
+
+  normals %<=% {
+    doCRMAv2("HapMap2", chipType="GenomeWideSNP_6")
+  }
+
+  normals
+} %backend% "Google Compute Engine"
+
+
+task %<=% {
+  backup_machine()
+} %backend% "@home"
+```
+Obviously great care needs to be taken in order to minimize the amount
+of data sent back and forth, e.g. returning really large objects.
+  
 
 ## Appendix
 
