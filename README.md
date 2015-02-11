@@ -129,10 +129,10 @@ Error: BatchJobError: 'Error in eval(expr, envir = envir) : Woops! '
 This error is rethrown each time `e` is retrieved, so it is not
 possible to "inspect" `e` any further using standard R functions such
 as `print()` and `str()`.
-In order to troubleshoot an error, one can use the `task()` function
-to retrieve the underlying asynchroneous "task" object, e.g.
+In order to troubleshoot an error, one can use the `inspect()` function
+to retrieve the underlying asynchroneous "inspect" object, e.g.
 ```r
-> task(e)
+> inspect(e)
 AsyncTask:
 Expression:
   {

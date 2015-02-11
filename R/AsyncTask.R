@@ -299,16 +299,16 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
   x & y
 }
 
-#' Get an asynchroneous expression
+#' Inspect an asynchroneous variable
 #'
-#' @param var the asynchroneous variable.
+#' @param var the variable.
 #' @param envir the environment where to search from.
 #' @param inherits Search parent frames or not.
 #'
 #' @return An AsyncTask object
 #'
 #' @export
-task <- function(var, envir=parent.frame(), inherits=TRUE) {
+inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
   name <- sprintf("%s.task", deparse(substitute(var)))
   get(name, mode="list", envir=envir, inherits=inherits)
 }
