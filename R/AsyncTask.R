@@ -118,6 +118,7 @@ status.AsyncTask <- function(obj, ...) {
   status <- (unlist(status) == 1L)
   status <- status[status]
   status <- sort(names(status))
+  status <- setdiff(status, c("n"))
   status
 } # status()
 
@@ -194,24 +195,54 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
   maxTries <- as.integer(maxTries)
 
   debug <- getOption("async::debug", FALSE)
-  if (debug) mprintf("Polling...")
+  if (debug) mprintf("Polling...\n")
 
   expr <- obj$expr
   backend <- obj$backend
   reg <- backend$reg
   id <- backend$id
 
-  finished <- FALSE
+  ## It appears that occassionally a job can shown as 'expired'
+  ## just before becoming 'done'.  It's odd and should be reported
+  ## but here's a workaround that won't trust 'expired' without
+  ## confirming it several times with delay.
+  final_countdown <- 5L
+  final_state <- NULL
+  final_state_prev <- NULL
+  finish_states <- c("done", "error", "expired")
+  
   stat <- NULL
   tries <- 1L
   interval <- delta
+  finished <- FALSE
   while (tries <= maxTries) {
     stat <- status(obj)
-    if (any(c("done", "error", "expired") %in% stat)) {
-      finished <- TRUE
-      break
+    if (debug) mprintf(" Status %d: %s\n", tries, paste(stat, collapse=", "))
+    if (any(finish_states %in% stat)) {
+      final_state <- intersect(stat, finish_states)
+
+      ## ROBUSTNESS: Don't trust a single 'expired' status.
+      ## Need to see that several times before believing it.
+      ## See BatchJobs Issue #70.
+      if ("expired" %in% final_state) {
+        if (!identical(final_state, final_state_prev)) {
+          final_state_prev <- final_state
+    	  final_countdown <- 5L
+          interval <- delta
+  	  maxTries <- maxTries + final_countdown
+        } else {
+          final_countdown <- final_countdown - 1L
+          if (debug) mprintf(" 'expired' status countdown: %d\n", final_countdown)
+          if (final_countdown == 0L) {
+            finished <- TRUE
+            break
+  	  }
+        }
+      } else {
+        finished <- TRUE
+        break
+      }
     }
-    if (debug) { mprintf("\n"); mprint(stat) }
     Sys.sleep(interval)
     interval <- alpha*interval
     tries <- tries + 1L
@@ -227,11 +258,12 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
       throw("BatchJobError: ", error(obj))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
-      msg <- "<expired>"
+      msg <- sprintf("Job of registry '%s' expired: %s", reg$id, reg$file.dir)
       throw("BatchJobExpiration: ", msg)
     }
   } else {
-    throw(sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries, interval, reg$id, reg$file.dir))
+    if (debug) { assign("reg_expired", reg, envir=globalenv()) }
+    throw(sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir))
   }
 
   ## Cleanup?
