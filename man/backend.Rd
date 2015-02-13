@@ -9,6 +9,7 @@ backend(what = NULL, ..., quietly = TRUE)
 \arguments{
 \item{what}{A \code{character} \code{vector} of preferred backend to be used.
 If \code{NULL}, the currently default backend is returned.
+If \code{"aliases"}, all registered aliases are returned.
 If \code{"default"}, the default backend according to alias
    \code{"default"} is used (see below).
 If \code{"reset"}, the backend is reset to \code{"default"}.}
@@ -19,7 +20,7 @@ for character sets of backends.}
 \item{quietly}{If TRUE, messages are supressed.}
 }
 \value{
-Returns the name of the backend used.
+Returns the name of the backend used, or a list of named aliases.
 }
 \description{
 Switch backend to be used for asynchronous processing
@@ -33,7 +34,9 @@ an informative warning will be given.
 
 A backend alias is single character representing a character vector
 of backend strings.  Aliases can be set by specifying a named
-character vector.  From start, there is a single alias:
+character vector, e.g. \code{backend(spare=c("multicore-2", "local"))}.
+To list all registered aliases, use \code{backend("aliases")}.
+From start, there is a single alias:
 \itemize{
  \item{\code{default = c(".BatchJobs.R", "multicore-1", "multicore",
                          "interactive", "local", "rscript")}}

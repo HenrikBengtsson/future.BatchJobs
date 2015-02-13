@@ -3,6 +3,7 @@
 #' @param what
 #'   A \code{character} \code{vector} of preferred backend to be used.
 #'   If \code{NULL}, the currently default backend is returned.
+#'   If \code{"aliases"}, all registered aliases are returned.
 #'   If \code{"default"}, the default backend according to alias
 #'      \code{"default"} is used (see below).
 #'   If \code{"reset"}, the backend is reset to \code{"default"}.
@@ -10,7 +11,7 @@
 #'            for character sets of backends.
 #' @param quietly If TRUE, messages are supressed.
 #'
-#' @return Returns the name of the backend used.
+#' @return Returns the name of the backend used, or a list of named aliases.
 #'
 #' @note The Windows operating system does not support the 'multicore'
 #' backend, which then will be ignored.  If explicitly specified, then
@@ -19,7 +20,9 @@
 #' @section Aliases:
 #' A backend alias is single character representing a character vector
 #' of backend strings.  Aliases can be set by specifying a named
-#' character vector.  From start, there is a single alias:
+#' character vector, e.g. \code{backend(spare=c("multicore-2", "local"))}.
+#' To list all registered aliases, use \code{backend("aliases")}.
+#' From start, there is a single alias:
 #' \itemize{
 #'  \item{\code{default = c(".BatchJobs.R", "multicore-1", "multicore",
 #'                          "interactive", "local", "rscript")}}
@@ -31,7 +34,7 @@
 #' @importFrom R.utils use
 backend <- local({
   aliases = list(
-    default = ".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript"
+    default = c(".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript")
   )
   last = NULL
 
@@ -46,13 +49,6 @@ backend <- local({
     getBatchJobsConf <- get("getBatchJobsConf", mode="function", envir=ns)
     assignConf <- get("assignConf", mode="function", envir=ns)
     readConfs <- get("readConfs", mode="function", envir=ns)
-
-
-    if (is.null(what)) {
-      return(last)
-    } else if (identical(what, "reset")) {
-      what <- "default"
-    }
 
 
     ## Set custom aliases?
@@ -72,6 +68,13 @@ backend <- local({
       return(invisible(aliases))
     }
 
+    if (is.null(what)) {
+      return(last)
+    } else if (identical(what, "aliases")) {
+      return(aliases)
+    } else if (identical(what, "reset")) {
+      what <- "default"
+    }
 
     explicit_what <- !missing(what)
     dropped <- NULL
