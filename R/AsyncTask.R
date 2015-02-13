@@ -279,7 +279,7 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
 
   ## Cleanup?
   if (cleanup) {
-    delete(obj, delta=0.1*delta, alpha=alpha, ...)
+    delete(obj, delta=0.5*delta, alpha=alpha, ...)
   }
 
   res
@@ -337,7 +337,7 @@ delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onM
 
 
   ## Sucess?
-  if (!file_test("-d", path)) {
+  if (file_test("-d", path)) {
     if (onFailure %in% c("warning", "error")) {
       msg <- sprintf("Failed to remove BatchJob registry: %s", sQuote(path))
       if (onMissing == "warning") {

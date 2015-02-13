@@ -3,7 +3,7 @@ use("async")
 
 oopts <- options(warn=1, "async::debug"=FALSE)
 
-backend("interactive")
+##backend("interactive")
 
 rm(list=intersect(c("x", "y"), ls()))
 
