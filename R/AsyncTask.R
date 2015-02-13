@@ -3,6 +3,8 @@
 #' @param expr The R expression to be evaluated
 #' @param envir The environment in which global environment
 #' should be located.
+#' @param finalize If TRUE, any underlying registries are
+#' deleted when this object is garbage collected, otherwise not.
 #'
 #' @return An AsyncTask object
 #'
@@ -11,7 +13,7 @@
 #' @export async
 #' @importFrom R.utils mcat mstr mprint mprintf
 #' @importFrom BatchJobs batchMap submitJobs
-AsyncTask <- function(expr=NULL, envir=parent.frame()) {
+AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async::finalize", TRUE)) {
   # Argument 'expr':
   expr <- substitute(expr)
 
@@ -50,6 +52,21 @@ AsyncTask <- function(expr=NULL, envir=parent.frame()) {
     backend=list(reg=reg, id=id)
   )
   obj <- structure(obj, class=c("AsyncTask"))
+
+  ## Register finalizer (will clean up registries
+  if (finalize) {
+    ## Use a "dummy" environment for GC finalization
+    gcenv = new.env()
+    gcenv$obj <- obj
+    obj$gcenv <- gcenv;
+
+    reg.finalizer(gcenv, f=function(gcenv) {
+      obj <- gcenv$obj
+      if (inherits(obj, "AsyncTask") && "async" %in% loadedNamespaces()) {
+        try( delete(obj, onFailure="warning", onMissing="ignore") )
+      }
+    }, onexit=TRUE)
+  }
 
   ## Submit job
   submitJobs(reg, ids=id)
