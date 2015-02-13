@@ -151,7 +151,7 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
   envir <- parent.frame(1)
 
   ## Temporary use a different backend
-  obackend <- backend("?")
+  obackend <- backend(NULL)
   on.exit(backend(obackend, quietly=TRUE))
   what <- backend(backend)
 ##  mprintf("Using backend: '%s'\n", what)

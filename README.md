@@ -154,9 +154,9 @@ Job registry:  async1189072551
 ## Choosing backend
 The asynchronous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using the `backend()` function.  Examples:
 
-* `backend()` - use `.BatchJobs.R` configuration file, if available.
-   If not, use `"multicore-1"` if supported,
-   otherwise `"interactive"`
+* `backend("default")` - use `.BatchJobs.R` configuration file,
+   if available. If not, use `"multicore-1"` if supported,
+   otherwise use `"interactive"`
 * `backend("multicore")` - parallel processing using all available
    cores on the local machine.
 * `backend("multicore-1")` - parallel processing using all but one
@@ -173,7 +173,9 @@ available/supported backend will be used.
 If none of the requested backends work/are supported, the fallback is
 always to use the `"interactive"` which is available on all systems.
 
-To see what the most recently set backend was, use `backend("?")`.
+To see what the most recently set backend was, use `backend(NULL)`.
+To reset, use `backend("reset")`
+(which is equivalent to `backend("default")`).
 
 
 
@@ -212,7 +214,7 @@ backend("cluster")
 
 
 ### Evaluate asynchronous expression on specific backend
-Asynchronous expressions are processed by the default backend as given by `backend("?")`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
+Asynchronous expressions are processed by the default backend as given by `backend(NULL)`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
 ```r
 a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore-2"
 b %<=% { Sys.sleep(2); rnorm(1) } %backend% "cluster"

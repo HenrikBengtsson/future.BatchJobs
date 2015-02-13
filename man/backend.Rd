@@ -4,11 +4,14 @@
 \alias{backend}
 \title{Switch backend to be used for asynchronous processing}
 \usage{
-backend(what = c(".BatchJobs.R", "multicore-1", "multicore", "interactive",
-  "local", "rscript"), ..., quietly = TRUE)
+backend(what = NULL, ..., quietly = TRUE)
 }
 \arguments{
-\item{what}{A character vector of preferred backend to be used.}
+\item{what}{A \code{character} \code{vector} of preferred backend to be used.
+If \code{NULL}, the currently default backend is returned.
+If \code{"default"}, the default backend according to alias
+   \code{"default"} is used (see below).
+If \code{"reset"}, the backend is reset to \code{"default"}.}
 
 \item{...}{Named character arguments specifying custom aliases
 for character sets of backends.}
@@ -25,5 +28,15 @@ Switch backend to be used for asynchronous processing
 The Windows operating system does not support the 'multicore'
 backend, which then will be ignored.  If explicitly specified, then
 an informative warning will be given.
+}
+\section{Aliases}{
+
+A backend alias is single character representing a character vector
+of backend strings.  Aliases can be set by specifying a named
+character vector.  From start, there is a single alias:
+\itemize{
+ \item{\code{default = c(".BatchJobs.R", "multicore-1", "multicore",
+                         "interactive", "local", "rscript")}}
+}
 }
 

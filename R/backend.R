@@ -1,6 +1,11 @@
 #' Switch backend to be used for asynchronous processing
 #'
-#' @param what A character vector of preferred backend to be used.
+#' @param what
+#'   A \code{character} \code{vector} of preferred backend to be used.
+#'   If \code{NULL}, the currently default backend is returned.
+#'   If \code{"default"}, the default backend according to alias
+#'      \code{"default"} is used (see below).
+#'   If \code{"reset"}, the backend is reset to \code{"default"}.
 #' @param ... Named character arguments specifying custom aliases
 #'            for character sets of backends.
 #' @param quietly If TRUE, messages are supressed.
@@ -11,15 +16,26 @@
 #' backend, which then will be ignored.  If explicitly specified, then
 #' an informative warning will be given.
 #'
+#' @section Aliases:
+#' A backend alias is single character representing a character vector
+#' of backend strings.  Aliases can be set by specifying a named
+#' character vector.  From start, there is a single alias:
+#' \itemize{
+#'  \item{\code{default = c(".BatchJobs.R", "multicore-1", "multicore",
+#'                          "interactive", "local", "rscript")}}
+#' }
+#'
 #' @export
 #' @importFrom parallel detectCores
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
 #' @importFrom R.utils use
 backend <- local({
-  aliases = list()
+  aliases = list(
+    default = ".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript"
+  )
   last = NULL
 
-  function(what=c(".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript"), ..., quietly=TRUE) {
+  function(what=NULL, ..., quietly=TRUE) {
     ## Attach BatchJobs here, because it will attach itself later
     ## anyways and then it will load its own default settings and
     ## override whatever settings we use here.
@@ -32,9 +48,10 @@ backend <- local({
     readConfs <- get("readConfs", mode="function", envir=ns)
 
 
-    ## What was the last backend assigned?
-    if (is.null(what) || identical(what, NA) || identical(what, "?")) {
+    if (is.null(what)) {
       return(last)
+    } else if (identical(what, "reset")) {
+      what <- "default"
     }
 
 
