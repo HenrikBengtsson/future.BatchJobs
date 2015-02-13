@@ -40,7 +40,7 @@ AsyncTask <- function(expr=NULL, envir=parent.frame()) {
   if (debug) mprint(reg)
 
   ## Create job
-  id <- batchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
+  id <- asyncBatchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
   if (debug) mprintf("Created job #%d\n", id)
 
   ## Setup return value

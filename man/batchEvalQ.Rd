@@ -2,31 +2,28 @@
 % Please edit documentation in R/batchEvalQ.R
 \name{batchEvalQ}
 \alias{batchEvalQ}
-\title{A batch map function for R expressions}
+\title{Evaluates expressions as jobs on a registry}
 \usage{
-batchEvalQ(reg, exprs, globals = TRUE, envir = parent.frame(), ...)
+batchEvalQ(reg, exprs, ...)
 }
 \arguments{
-\item{reg}{A Registry.}
+\item{reg}{[\code{\link{Registry}}]\cr
+Empty Registry that will store jobs for the mapping.}
 
-\item{exprs}{A list of R expressions.}
+\item{exprs}{[\code{\link{expression}}]\cr
+R expressions to evaluate.}
 
-\item{globals}{A named list of R objects to be loaded by each job.
-If TRUE, globals are automatically searched for.}
-
-\item{envir}{The environment where to search for globals.}
-
-\item{...}{Additional arguments passed to \code{batchMap()}.}
+\item{...}{[any]\cr
+  Additional arguments passed to \code{\link{batchMap}}.}
 }
 \value{
-Job IDs.
+Vector of type \code{integer} with job ids.
 }
 \description{
-A batch map function for R expressions
+Evaluates expressions as jobs on a registry
 }
 \seealso{
 This function is \pkg{BatchJobs}'s analogy to
-\code{parallel::clusterEvalQ()} and \code{parallel::clusterExport()}
-if globals are passed along as well.
+\code{parallel::clusterEvalQ()}.
 }
 

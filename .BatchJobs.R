@@ -2,7 +2,7 @@ cluster.functions <- local({
   backend <- if (.Platform$OS == "windows") "local" else "multicore"
   backend <- Sys.getenv("R_ASYNC_BACKEND", backend)
 ##  backend <- "tipcc"
-  backend <- "cccore070"
+##  backend <- "cccore070"
   if (backend == "interactive") {
     makeClusterFunctionsInteractive()
   } else if (backend == "local") {
