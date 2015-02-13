@@ -313,7 +313,7 @@ delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onM
   path <- reg$file.dir
 
   ## Already deleted?
-  if (!file_test("-d", path)) {
+  if (is.null(path) || !file_test("-d", path)) {
     if (onMissing %in% c("warning", "error")) {
       msg <- sprintf("Cannot remove BatchJob registry, because directory does not exist: %s", sQuote(path))
       if (onMissing == "warning") {
