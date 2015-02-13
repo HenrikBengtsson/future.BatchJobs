@@ -193,7 +193,9 @@ await <- function(...) UseMethod("await")
 record <- function(...) UseMethod("record")
 record.AsyncTask <- function(task, name) {
   name <- sprintf("%s.task", name)
-  assign(name, task, envir=task$envir)
+  task_without_gc <- task
+  task_without_gc$gcenv <- NULL
+  assign(name, task_without_gc, envir=task$envir)
 }
 
 
