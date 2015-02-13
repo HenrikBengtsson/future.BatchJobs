@@ -56,16 +56,19 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async
   ## Register finalizer (will clean up registries
   if (finalize) {
     ## Use a "dummy" environment for GC finalization
-    gcenv = new.env()
+    gcenv <- new.env()
     gcenv$obj <- obj
-    obj$gcenv <- gcenv;
 
     reg.finalizer(gcenv, f=function(gcenv) {
       obj <- gcenv$obj
+      gcenv$obj <- NULL
       if (inherits(obj, "AsyncTask") && "async" %in% loadedNamespaces()) {
         try( delete(obj, onFailure="warning", onMissing="ignore") )
       }
     }, onexit=TRUE)
+    
+    obj$.gcenv <- gcenv
+    gcenv <- NULL
   }
 
   ## Submit job
@@ -194,7 +197,7 @@ record <- function(...) UseMethod("record")
 record.AsyncTask <- function(task, name) {
   name <- sprintf("%s.task", name)
   task_without_gc <- task
-  task_without_gc$gcenv <- NULL
+  task_without_gc$.gcenv <- NULL
   assign(name, task_without_gc, envir=task$envir)
 }
 
