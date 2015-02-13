@@ -171,8 +171,9 @@ error.AsyncTask <- function(obj, ...) {
 #' @export
 await <- function(...) UseMethod("await")
 
-record <- function(...) UseMethod("record")
 
+## Internal
+record <- function(...) UseMethod("record")
 record.AsyncTask <- function(task, name) {
   name <- sprintf("%s.task", name)
   assign(name, task, envir=task$envir)
@@ -298,8 +299,9 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
 #'
 #' @return (invisibly) TRUE if deleted and FALSE otherwise.
 #'
-#' @aliases delete
 #' @export
+#' @export delete
+#' @aliases delete
 #' @importFrom BatchJobs removeRegistry
 delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   onMissing <- match.arg(onMissing)
