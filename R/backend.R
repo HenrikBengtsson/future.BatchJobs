@@ -42,6 +42,8 @@ backend <- local({
     ## Attach BatchJobs here, because it will attach itself later
     ## anyways and then it will load its own default settings and
     ## override whatever settings we use here.
+    oopts <- options(BatchJobs.load.config=FALSE)
+    on.exit(options(oopts))
     use("BatchJobs")
 
     ## Imported functions
