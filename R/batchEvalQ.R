@@ -9,14 +9,14 @@
 #'
 #' @return Vector of type \code{integer} with job ids.
 #'
-#' @seealso This function is \pkg{BatchJobs}'s analogy to
-#' \code{parallel::clusterEvalQ()}.
+#' @seealso This function is analogous to
+#' \code{parallel::\link[parallel]{clusterEvalQ}}.
 #'
 #' @export
-#' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 batchEvalQ <- function(reg, exprs, ...) {
   fun <- function(expr, ..., envir=parent.frame()) {
     eval(expr, envir=envir)
   }
   batchMap(reg, fun=fun, exprs, ...)
-} # batchEvalQ()
+}
+

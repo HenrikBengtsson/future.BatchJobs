@@ -23,7 +23,7 @@ Vector of type \code{integer} with job ids.
 Evaluates expressions as jobs on a registry
 }
 \seealso{
-This function is \pkg{BatchJobs}'s analogy to
-\code{parallel::clusterEvalQ()}.
+This function is analogous to
+\code{parallel::\link[parallel]{clusterEvalQ}}.
 }
 
