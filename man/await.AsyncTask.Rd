@@ -14,7 +14,7 @@
 \item{cleanup}{If TRUE, the registry is completely removed upon
 success, otherwise not.}
 
-\item{maxTries}{The number of polls before giving up.}
+\item{maxTries}{The number of tries before giving up.}
 
 \item{delta}{The number of seconds to wait the first time.}
 

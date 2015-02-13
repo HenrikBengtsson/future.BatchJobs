@@ -184,7 +184,7 @@ record.AsyncTask <- function(task, name) {
 #' @param obj The asynchronously task
 #' @param cleanup If TRUE, the registry is completely removed upon
 #' success, otherwise not.
-#' @param maxTries The number of polls before giving up.
+#' @param maxTries The number of tries before giving up.
 #' @param delta The number of seconds to wait the first time.
 #' @param alpha A factor to scale up the waiting time in each iteration
 #' such that the waiting time in the k:th iteration is \code{alpha^k*delta}.
@@ -278,26 +278,80 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
 
   ## Cleanup?
   if (cleanup) {
-    interval <- 0.1*delta
-    for (kk in 1:10) {
-      if (isTRUE(try(removeRegistry(reg, ask="no"), silent=TRUE))) break
-      Sys.sleep(interval)
-      interval <- alpha*interval
-    }
-    if (file_test("-d", reg$file.dir)) {
-      warning(sprintf("Failed to remove BatchJobs registry '%s' (%s)", reg$id, reg$file.dir))
-    }
+    delete(obj, delta=0.1*delta, alpha=alpha, ...)
   }
 
   res
 } # await()
 
 
-`&.AsyncTask` <- function(x, y) {
-  if (inherits(x, "AsyncTask")) x <- await(x)
-  if (inherits(y, "AsyncTask")) y <- await(y)
-  x & y
-}
+#' Removes an asynchroneous task
+#'
+#' @param obj The asynchronously task
+#' @param onFailure Action if failing to delete task.
+#' @param onMissing Action if task does not exist.
+#' @param maxTries The number of tries before giving up.
+#' @param delta The delay interval (in seconds) between retries.
+#' @param alpha A multiplicative penalty increasing the delay
+#' for each failed try.
+#' @param ... Not used.
+#'
+#' @return (invisibly) TRUE if deleted and FALSE otherwise.
+#'
+#' @aliases delete
+#' @export
+#' @importFrom BatchJobs removeRegistry
+delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+  onMissing <- match.arg(onMissing)
+  onFailure <- match.arg(onFailure)
+
+  ## Identify registry
+  backend <- obj$backend
+  reg <- backend$reg
+  path <- reg$file.dir
+
+  ## Already deleted?
+  if (!file_test("-d", path)) {
+    if (onMissing %in% c("warning", "error")) {
+      msg <- sprintf("Cannot remove BatchJob registry, because directory does not exist: %s", sQuote(path))
+      if (onMissing == "warning") {
+        warning(msg)
+      } else if (onMissing == "error") {
+        throw(msg)
+      }
+    }
+    return(invisible(TRUE))
+  }
+
+
+  ## Try to delete registry
+  interval <- delta
+  for (kk in seq_len(maxTries)) {
+    try(removeRegistry(reg, ask="no"), silent=TRUE)
+    if (!file_test("-d", path)) break
+    Sys.sleep(interval)
+    interval <- alpha*interval
+  }
+
+
+  ## Sucess?
+  if (!file_test("-d", path)) {
+    if (onFailure %in% c("warning", "error")) {
+      msg <- sprintf("Failed to remove BatchJob registry: %s", sQuote(path))
+      if (onMissing == "warning") {
+        warning(msg)
+      } else if (onMissing == "error") {
+        throw(msg)
+      }
+    }
+    return(invisible(FALSE))
+  }
+
+  invisible(TRUE)
+} # delete()
+
+delete <- function(...) UseMethod("delete")
+
 
 #' Inspect an asynchroneous variable
 #'
