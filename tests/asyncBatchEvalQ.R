@@ -1,7 +1,7 @@
 R.utils::use()
 use("async")
 
-message("*** backEvalQ()")
+message("*** asyncBatchEvalQ()")
 
 oopts <- options(warn=1, "async::debug"=TRUE)
 
@@ -17,7 +17,7 @@ exprs <- list(
 )
 
 message("Adding expressions to batch registry")
-ids <- batchEvalQ(reg, exprs=exprs)
+ids <- asyncBatchEvalQ(reg, exprs=exprs)
 mprint(ids)
 
 message("Submitting expressions")
