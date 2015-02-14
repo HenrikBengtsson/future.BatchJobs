@@ -22,7 +22,7 @@ about 5 seconds to complete when done on a
 multi-core system:
 
 ```r
-> library(async)
+> library('async')
 > x %<=% { Sys.sleep(5); 3.14 }
 > y %<=% { Sys.sleep(5); 2.71 }
 > z <- x + y
@@ -234,6 +234,17 @@ c %<=% {
 d <- runif(1)
 ```
 
+## Examples
+
+### Download files in parallel
+```r
+library('async')
+library('R.utils')
+cran_pkgs %<=% downloadFile('http://cran.r-project.org/src/contrib/PACKAGES', path='CRAN')
+bioc_pkgs %<=% downloadFile('http://www.bioconductor.org/packages/release/bioc/src/contrib/PACKAGES', path='Bioc')
+print(c(cran_pkgs, bioc_pkgs))
+```
+
 
 ## Availability
 This package is only available via GitHub.  Install in R as:
@@ -241,6 +252,7 @@ This package is only available via GitHub.  Install in R as:
 ```s
 source('http://callr.org/install#HenrikBengtsson/async')
 ```
+
 
 ## Future directions
 If it would be possible to abstract the [BatchJobs] Registry layer
