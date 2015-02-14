@@ -14,6 +14,8 @@ getGlobals(expr, envir = parent.frame(), ..., primitive = FALSE,
 
 \item{...}{Not used.}
 
+\item{primitive}{If TRUE, primitive globals are returned, otherwise not.}
+
 \item{unlist}{If TRUE, a list of unique objects is returned.
        If FALSE, a list of \code{length(expr)} sublists.}
 }

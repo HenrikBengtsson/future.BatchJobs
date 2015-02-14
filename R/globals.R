@@ -56,6 +56,7 @@ findGlobals <- function(expr, envir=parent.frame(), ..., unlist=TRUE) {
 #' @param expr An R expression or a a list of R expressions.
 #' @param envir The environment where to search for globals.
 #' @param ... Not used.
+#' @param primitive If TRUE, primitive globals are returned, otherwise not.
 #' @param unlist If TRUE, a list of unique objects is returned.
 #'        If FALSE, a list of \code{length(expr)} sublists.
 #'
