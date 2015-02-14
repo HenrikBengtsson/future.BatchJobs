@@ -9,18 +9,10 @@ opwd <- setwd(tmpdir)
 url <- "http://www.r-project.org"
 
 ## Download front page
-front %<=% {
-  cat("URL:\n")
-  print(url)
-  urlT <- file.path(url, "index.html")
-  downloadFile(urlT)
-}
-
+front %<=% downloadFile(file.path(url, "index.html"))
 
 ## Download subpages
 pages %<=% {
-  url2 <- "http://www.r-project.org"
-
   pattern <- '.*"(.*[.]html)".*'
   files <- gsub(pattern, "\\1", grep(pattern, readLines(front), value=TRUE))
   files <- unique(files)
@@ -28,10 +20,10 @@ pages %<=% {
 
   pages <- new.env()
   for (file in files) {
-    urlT <- file.path(url2, file)
-    pages[[file]] %<=% downloadFile(urlT)
+    pages[[file]] %<=% downloadFile(file.path(url, file))
   }
-  print(ls(envir=pages))
+
+  # Don't forget to retrieve the "files"!
   mget(files, envir=pages)
 }
 print(pages)
