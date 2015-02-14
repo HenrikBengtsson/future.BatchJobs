@@ -1,9 +1,12 @@
 R.utils::use()
 use("async")
 
+## Make sure not to clash with R.utils::`%<-%`
+#stopifnot(identical(`%<-%`, async::`%<-%`))
+
 oopts <- options(warn=1, "async::debug"=FALSE)
 
-##backend("interactive")
+backend("interactive")
 
 rm(list=intersect(c("x", "y"), ls()))
 
@@ -33,7 +36,7 @@ v4 %<=% {
   ## FIXME: On our cluster outputting to stdout/stderr causes it
   ## to stall. Don't understand why? /HB 2015-02-10
   mprintf <- function(...) {}
-  
+
   mprintf("Processing: ")
   for (ii in 1:10) { mprintf("."); Sys.sleep(0.5) }
   mprintf(" [100%%]\n")

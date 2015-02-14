@@ -4,7 +4,7 @@
 \alias{batchEvalQ}
 \title{Evaluates expressions as jobs on a registry}
 \usage{
-batchEvalQ(reg, exprs, ...)
+batchEvalQ(reg, exprs, local = FALSE, ...)
 }
 \arguments{
 \item{reg}{[\code{\link{Registry}}]\cr
@@ -12,6 +12,11 @@ Empty Registry that will store jobs for the mapping.}
 
 \item{exprs}{[\code{\link{expression}}]\cr
 R expressions to evaluate.}
+
+\item{local}{[\code{\link{logical}}[1]]\cr
+If TRUE, the expression is evaluated wrapped in a
+\code{\link[base]{local}} call, otherwise directly
+in the global environment (of the job).}
 
 \item{...}{[any]\cr
   Additional arguments passed to \code{\link{batchMap}}.}

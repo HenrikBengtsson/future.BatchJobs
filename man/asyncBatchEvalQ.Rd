@@ -16,7 +16,7 @@ If TRUE, globals are automatically searched for.}
 
 \item{envir}{The environment where to search for globals.}
 
-\item{...}{Additional arguments passed to \code{batchEvalQ()}.}
+\item{...}{Additional arguments passed to \code{batchEvalQ)}.}
 }
 \value{
 Vector of type \code{integer} with job ids.

@@ -5,7 +5,7 @@
 #' @param globals A named list of R objects to be loaded by each job.
 #'        If TRUE, globals are automatically searched for.
 #' @param envir The environment where to search for globals.
-#' @param ... Additional arguments passed to \code{batchEvalQ()}.
+#' @param ... Additional arguments passed to \code{batchEvalQ)}.
 #'
 #' @return Vector of type \code{integer} with job ids.
 #'
@@ -70,5 +70,5 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
   }
   rm(list=c("globals")) # Not needed anymore
 
-  batchEvalQ(reg, exprs=exprs, ...)
+  batchEvalQ(reg, exprs=exprs, local=TRUE, ...)
 } # asyncBatchEvalQ()
