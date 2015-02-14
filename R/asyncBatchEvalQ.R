@@ -10,11 +10,18 @@
 #' @return Vector of type \code{integer} with job ids.
 #'
 #' @export
+#' @importFrom R.utils mcat mprint mprintf mstr
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
+  debug <- getOption("async::debug", FALSE)
+
   ## Identify globals?
   if (isTRUE(globals)) {
     globals <- getGlobals(exprs, envir=envir, unlist=TRUE)
+    if (debug) {
+      mcat("Identified globals:\n")
+      mstr(globals)
+    }
   }
 
   pkgsNeeded <- NULL
@@ -39,6 +46,10 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
           !is.null(x$Priority) && x$Priority == "base"
       })
       pkgs <- pkgs[!basePkgs]
+
+      if (debug) {
+        mprintf("Identified %d packages: %s\n", length(pkgs), sQuote(pkgs))
+      }
     }
 
     if (length(pkgs) > 0L) {
@@ -48,8 +59,12 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
     ## BatchJobs::batchExport() validated names of globals using
     ## checkmate::assertList(more.args, names="strict") which doesn't
     ## like names such as "{", although they should be valid indeed.
-    keep <- grep("^[.a-zA-Z]", names(globals))
+    keep <- grepl("^[.a-zA-Z]", names(globals))
     globals <- globals[keep]
+    if (debug && !all(keep)) {
+      mcat("Filtered globals:\n")
+      mstr(globals)
+    }
 
     batchExport(reg, li=globals)
   }
