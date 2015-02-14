@@ -66,7 +66,7 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async
         try( delete(obj, onFailure="warning", onMissing="ignore") )
       }
     }, onexit=TRUE)
-    
+
     obj$.gcenv <- gcenv
     gcenv <- NULL
   }
@@ -195,7 +195,7 @@ await <- function(...) UseMethod("await")
 ## Internal
 record <- function(...) UseMethod("record")
 record.AsyncTask <- function(task, name) {
-  name <- sprintf("%s.task", name)
+  name <- sprintf(".task_%s", name)
   task_without_gc <- task
   task_without_gc$.gcenv <- NULL
   assign(name, task_without_gc, envir=task$envir)
@@ -387,7 +387,7 @@ delete <- function(...) UseMethod("delete")
 #'
 #' @export
 inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
-  name <- sprintf("%s.task", deparse(substitute(var)))
+  name <- sprintf(".task_%s", deparse(substitute(var)))
   get(name, mode="list", envir=envir, inherits=inherits)
 }
 

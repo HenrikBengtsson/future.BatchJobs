@@ -18,6 +18,7 @@ pages %<-% {
 
   pattern <- '.*"(.*[.]html)".*'
   files <- gsub(pattern, "\\1", grep(pattern, readLines(front), value=TRUE))
+  files <- unique(files)
   print(files)
 
   pages <- new.env()
