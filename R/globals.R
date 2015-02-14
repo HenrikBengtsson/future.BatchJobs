@@ -5,6 +5,34 @@ asFunction <- function(expr, envir=parent.frame(), ...) {
   eval(substitute(function() x, list(x=expr)), envir=envir, ...)
 }
 
+
+tweakExpression <- function(expr) {
+  if (!is.language(expr)) return(expr)
+
+  for (ii in seq_along(expr)) {
+    # If expr[[ii]] is "missing", ignore the error.  This
+    # happens with for instance expressions like x[,1].
+    # FIXME: Is there a better way?!? /HB 2014-05-08
+    tryCatch({
+      exprI <- expr[[ii]]
+      op <- exprI[[1]]
+      if (!is.symbol(op)) next
+      if (op == "%<-%") {
+        lhs <- exprI[[2]]
+        rhs <- exprI[[3]]
+        exprF <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
+        expr[[ii]] <- exprF
+      } else if (op == "%->%") {
+        lhs <- exprI[[3]]
+        rhs <- exprI[[2]]
+        exprI <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
+        expr[[ii]] <- exprI
+      }
+    }, error=function(ex) {})
+  }
+  expr
+} # tweakExpression()
+
 findGlobals <- function(expr, envir=parent.frame(), ..., unlist=TRUE) {
   if (is.list(expr)) {
     names <- lapply(expr, FUN=findGlobals, envir=envir, ...)
@@ -13,11 +41,10 @@ findGlobals <- function(expr, envir=parent.frame(), ..., unlist=TRUE) {
       names <- sort(unique(names))
     }
   } else {
-    ## FIXME: codetools don't see 'a %<-% { ... }' as an assignment
-    ## and is therefore picking up 'a' as a global variable, which
-    ## will later cause problems for getGlobals().
-    ## Idea: Could we replace all '%<-%' with regular '<-' before
-    ## calling codetools?  /HB 2015-02-09
+    ## codetools don't see 'a %<-% b' as an assignment and therefore
+    ## picks up 'a' as a global variable.  Here we inject 'a <- b'
+    ## to fix this.
+    expr <- tweakExpression(expr)
     fcn <- asFunction(expr, envir=envir, ...)
     names <- codetools::findGlobals(fcn, merge=TRUE)
   }
