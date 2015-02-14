@@ -2,22 +2,44 @@ library("async")
 library("R.utils")
 
 findGlobals <- async:::findGlobals
+getGlobals <- async:::getGlobals
 
 message("Setting up expressions")
-a <- 1
 exprs <- list(
   A = substitute({ Sys.sleep(5); x <- 0.1 }),
-  B = substitute({ Sys.sleep(5); y <- 0.2 }),
-  B = substitute({ Sys.sleep(5); z <- a+0.3 })
+  B = substitute({ y <- 0.2 }),
+  C = substitute({ z <- a+0.3 }),
+  D = substitute({ pathname <- file.path(dirname(url), filename) })
+)
+
+atleast <- list(
+  A = c("Sys.sleep"),
+  B = c(),
+  C = c("a"),
+  D = c("url", "filename", "dirname", "file.path")
 )
 
 
-message("Searching for globals")
+## Define globals
+a <- 3.14
+filename <- "index.html"
+# Yes, pretend we forget 'url'
+
+message("Find for globals")
 for (kk in seq_along(exprs)) {
-  mprintf("Expression #%d:\n", kk)
-  expr <- exprs[[kk]]
+  key <- names(exprs)[kk]
+  expr <- exprs[[key]]
+  mprintf("Expression #%d ('%s'):\n", kk, key)
   mprint(expr)
+
   names <- findGlobals(expr)
   mprintf("Globals: %s\n", paste(sQuote(names), collapse=", "))
+  stopifnot(all(atleast[[key]] %in% names))
+
+  globals <- getGlobals(expr)
+  mprintf("Globals: %s\n", paste(sQuote(names(globals)), collapse=", "))
+  stopifnot(all(atleast[[key]] %in% names(globals)))
+  mstr(globals)
+
   mcat("\n")
 }
