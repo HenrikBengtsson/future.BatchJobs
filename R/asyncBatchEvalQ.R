@@ -62,7 +62,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
     }
 
     if (length(pkgs) > 0L) {
-      addRegistyPackages(reg, packages=pkgs)
+      addRegistryPackages(reg, packages=pkgs)
     }
 
     ## BatchJobs::batchExport() validated names of globals using
