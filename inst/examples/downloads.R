@@ -1,6 +1,5 @@
 R.utils::use()
 use("async")
-backend("local")
 
 tmpdir <- "downloads"
 mkdirs(tmpdir)
