@@ -13,7 +13,7 @@ front %<=% {
 print(front)
 
 ## Download subpages
-pages %<=% {
+pages %<-% {
   url2 <- "http://www.r-project.org"
 
   pattern <- '.*"(.*[.]html)".*'
@@ -22,11 +22,10 @@ pages %<=% {
 
   pages <- new.env()
   for (file in files) {
-    print(url)
     urlT <- file.path(url2, file)
-    print(urlT)
-    pages[[file]] %<-% downloadFile(urlT)
+    pages[[file]] %<=% downloadFile(urlT)
   }
-  ls(envir=pages)
+  print(ls(envir=pages))
+  mget(files, envir=pages)
 }
 print(pages)
