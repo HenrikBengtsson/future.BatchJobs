@@ -17,9 +17,9 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
 
   ## Identify globals?
   if (isTRUE(globals)) {
-    globals <- getGlobals(exprs, envir=envir, primitive=FALSE, unlist=TRUE)
+    globals <- getGlobals(exprs, envir=envir, primitive=FALSE, base=FALSE, unlist=TRUE)
     if (debug) {
-      mcat("Identified (non-primitive) globals:\n")
+      mcat("Identified (non-primitive non-\"base\") globals:\n")
       mstr(globals)
     }
   } else if (list(globals)) {
@@ -36,30 +36,17 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
       environmentName(environment(obj))
     })
 
-    ## Identify globals part of "base" packages (because they
-    ## are always available and don't have to be exported)
-    pd <- lapply(pkgs, FUN=function(pkg) {
-      if (pkg == "") return(list())
-      packageDescription(pkg, encoding=NA)
-    })
-
-    ## Globals/"base" packages don't have to be exported
-    isBase <- sapply(pd, FUN=function(x) {
-      !is.null(x$Priority) && x$Priority == "base"
-    })
-    if (any(isBase)) {
-      globals <- globals[!isBase]
-      pkgs <- pkgs[!isBase]
-    }
-
     ## Drop "missing" packages, e.g. globals in globalenv().
-    pkgs <- pkgs[!sapply(pd, FUN=identical, list())]
+    pkgs <- pkgs[nchar(pkgs) > 0L]
 
     ## Packages to be loaded
     pkgs <- sort(unique(pkgs))
     if (debug) {
       mprintf("Identified %d packages: %s\n", length(pkgs), sQuote(pkgs))
     }
+
+    ## Sanity check
+    stopifnot(all(nzchar(pkgs)))
 
     if (length(pkgs) > 0L) {
       addRegistryPackages(reg, packages=pkgs)

@@ -51,12 +51,28 @@ findGlobals <- function(expr, envir=parent.frame(), ..., unlist=TRUE) {
   names
 }
 
+findBasePkgs <- local({
+  pkgs <- NULL
+  function() {
+    if (length(pkgs) > 0L) return(pkgs)
+    data <- installed.packages()
+    isBase <- (data[,"Priority"] %in% "base")
+    pkgs <<- rownames(data)[isBase]
+    pkgs
+  }
+})
+
+isBasePkgs <- function(pkgs) {
+  pkgs %in% findBasePkgs()
+}
+
 #' Get all global objects for one or more R expressions
 #'
 #' @param expr An R expression or a a list of R expressions.
 #' @param envir The environment where to search for globals.
 #' @param ... Not used.
 #' @param primitive If TRUE, primitive globals are returned, otherwise not.
+#' @param base If TRUE, globals part of "base" packages are returned, otherwise not.
 #' @param unlist If TRUE, a list of unique objects is returned.
 #'        If FALSE, a list of \code{length(expr)} sublists.
 #'
@@ -64,7 +80,7 @@ findGlobals <- function(expr, envir=parent.frame(), ..., unlist=TRUE) {
 #'
 #' @export
 #' @importFrom BatchJobs batchExport batchMap
-getGlobals <- function(expr, envir=parent.frame(), ..., primitive=FALSE, unlist=TRUE) {
+getGlobals <- function(expr, envir=parent.frame(), ..., primitive=FALSE, base=FALSE, unlist=TRUE) {
   names <- findGlobals(expr, envir=envir, ..., unlist=unlist)
   globals <- lapply(names, FUN=function(names) {
     objs <- lapply(names, FUN=get, envir=envir, inherits=TRUE)
@@ -72,6 +88,11 @@ getGlobals <- function(expr, envir=parent.frame(), ..., primitive=FALSE, unlist=
     ## Drop primitive functions?
     if (!primitive) {
       objs <- objs[!sapply(objs, FUN=is.primitive)]
+    }
+    ## Drop function in "base" packages?
+    if (!base) {
+      pkgs <- sapply(objs, FUN=function(x) environmentName(environment(x)))
+      objs <- objs[!isBasePkgs(pkgs)]
     }
     objs
   })

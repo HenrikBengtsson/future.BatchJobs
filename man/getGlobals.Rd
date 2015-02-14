@@ -5,7 +5,7 @@
 \title{Get all global objects for one or more R expressions}
 \usage{
 getGlobals(expr, envir = parent.frame(), ..., primitive = FALSE,
-  unlist = TRUE)
+  base = FALSE, unlist = TRUE)
 }
 \arguments{
 \item{expr}{An R expression or a a list of R expressions.}
@@ -15,6 +15,8 @@ getGlobals(expr, envir = parent.frame(), ..., primitive = FALSE,
 \item{...}{Not used.}
 
 \item{primitive}{If TRUE, primitive globals are returned, otherwise not.}
+
+\item{base}{If TRUE, globals part of "base" packages are returned, otherwise not.}
 
 \item{unlist}{If TRUE, a list of unique objects is returned.
        If FALSE, a list of \code{length(expr)} sublists.}

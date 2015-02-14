@@ -14,10 +14,10 @@ exprs <- list(
 )
 
 atleast <- list(
-  A = c("Sys.sleep"),
+  A = c(),
   B = c(),
   C = c("a"),
-  D = c("url", "filename", "dirname", "file.path"),
+  D = c("filename"),
   E = c("c")
 )
 
