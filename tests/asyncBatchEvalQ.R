@@ -43,10 +43,6 @@ c <- loadResult(reg, id=ids[3])
 mprintf("c=%g\n", c)
 stopifnot(c == 1.3)
 
-message("Remove registry")
-removeRegistry(reg, ask="no"); rm(list="reg")
-
-
 ## Undo
 options(oopts)
 
