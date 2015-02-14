@@ -63,11 +63,15 @@ findGlobals <- function(expr, envir=parent.frame(), ..., unlist=TRUE) {
 #'
 #' @export
 #' @importFrom BatchJobs batchExport batchMap
-getGlobals <- function(expr, envir=parent.frame(), ..., unlist=TRUE) {
+getGlobals <- function(expr, envir=parent.frame(), ..., primitive=FALSE, unlist=TRUE) {
   names <- findGlobals(expr, envir=envir, ..., unlist=unlist)
   globals <- lapply(names, FUN=function(names) {
     objs <- lapply(names, FUN=get, envir=envir, inherits=TRUE)
     names(objs) <- names
+    ## Drop primitive functions?
+    if (!primitive) {
+      objs <- objs[!sapply(objs, FUN=is.primitive)]
+    }
     objs
   })
   if (unlist) globals <- Reduce(c, globals)

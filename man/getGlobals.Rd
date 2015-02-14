@@ -4,7 +4,8 @@
 \alias{getGlobals}
 \title{Get all global objects for one or more R expressions}
 \usage{
-getGlobals(expr, envir = parent.frame(), ..., unlist = TRUE)
+getGlobals(expr, envir = parent.frame(), ..., primitive = FALSE,
+  unlist = TRUE)
 }
 \arguments{
 \item{expr}{An R expression or a a list of R expressions.}

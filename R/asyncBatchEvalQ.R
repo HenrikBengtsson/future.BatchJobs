@@ -17,11 +17,15 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
 
   ## Identify globals?
   if (isTRUE(globals)) {
-    globals <- getGlobals(exprs, envir=envir, unlist=TRUE)
+    globals <- getGlobals(exprs, envir=envir, primitive=FALSE, unlist=TRUE)
     if (debug) {
-      mcat("Identified globals:\n")
+      mcat("Identified (non-primitive) globals:\n")
       mstr(globals)
     }
+  } else if (list(globals)) {
+    globals <- globals[!sapply(globals, FUN=is.primitive)]
+  } else {
+    throw("Unknown value on argument 'globals': ", mode(globals))
   }
 
   pkgsNeeded <- NULL
@@ -31,29 +35,34 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
     pkgs <- sapply(globals, FUN=function(obj) {
       environmentName(environment(obj))
     })
-    pkgs <- sort(unique(pkgs))
-    pkgs <- pkgs[nchar(pkgs) > 0L]
-    if (length(pkgs) > 0L) {
-      pd <- lapply(pkgs, FUN=packageDescription, encoding=NA)
-      # Drop unknown package with a warning (should not happen, but)
-      unknown <- pkgs[sapply(pd, FUN=function(x) !is.list(x) && is.na(x))]
-      if (length(unknown) > 0L) {
-        pd <- pd[!unknown]
-        pkgs <- pkgs[!unknown]
-        warning("Detected globals in environments/namespaces that refer to unknown packages, which are ignored: ", paste(sQuote(unknown), collapse=", "))
-      }
-      basePkgs <- sapply(pd, FUN=function(x) {
-          !is.null(x$Priority) && x$Priority == "base"
-      })
-      pkgs <- pkgs[!basePkgs]
 
-      if (debug) {
-        mprintf("Identified %d packages: %s\n", length(pkgs), sQuote(pkgs))
-      }
+    ## Identify globals part of "base" packages (because they
+    ## are always available and don't have to be exported)
+    pd <- lapply(pkgs, FUN=function(pkg) {
+      if (pkg == "") return(list())
+      packageDescription(pkg, encoding=NA)
+    })
+
+    ## Globals/"base" packages don't have to be exported
+    isBase <- sapply(pd, FUN=function(x) {
+      !is.null(x$Priority) && x$Priority == "base"
+    })
+    if (any(isBase)) {
+      globals <- globals[!isBase]
+      pkgs <- pkgs[!isBase]
+    }
+
+    ## Drop "missing" packages, e.g. globals in globalenv().
+    pkgs <- pkgs[!sapply(pd, FUN=identical, list())]
+
+    ## Packages to be loaded
+    pkgs <- sort(unique(pkgs))
+    if (debug) {
+      mprintf("Identified %d packages: %s\n", length(pkgs), sQuote(pkgs))
     }
 
     if (length(pkgs) > 0L) {
-      addRegistryPackages(reg, packages=pkgs)
+      addRegistyPackages(reg, packages=pkgs)
     }
 
     ## BatchJobs::batchExport() validated names of globals using
