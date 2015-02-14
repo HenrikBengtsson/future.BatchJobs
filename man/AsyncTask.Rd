@@ -5,13 +5,17 @@
 \alias{async}
 \title{Create an asynchroneous task}
 \usage{
-AsyncTask(expr = NULL, envir = parent.frame())
+AsyncTask(expr = NULL, envir = parent.frame(),
+  finalize = getOption("async::finalize", TRUE))
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
 
 \item{envir}{The environment in which global environment
 should be located.}
+
+\item{finalize}{If TRUE, any underlying registries are
+deleted when this object is garbage collected, otherwise not.}
 }
 \value{
 An AsyncTask object

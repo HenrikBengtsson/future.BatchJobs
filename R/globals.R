@@ -18,7 +18,8 @@ findGlobals <- function(expr, envir=parent.frame(), ..., unlist=TRUE) {
     ## will later cause problems for getGlobals().
     ## Idea: Could we replace all '%<-%' with regular '<-' before
     ## calling codetools?  /HB 2015-02-09
-    names <- codetools::findGlobals(asFunction(expr, envir=envir, ...))
+    fcn <- asFunction(expr, envir=envir, ...)
+    names <- codetools::findGlobals(fcn, merge=TRUE)
   }
   names
 }
