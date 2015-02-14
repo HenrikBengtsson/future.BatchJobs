@@ -75,7 +75,9 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
       mstr(globals)
     }
 
-    batchExport(reg, li=globals)
+    if (length(globals) > 0L) {
+      batchExport(reg, li=globals)
+    }
   }
   rm(list=c("globals")) # Not needed anymore
 
