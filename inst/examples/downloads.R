@@ -1,5 +1,11 @@
 R.utils::use()
 use("async")
+backend("local")
+
+tmpdir <- "downloads"
+mkdirs(tmpdir)
+opwd <- setwd(tmpdir)
+
 
 url <- "http://www.r-project.org"
 
@@ -10,10 +16,10 @@ front %<=% {
   urlT <- file.path(url, "index.html")
   downloadFile(urlT)
 }
-print(front)
+
 
 ## Download subpages
-pages %<-% {
+pages %<=% {
   url2 <- "http://www.r-project.org"
 
   pattern <- '.*"(.*[.]html)".*'
@@ -30,3 +36,6 @@ pages %<-% {
   mget(files, envir=pages)
 }
 print(pages)
+
+setwd(opwd)
+
