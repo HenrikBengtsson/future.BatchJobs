@@ -116,8 +116,8 @@ a _delayed assignment_ using `delayedAssign()`, which in turn has very
 similar constraints as of what you can assign using the `assign()`
 function, i.e. you can specify the name and target environment (which
 defaults to the current environment) of the variable you want to
-assign.  This means that you, for instance, cannot assign to an
-element of a vector, matrix, list or a data.frame.  If tried, an
+assign.  This means that you, for instance, cannot assign a value to
+an element of a vector, matrix, list or a data.frame.  If tried, an
 informative error will be generated, e.g.
 ```r
 > x <- list()
