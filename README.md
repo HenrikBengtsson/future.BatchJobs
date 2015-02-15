@@ -137,9 +137,12 @@ for ii in 1:3) {
 }
 names(x) <- c("a", "b", "c")
 ```
-The asynchroneous values can retrieved individually as `x[[2]]`,
-`x[["b"]]` and `x$b`.  All values can be retrieved as a list as
-`as.list(x)`.  As with asynchroneous values, retrieving one or more of
+The asynchroneous values of indexed environment can be retrieved
+individually as `x[["b"]]` and `x$b` just as with regular
+environments, but also as  `x[[2]]`.
+To retrieve all values in an environment, not only indexed once, as a
+list use `as.list(x)`.
+As with asynchroneous values, retrieving one or more of
 them from and indexed environment will cause R to pause until all
 requested values are available, that is, until all corresponding
 asynchroneous evaluations have been completed.
