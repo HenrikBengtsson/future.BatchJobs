@@ -122,8 +122,8 @@ informative error will be generated, e.g.
 ```r
 > x <- list()
 > x$a %<=% { 1 }
-Error: Delayed assignments can not be done to a 'list'; only to a variable and a
-n environment: x$a
+Error: Delayed assignments can not be done to a 'list'; only to a
+variable or an environment: x$a
 ```
 
 If _indexed subsetting_ is needed for assignments, one can instead use

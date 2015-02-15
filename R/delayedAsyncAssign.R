@@ -107,7 +107,7 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
           res$name <- idx
           res$envir <- obj
         } else {
-          stop(sprintf("Delayed assignments can not be done to a %s; only to a variable and an environment: %s", sQuote(mode(obj)), name), call.=FALSE)
+          stop(sprintf("Delayed assignments can not be done to a %s; only to a variable or an environment: %s", sQuote(mode(obj)), name), call.=FALSE)
         }
       } else {
         stop("Not a valid target for a delayed assignment: ", name, call.=FALSE)
