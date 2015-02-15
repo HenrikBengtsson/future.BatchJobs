@@ -356,7 +356,7 @@ environments that emulates part of what can be done with lists,
 specifically they supports _subsetting by indices_.  For example,
 ```r
 > x <- idxenv()
-> x[[i]] %<=% { 1 }
+> x[[1]] %<=% { 1 }
 > x[[3]] %<=% { "Hello world!" }
 > length(x)
 3
