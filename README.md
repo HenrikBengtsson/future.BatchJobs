@@ -127,7 +127,7 @@ for ii in 1:3) {
 names(x) <- c("a", "b", "c")
 ```
 The asynchroneous values can retrieved individually as `x[[2]]`,
-`x[['b']]` and `x$b`.  All values can be retrieved as a list as
+`x[["b"]]` and `x$b`.  All values can be retrieved as a list as
 `as.list(x)`.  As with asynchroneous values, retrieving one or more of
 them from and indexed environment will cause R to pause until all
 requested values are available, that is, until all corresponding
@@ -260,9 +260,14 @@ d <- runif(1)
 ```r
 library('async')
 library('R.utils')
-cran_pkgs %<=% downloadFile('http://cran.r-project.org/src/contrib/PACKAGES', path='CRAN')
-bioc_pkgs %<=% downloadFile('http://www.bioconductor.org/packages/release/bioc/src/contrib/PACKAGES', path='Bioc')
-print(c(cran_pkgs, bioc_pkgs))
+repos <- c(CRAN="http://cran.r-project.org",
+           Bioc="http://www.bioconductor.org/packages/release/bioc")
+urls <- sapply(repos, file.path, "src/contrib/PACKAGES", fsep="/")
+files <- new.env()
+for (name in names(urls)) {
+  files[[name]] %<=% downloadFile(urls[[name]], path=name)
+}
+str(as.list(files))
 ```
 
 
