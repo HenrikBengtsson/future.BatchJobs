@@ -98,7 +98,11 @@ This will evaluate the expression for `c` asynchronously such that `d` is assign
 
 
 ## Other types of asynchronous assignments
-The `%<=%` assignment operator _cannot_ be used in all cases where regular `<-` assignment operator can be used.  This is because `%<=%` assignments are _delayed assignment_, cf. `help("delayedAssign")`.  As shown above, `%<=%` can be used for assignment of (asynchronous) values to variables (formally symbols).  It can also be use to assign to variables in _environments_.  For example,
+The `%<=%` assignment operator _cannot_ be used in all cases where
+regular `<-` assignment operator can be used.  As shown above, `%<=%`
+can be used for assignment of (asynchronous) values to variables
+(formally symbols).  It can also be use to assign to variables in
+_environments_.  For example,
 ```r
 > env <- new.env()
 > env$a %<=% { 1 }
@@ -107,7 +111,14 @@ The `%<=%` assignment operator _cannot_ be used in all cases where regular `<-` 
 > env[[name]] %<=% { 3 }
 ```
 
-The limitations of delayed asynchronous assignments are the same as the limitations that `assign()` has, i.e. you can assign to variables and you can specify the target environment.  This means that you, for instance, cannot assign to an element of a vector, matrix, list or a data.frame.  If tried, an informative error will be generated, e.g.
+These limitations of assignments via `%<=%` are because it performs
+a _delayed assignment_ using `delayedAssign()`, which in turn has very
+similar constraints as of what you can assign using the `assign()`
+function, i.e. you can specify the name and target environment (which
+defaults to the current environment) of the variable you want to
+assign.  This means that you, for instance, cannot assign to an
+element of a vector, matrix, list or a data.frame.  If tried, an
+informative error will be generated, e.g.
 ```r
 > x <- list()
 > x$a %<=% { 1 }
