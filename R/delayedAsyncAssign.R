@@ -65,6 +65,13 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
       ## Assignment to enviroment via $ and [[
       op <- expr[[1]]
       if (op == "$" || op == "[[") {
+        ## Target
+        objname <- deparse(expr[[2]])
+        if (!exists(objname, envir=envir, inherits=TRUE)) {
+          stop(sprintf("Object %s not found: %s", sQuote(objname), name), call.=FALSE)
+        }
+        obj <- get(objname, envir=envir, inherits=TRUE)
+
         ## Subset
         idx <- expr[[3]]
         if (is.symbol(idx)) {
@@ -75,26 +82,32 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
             }
             idx <- get(idx, envir=envir, inherits=TRUE)
           }
+        } else if (is.language(idx)) {
+          idx <- eval(idx, envir=envir)
         }
+
+        ## Validate subetting, i.e. the 'idx'
+        if (length(idx) > 1L) {
+          stop(sprintf("Delayed assignments with subsetting can only be done on a single element at the time, not %d: %s", length(idx), name), call.=FALSE)
+        }
+
         if (is.character(idx)) {
+        } else if (is.numeric(idx)) {
+          if (!inherits(obj, "IndexedEnvironment")) {
+            stop(sprintf("Delayed assignments with numeric subsetting can not be done on a %s; only on an IndexedEnvironment: %s", sQuote(mode(obj)), name), call.=FALSE)
+          }
         } else {
           stop(sprintf("Invalid subset %s: %s", sQuote(deparse(idx)), name), call.=FALSE)
         }
-        res$name <- idx
 
-        ## Target
-        objname <- deparse(expr[[2]])
-        if (!exists(objname, envir=envir, inherits=TRUE)) {
-          stop(sprintf("Object %s not found: %s", sQuote(objname), name), call.=FALSE)
-        }
-        obj <- get(objname, envir=envir, inherits=TRUE)
         if (is.environment(obj)) {
+          res$name <- idx
+          res$envir <- obj
         } else {
-          stop(sprintf("Delayed assignments can not be done to a %s; only to variables and environments: %s", sQuote(mode(obj)), name), call.=FALSE)
+          stop(sprintf("Delayed assignments can not be done to a %s; only to a variable and an environment: %s", sQuote(mode(obj)), name), call.=FALSE)
         }
-        res$envir <- obj
       } else {
-        stop("Not a valid target for delayed assignments: ", name, call.=FALSE)
+        stop("Not a valid target for a delayed assignment: ", name, call.=FALSE)
       }
     }
   }
