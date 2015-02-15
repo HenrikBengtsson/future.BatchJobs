@@ -183,6 +183,16 @@ Job registry:  async1189072551
   Required packages: BatchJobs
 ```
 
+### Interrupts
+Interrupts such as user interrupts ("Ctrl-C") will only interrupt any
+evaluation running in the same R session.  They will not interrupts
+the evaluation of asynchroneous expressions running in seperate R
+processes such as those pushed out on a cluster.  This can be useful
+when one tries to get the value of a asynchroneous evaluation that
+took longer than expected causing R to pause.  By hitting Ctrl-C one
+can get back to the main prompt and do other tasks while waiting for
+the long-running evaluation to complete.
+
 
 ## Choosing backend
 The asynchronous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using the `backend()` function.  Examples:
