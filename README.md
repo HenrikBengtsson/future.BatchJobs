@@ -115,7 +115,7 @@ Error: Delayed assignments can not be done to a 'list'; only to a variable and a
 n environment: x$a
 ```
 
-** (TO DO: Indexed environments are not yet implemented) **
+**(TO DO: Indexed environments are not yet implemented)**
 
 If _indexed subsetting_ is needed, one can instead use an
 _indexed environment_, e.g. 
