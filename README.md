@@ -127,7 +127,8 @@ variable or an environment: x$a
 ```
 
 If _indexed subsetting_ is needed for assignments, one can instead use
-_"list environments"_ (implemented by the async package), e.g.
+_"list environments"_ (implemented by the async package), which
+emulates some of the index subsetting that lists have.  For example,
 ```r
 x <- listenv()
 for (ii in 1:3) {
