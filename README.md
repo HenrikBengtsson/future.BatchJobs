@@ -107,13 +107,33 @@ The `%<=%` assignment operator _cannot_ be used in all cases where regular `<-` 
 > env[[name]] %<=% { 3 }
 ```
 
-### Limitations
 The limitations of delayed asynchronous assignments are the same as the limitations that `assign()` has, i.e. you can assign to variables and you can specify the target environment.  This means that you, for instance, cannot assign to an element of a vector, matrix, list or a data.frame.  If tried, an informative error will be generated, e.g.
 ```r
 > x <- list()
-> x[[1]] %<=% { 1 }
-Error: Not a valid variable name for delayed assignments: x[[1]]
+> x$a %<=% { 1 }
+Error: Delayed assignments can not be done to a 'list'; only to a variable and a
+n environment: x$a
 ```
+
+** (TO DO: Indexed environments are not yet implemented) **
+
+If _indexed subsetting_ is needed, one can instead use an
+_indexed environment_, e.g. 
+```r
+x <- idxenv()
+for ii in 1:3) {
+  x[[ii]] %<=% { rnorm(ii) }
+}
+names(x) <- c("a", "b", "c")
+```
+The asynchroneous values can retrieved individually as `x[[2]]`,
+`x[['b']]` and `x$b`.  All values can be retrieved as a list as
+`as.list(x)`.  As with asynchroneous values, retrieving one or more of
+them from and indexed environment will cause R to pause until all
+requested values are available, that is, until all corresponding
+asynchroneous evaluations have been completed.
+
+
 
 ## Exception handling
 If an error occurs during the evaluation of an asynchronous
@@ -328,6 +348,41 @@ where the "tmpl" file is a [brew]-embedded PBS script template.
 
 For further details and examples on how to configure BatchJobs,
 see the [BatchJobs configuration] wiki page.
+
+
+## Indexed environments
+The async package provides _indexed environments_, which is a class of
+environments that emulates part of what can be done with lists,
+specifically they supports _subsetting by indices_.  For example,
+```r
+> x <- idxenv()
+> x[[i]] %<=% { 1 }
+> x[[3]] %<=% { "Hello world!" }
+> length(x)
+3
+> seq_along(x)
+[1] 1 2 3
+> names(x) <- c("a", "b", "c")
+> x$b <- TRUE
+> x[[1]]
+1
+> as.list(x)
+$a
+[1] 1
+
+$b
+[1] TRUE
+
+$c
+[1] "Hello world!"
+```
+
+It is possible to also specify the length upfront, e.g.
+```r
+> x <- idxenv(length=4)
+> seq_along(x)
+[1] 1 2 3 4
+```
 
 
 ### Software quality
