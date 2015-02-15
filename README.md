@@ -141,7 +141,7 @@ The asynchroneous values of indexed environment can be retrieved
 individually as `x[["b"]]` and `x$b` just as with regular
 environments, but also as  `x[[2]]`.
 To retrieve all values of an environment as a list, use `as.list(x)`.
-As with asynchroneous values, retrieving one or more of
+As with any asynchroneous values, retrieving one or more of
 them from and indexed environment will cause R to pause until all
 requested values are available, that is, until all corresponding
 asynchroneous evaluations have been completed.
