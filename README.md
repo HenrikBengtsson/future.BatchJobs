@@ -167,7 +167,7 @@ The asynchronous evaluation done by the [async] package uses the [BatchJobs] pac
 * `backend(".BatchJobs.R")` - use `.BatchJobs.R` configuration file.
 
 It is possible to specify a set of possible backends,
-e.g. `backend(c("multicore", "interactive")`.  The first
+e.g. `backend(c("multicore", "interactive"))`.  The first
 available/supported backend will be used.
 
 If none of the requested backends work/are supported, the fallback is
