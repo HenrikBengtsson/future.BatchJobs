@@ -126,23 +126,21 @@ Error: Delayed assignments can not be done to a 'list'; only to a variable and a
 n environment: x$a
 ```
 
-**(TO DO: Indexed environments are not yet implemented)**
-
 If _indexed subsetting_ is needed for assignments, one can instead use
-an _indexed environment_, e.g. 
+_"list environments"_ (implemented by the async package), e.g.
 ```r
-x <- idxenv()
+x <- listenv()
 for ii in 1:3) {
   x[[ii]] %<=% { rnorm(ii) }
 }
 names(x) <- c("a", "b", "c")
 ```
-The asynchroneous values of indexed environment can be retrieved
+The asynchroneous values of a list environment can be retrieved
 individually as `x[["b"]]` and `x$b` just as with regular
 environments, but also as  `x[[2]]`.
 To retrieve all values of an environment as a list, use `as.list(x)`.
 As with any asynchroneous values, retrieving one or more of
-them from and indexed environment will cause R to pause until all
+them from and list environment will cause R to pause until all
 requested values are available, that is, until all corresponding
 asynchroneous evaluations have been completed.
 
@@ -340,7 +338,7 @@ task %<=% {
 ```
 Obviously great care needs to be taken in order to minimize the amount
 of data sent back and forth, e.g. returning really large objects.
-  
+
 
 ## Appendix
 
@@ -378,14 +376,14 @@ For further details and examples on how to configure BatchJobs,
 see the [BatchJobs configuration] wiki page.
 
 
-## Indexed environments
-The async package provides _indexed environments_, which is a class of
+## Indexing using list environments
+The async package provides _list environments_, which is a class of
 environments that emulates part of what can be done with lists,
 specifically they supports _subsetting by indices_.  For example,
 ```r
-> x <- idxenv()
-> x[[1]] %<=% { 1 }
-> x[[3]] %<=% { "Hello world!" }
+> x <- listenv()
+> x[[1]] <- { 1 }
+> x[[3]] <- { "Hello world!" }
 > length(x)
 3
 > seq_along(x)
@@ -407,7 +405,7 @@ $c
 
 It is possible to also specify the length upfront, e.g.
 ```r
-> x <- idxenv(length=4)
+> x <- listenv(length=4)
 > seq_along(x)
 [1] 1 2 3 4
 ```
