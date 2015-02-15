@@ -128,8 +128,8 @@ n environment: x$a
 
 **(TO DO: Indexed environments are not yet implemented)**
 
-If _indexed subsetting_ is needed, one can instead use an
-_indexed environment_, e.g. 
+If _indexed subsetting_ is needed for assignments, one can instead use
+an _indexed environment_, e.g. 
 ```r
 x <- idxenv()
 for ii in 1:3) {
