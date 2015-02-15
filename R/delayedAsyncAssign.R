@@ -93,8 +93,11 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
 
         if (is.character(idx)) {
         } else if (is.numeric(idx)) {
-          if (!inherits(obj, "IndexedEnvironment")) {
-            stop(sprintf("Delayed assignments with numeric subsetting can not be done on a %s; only on an IndexedEnvironment: %s", sQuote(mode(obj)), name), call.=FALSE)
+          if (inherits(obj, "listenv")) {
+            ## Get variable name to use
+            idx <- get_variable(obj, idx)
+          } else {
+            stop(sprintf("Delayed assignments with indexed subsetting can not be done on a %s; only for listenv: %s", sQuote(mode(obj)), name), call.=FALSE)
           }
         } else {
           stop(sprintf("Invalid subset %s: %s", sQuote(deparse(idx)), name), call.=FALSE)

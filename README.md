@@ -130,7 +130,7 @@ If _indexed subsetting_ is needed for assignments, one can instead use
 _"list environments"_ (implemented by the async package), e.g.
 ```r
 x <- listenv()
-for ii in 1:3) {
+for (ii in 1:3) {
   x[[ii]] %<=% { rnorm(ii) }
 }
 names(x) <- c("a", "b", "c")

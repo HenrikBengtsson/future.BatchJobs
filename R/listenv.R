@@ -191,6 +191,44 @@ as.list.listenv <- function(x) {
   invisible(x)
 }
 
+#' @export
+get_variable <- function(...) UseMethod("get_variable")
+
+#' @export
+get_variable.listenv <- function(x, i, ...) {
+##  str(list(method="get_variable", i=i))
+
+  if (length(i) != 1L) {
+    stop("Index must be a scalar: ", length(i))
+  }
+
+  map <- map(x)
+  var <- map[i]
+  if (!is.na(var)) return(var)
+
+  if (is.character(i)) {
+    var <- i
+    ## Append to map
+    map <- c(map, var)
+    names(map)[length(map)] <- var
+    ## Update map
+    map(x) <- map
+  } else if (is.numeric(i)) {
+    ## Expand map?
+    if (i > length(map)) {
+      extra <- rep(NA_character_, times=i-length(map))
+      map <- c(map, extra)
+    }
+    ## Create internal variable name
+    var <- tempvar(value=value, envir=x, inherits=FALSE)
+    map[i] <- var
+    ## Update map
+    map(x) <- map
+  }
+
+  var
+}
+
 
 tempvar <- function(prefix="var", value, envir=parent.frame(), inherits=FALSE) {
   maxTries <- 1e+06

@@ -86,3 +86,59 @@ y <- as.list(x)
 str(y)
 stopifnot(length(y) == 3)
 
+
+##
+x <- listenv()
+x$a <- 1
+x[[3]] <- 3
+print(names(x))
+stopifnot(identical(names(x), c("a", "", "")))
+
+# First element (should be named 'a')
+var <- get_variable(x, "a")
+stopifnot(var == "a")
+var <- get_variable(x, 1)
+stopifnot(var == "a")
+
+# Third element (should be a temporary name)
+var <- get_variable(x, 3)
+stopifnot(var != "c")
+names(x) <- c("a", "b", "c")
+var <- get_variable(x, 3)
+stopifnot(var != "c")
+var <- get_variable(x, "c")
+stopifnot(var != "c")
+
+## Second element (should become 'b', because it was never used
+#                  before it was "named" 'b')
+x$b <- 2
+var <- get_variable(x, 2)
+stopifnot(var == "b")
+var <- get_variable(x, "b")
+stopifnot(var == "b")
+
+
+## Delayed assignment
+z <- listenv()
+z[[1]] %<-% { 1 }
+z[[3]] %<-% { "Hello world!" }
+stopifnot(length(z) == 3)
+names(z) <- c("a", "b", "c")
+z$b %<-% TRUE
+y <- as.list(z)
+str(y)
+stopifnot(length(y) == 3)
+
+
+
+## Async delayed assignment
+z <- listenv()
+z[[1]] %<=% { 2 }
+z[[4]] %<=% { "async!" }
+stopifnot(length(z) == 4)
+names(z) <- c("A", "B", "C", "D")
+z$b %<=% TRUE
+y <- as.list(z)
+str(y)
+stopifnot(length(y) == 4)
+
