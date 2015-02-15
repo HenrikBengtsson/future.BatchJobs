@@ -135,14 +135,14 @@ for (ii in 1:3) {
 }
 names(x) <- c("a", "b", "c")
 ```
-The asynchroneous values of a list environment can be retrieved
+The asynchronous values of a list environment can be retrieved
 individually as `x[["b"]]` and `x$b` just as with regular
 environments, but also as  `x[[2]]`.
 To retrieve all values of an environment as a list, use `as.list(x)`.
-As with any asynchroneous values, retrieving one or more of
+As with any asynchronous values, retrieving one or more of
 them from and list environment will cause R to pause until all
 requested values are available, that is, until all corresponding
-asynchroneous evaluations have been completed.
+asynchronous evaluations have been completed.
 
 
 
@@ -151,26 +151,26 @@ If an error occurs during the evaluation of an asynchronous
 expression, that error is thrown when the asynchronous value is
 retrieved.  For example:
 ```r
-> e %<=% { stop("Woops!") }
+> e %<=% { stop("Whoops!") }
 > 1+2
 [1] 3
 > e
-Error: BatchJobError: 'Error in eval(expr, envir = envir) : Woops! '
+Error: BatchJobError: 'Error in eval(expr, envir = envir) : Whoops! '
 ```
 This error is rethrown each time `e` is retrieved, so it is not
 possible to "inspect" `e` any further using standard R functions such
 as `print()` and `str()`.
 In order to troubleshoot an error, one can use the `inspect()` function
-to retrieve the underlying asynchroneous "task" object, e.g.
+to retrieve the underlying asynchronous "task" object, e.g.
 ```r
 > inspect(e)
 AsyncTask:
 Expression:
   {
-      stop("Woops!")
+      stop("Whoops!")
   }
 Status: 'error', 'started', 'submitted'
-Error: 'Error in eval(expr, envir = envir) : Woops! '
+Error: 'Error in eval(expr, envir = envir) : Whoops! '
 Backend:
 Job registry:  async1189072551
   Number of jobs:  1
@@ -184,9 +184,9 @@ Job registry:  async1189072551
 ### Interrupts
 Interrupts such as user interrupts ("Ctrl-C") will only interrupt any
 evaluation running in the same R session.  They will not interrupts
-the evaluation of asynchroneous expressions running in seperate R
+the evaluation of asynchronous expressions running in separate R
 processes such as those pushed out on a cluster.  This can be useful
-when one tries to get the value of a asynchroneous evaluation that
+when one tries to get the value of a asynchronous evaluation that
 took longer than expected causing R to pause.  By hitting Ctrl-C one
 can get back to the main prompt and do other tasks while waiting for
 the long-running evaluation to complete.
@@ -247,7 +247,7 @@ It is possible to create aliases for favorite sets of backends.  For instance,
 backend(cluster=c(".BatchJobs.R", "multicore", "local"))
 ```
 creates backend alias `"cluster"` using whatever BatchJobs
-configuration file is available with fallbacks to `"multicore"`
+configuration file is available with fallback to `"multicore"`
 and `"local"`.  After setting an alias it can be specified as:
 ```r
 backend("cluster")
