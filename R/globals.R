@@ -80,6 +80,7 @@ isBasePkgs <- function(pkgs) {
 #'
 #' @export
 #' @importFrom BatchJobs batchExport batchMap
+#' @keywords internal
 getGlobals <- function(expr, envir=parent.frame(), ..., primitive=FALSE, base=FALSE, unlist=TRUE) {
   names <- findGlobals(expr, envir=envir, ..., unlist=unlist)
   globals <- lapply(names, FUN=function(names) {

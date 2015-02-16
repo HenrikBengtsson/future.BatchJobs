@@ -31,4 +31,5 @@ for each failed try.}
 \description{
 Removes an asynchroneous task
 }
+\keyword{internal}
 

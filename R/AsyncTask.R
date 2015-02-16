@@ -13,6 +13,7 @@
 #' @export async
 #' @importFrom R.utils mcat mstr mprint mprintf
 #' @importFrom BatchJobs batchMap submitJobs
+#' @keywords internal
 AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async::finalize", TRUE)) {
   # Argument 'expr':
   expr <- substitute(expr)
@@ -89,6 +90,7 @@ async <- AsyncTask
 #' @export
 #' @importFrom R.utils captureOutput
 #' @importFrom R.utils printf
+#' @keywords internal
 print.AsyncTask <- function(x, ...) {
   printf("%s:\n", class(x)[1])
   printf("Expression:\n")
@@ -115,6 +117,7 @@ print.AsyncTask <- function(x, ...) {
 #' @export finished
 #' @export value
 #' @export error
+#' @keywords internal
 status <- function(...) UseMethod("status")
 finished <- function(...) UseMethod("finished")
 value <- function(...) UseMethod("value")
@@ -129,6 +132,7 @@ error <- function(...) UseMethod("error")
 #'
 #' @export
 #' @importFrom BatchJobs getStatus
+#' @keywords internal
 status.AsyncTask <- function(obj, ...) {
   backend <- obj$backend
   reg <- backend$reg
@@ -145,12 +149,14 @@ status.AsyncTask <- function(obj, ...) {
 
 
 #' @export
+#' @keywords internal
 finished.AsyncTask <- function(obj, ...) {
   any(c("done", "error", "expired") %in% status(obj))
 }
 
 
 #' @export
+#' @keywords internal
 value.AsyncTask <- function(obj, ...) {
   stat <- status(obj)
   if (!"done" %in% stat) {
@@ -164,6 +170,7 @@ value.AsyncTask <- function(obj, ...) {
 } # value()
 
 #' @export
+#' @keywords internal
 error.AsyncTask <- function(obj, ...) {
   if (!finished(obj)) {
     throw(sprintf("%s has not finished yet", class(obj)[1L]))
@@ -189,10 +196,11 @@ error.AsyncTask <- function(obj, ...) {
 #' If an error occurs, an informative Exception is thrown.
 #'
 #' @export
+#' @keywords internal
 await <- function(...) UseMethod("await")
 
 
-## Internal
+#' @keywords internal
 record <- function(...) UseMethod("record")
 record.AsyncTask <- function(task, name) {
   name <- sprintf(".task_%s", name)
@@ -220,6 +228,7 @@ record.AsyncTask <- function(task, name) {
 #' @importFrom R.methodsS3 throw
 #' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
+#' @keywords internal
 await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   throw <- R.methodsS3::throw
 
@@ -325,6 +334,7 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
 #' @export delete
 #' @aliases delete
 #' @importFrom BatchJobs removeRegistry
+#' @keywords internal
 delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)

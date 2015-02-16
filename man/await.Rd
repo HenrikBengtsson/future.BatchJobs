@@ -16,4 +16,5 @@ If an error occurs, an informative Exception is thrown.
 \description{
 Retrieves the value of of the asynchronously evaluated expression
 }
+\keyword{internal}
 

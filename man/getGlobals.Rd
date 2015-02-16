@@ -27,4 +27,5 @@ A named list of variables.
 \description{
 Get all global objects for one or more R expressions
 }
+\keyword{internal}
 

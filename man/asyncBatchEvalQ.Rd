@@ -24,4 +24,5 @@ Vector of type \code{integer} with job ids.
 \description{
 A batch map function for R expressions
 }
+\keyword{internal}
 

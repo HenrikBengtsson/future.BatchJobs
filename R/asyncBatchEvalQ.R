@@ -12,6 +12,7 @@
 #' @export
 #' @importFrom R.utils mcat mprint mprintf mstr
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
+#' @keywords internal
 asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
   debug <- getOption("async::debug", FALSE)
 

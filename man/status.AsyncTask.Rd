@@ -17,4 +17,5 @@ A character vector.
 \description{
 Status of an AsyncTask
 }
+\keyword{internal}
 

@@ -1,3 +1,9 @@
+#' Create a list environment
+#'
+#' @param length The number of NULL elements from start.
+#'
+#' @return An environment of class `listenv`.
+#'
 #' @export
 listenv <- function(length=0L) {
   .listenv.map <- character(0L)
@@ -10,16 +16,24 @@ listenv <- function(length=0L) {
   env
 }
 
+#' Variable name map for elements of list environment
+#'
+#' @param x A list environment.
+#'
+#' @return The a named character vector
+#'
+#' @aliases map.listenv map<- map<-.listenv
 #' @export
+#' @keywords internal
 map <- function(...) UseMethod("map")
 
-#' #' @export
-map.listenv <- function(x) {
+#' @export
+map.listenv <- function(x, ...) {
   get(".listenv.map", envir=x, inherits=TRUE)
 }
 
 #' @export
-`map<-` <- function(...) UseMethod("map<-")
+`map<-` <- function(x, value) UseMethod("map<-")
 
 #' @export
 `map<-.listenv` <- function(x, value) {
@@ -28,30 +42,25 @@ map.listenv <- function(x) {
   invisible(x)
 }
 
+#' Number of elements in list environment
+#'
+#' @param x A list environment.
+#'
 #' @export
-vars <- function(...) UseMethod("vars")
-vars.listenv <- function(x) {
-  map(x)
-}
-
-#' @export
+#' @keywords internal
 length.listenv <- function(x) {
   length(map(x))
 }
 
+#' Names of elements in list environment
+#'
+#' @param x A list environment.
+#'
+#' @aliases names<-.listenv
 #' @export
+#' @keywords internal
 names.listenv <- function(x) {
   names(map(x))
-}
-
-#' @export
-as.list.listenv <- function(x) {
-  vars <- map(x)
-  res <- vector("list", length=length(vars))
-  names(res) <- names(x)
-  ok <- !is.na(vars)
-  res[ok] <- mget(vars[ok], envir=x, inherits=FALSE)
-  res
 }
 
 #' @export
@@ -68,45 +77,43 @@ as.list.listenv <- function(x) {
   invisible(x)
 }
 
+#' List representation of a list environment
+#'
+#' @param x A list environment.
+#' @param ... Not used.
+#'
+#' @return A list.
+#'
 #' @export
+#' @keywords internal
+as.list.listenv <- function(x, ...) {
+  vars <- map(x)
+  res <- vector("list", length=length(vars))
+  names(res) <- names(x)
+  ok <- !is.na(vars)
+  res[ok] <- mget(vars[ok], envir=x, inherits=FALSE)
+  res
+}
+
+
+#' Get elements of list environment
+#'
+#' @param x A list environment.
+#' @param name The name or index of the element to retrieve.
+#'
+#' @return The value of an element or NULL if the element does not exist
+#'
+#' @aliases [[.listenv
+#' @export
+#' @keywords internal
 `$.listenv` <- function(x, name) {
+#' @keywords internal
 ##  str(list(method="$<-", name=name))
   map <- map(x)
   var <- map[name]
   if (is.na(var)) return(NULL)
 
   get(var, envir=x, inherits=FALSE)
-}
-
-
-#' @export
-`$<-.listenv` <- function(x, name, value) {
-##  str(list(method="$<-", name=name, value=value))
-  map <- map(x)
-
-  ## Map to an existing or a new element?
-  if (name %in% names(map)) {
-    var <- map[name]
-
-    ## A new variable?
-    if (is.na(var)) {
-      var <- name
-      map[name] <- name
-      map(x) <- map
-    }
-  } else {
-    var <- name
-
-    ## Append to map
-    map <- c(map, var)
-    names(map)[length(map)] <- var
-    map(x) <- map
-  }
-
-  ## Assign value
-  assign(var, value, envir=x, inherits=FALSE)
-
-  invisible(x)
 }
 
 
@@ -140,6 +147,45 @@ as.list.listenv <- function(x) {
   get(var, envir=x, inherits=FALSE)
 }
 
+
+
+#' Set an element of list environment
+#'
+#' @param x A list environment.
+#' @param name Name or index of element
+#' @param value The value to assign to the element
+#'
+#' @aliases [[<-.listenv
+#' @export
+#' @keywords internal
+`$<-.listenv` <- function(x, name, value) {
+##  str(list(method="$<-", name=name, value=value))
+  map <- map(x)
+
+  ## Map to an existing or a new element?
+  if (name %in% names(map)) {
+    var <- map[name]
+
+    ## A new variable?
+    if (is.na(var)) {
+      var <- name
+      map[name] <- name
+      map(x) <- map
+    }
+  } else {
+    var <- name
+
+    ## Append to map
+    map <- c(map, var)
+    names(map)[length(map)] <- var
+    map(x) <- map
+  }
+
+  ## Assign value
+  assign(var, value, envir=x, inherits=FALSE)
+
+  invisible(x)
+}
 
 #' @export
 `[[<-.listenv` <- function(x, i, value) {
@@ -191,29 +237,40 @@ as.list.listenv <- function(x) {
   invisible(x)
 }
 
+
+#' Get name of variable for a specific element of list environment
+#'
+#' @param x A list environment.
+#' @param name The name or index of element of interest.
+#'
+#' @return The name of the underlying variable
+#'
+#' @aliases get_variable.listenv
 #' @export
+#' @keywords internal
 get_variable <- function(...) UseMethod("get_variable")
 
 #' @export
-get_variable.listenv <- function(x, i, ...) {
-##  str(list(method="get_variable", i=i))
+get_variable.listenv <- function(x, name, ...) {
+##  str(list(method="get_variable", name))
 
-  if (length(i) != 1L) {
-    stop("Index must be a scalar: ", length(i))
+  if (length(name) != 1L) {
+    stop("Index must be a scalar: ", length(name))
   }
 
   map <- map(x)
-  var <- map[i]
+  var <- map[name]
   if (!is.na(var)) return(var)
 
-  if (is.character(i)) {
-    var <- i
+  if (is.character(name)) {
+    var <- name
     ## Append to map
     map <- c(map, var)
     names(map)[length(map)] <- var
     ## Update map
     map(x) <- map
-  } else if (is.numeric(i)) {
+  } else if (is.numeric(name)) {
+    i <- name
     ## Expand map?
     if (i > length(map)) {
       extra <- rep(NA_character_, times=i-length(map))
@@ -230,6 +287,7 @@ get_variable.listenv <- function(x, i, ...) {
 }
 
 
+#' @keywords internal
 tempvar <- function(prefix="var", value, envir=parent.frame(), inherits=FALSE) {
   maxTries <- 1e+06
   maxInt <- .Machine$integer.max
@@ -245,5 +303,5 @@ tempvar <- function(prefix="var", value, envir=parent.frame(), inherits=FALSE) {
     }
     ii <- ii + 1L
   }
-  stop(sprintf("Failed to generate a unique non-existing temporary variable with prefix '%s'", prefix), call.=FALES)
+  stop(sprintf("Failed to generate a unique non-existing temporary variable with prefix '%s'", prefix), call.=FALSE)
 } # tempvar()
