@@ -4,6 +4,11 @@ library("R.utils")
 findGlobals <- async:::findGlobals
 getGlobals <- async:::getGlobals
 
+## WORKAROUND: Avoid problem reported in testthat Issue #229, which
+## causes covr::package_coverage() to given an error. /HB 2015-02-16
+rm(list=c("x", "y", "z", "a", "pathname", "url", "filename", "b", "c"))
+
+
 message("Setting up expressions")
 exprs <- list(
   A = substitute({ Sys.sleep(5); x <- 0.1 }),
