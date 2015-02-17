@@ -18,7 +18,7 @@ asyncEvalQ <- function(exprs, ..., envir=parent.frame()) {
   for (ii in seq_len(nexprs)) {
     var <- get_variable(env, ii)
     expr <- exprs[[ii]]
-    delayedAsyncAssign(var, expr, assign.env=env)
+    delayedAsyncAssign(var, expr, envir=envir, assign.env=env)
   }
 
   env

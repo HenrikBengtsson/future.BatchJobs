@@ -4,7 +4,7 @@
   assign.env <- target$envir
   name <- target$name
   expr <- substitute(value)
-  delayedAsyncAssign(name, expr, assign.env=assign.env)
+  delayedAsyncAssign(name, expr, envir=parent.frame(), assign.env=assign.env)
 }
 
 `%=>%` <- function(x, value) {
@@ -13,5 +13,5 @@
   assign.env <- target$envir
   name <- target$name
   expr <- substitute(x)
-  delayedAsyncAssign(name, expr, assign.env=assign.env)
+  delayedAsyncAssign(name, expr, envir=parent.frame(), assign.env=assign.env)
 }

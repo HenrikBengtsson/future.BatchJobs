@@ -6,13 +6,16 @@
 \alias{delayedAsyncAssign}
 \title{Delayed asynchroneous evaluation}
 \usage{
-delayedAsyncAssign(name, expr, assign.env = parent.frame(1))
+delayedAsyncAssign(name, expr, envir = parent.frame(), assign.env = envir)
 }
 \arguments{
 \item{name}{the name of the variable to assign.}
 
 \item{expr}{the R expression to be asynchroneous evaluated and
 whose value will be assigned to the variable.}
+
+\item{envir}{The environment from which global variables used by
+the expression should be search for.}
 
 \item{assign.env}{The environment to which the variable should
 be assigned.}

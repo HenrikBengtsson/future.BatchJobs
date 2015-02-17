@@ -1,6 +1,9 @@
 R.utils::use()
 use("async")
+## Make sure not to clash with R.utils
+`%<-%` <- async::`%<-%`
 
+ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=FALSE)
 
 backend("interactive")
@@ -37,3 +40,4 @@ stopifnot(env$a == 1, env$b == 2, env$c == 3)
 
 ## Cleanup
 options(oopts)
+rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

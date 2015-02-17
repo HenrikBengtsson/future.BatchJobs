@@ -1,9 +1,9 @@
 R.utils::use()
 use("async")
+## Make sure not to clash with R.utils
+`%<-%` <- async::`%<-%`
 
-## Make sure not to clash with R.utils::`%<-%`
-#stopifnot(identical(`%<-%`, async::`%<-%`))
-
+ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=FALSE)
 
 backend("interactive")
@@ -11,25 +11,28 @@ backend("interactive")
 rm(list=intersect(c("x", "y"), ls()))
 
 message("** Delayed non-asynchronous evaluation")
+mprint(ls())
 v0 %<-% { print("Starting"); y <- 1; print("Finished"); y }
+mprint(ls())
 mprintf("v0=%s\n", v0)
 stopifnot(v0 == 1)
-stopifnot(!exists("y"))
-
+mprint(ls())
+print(exists("y"))
+stopifnot(!exists("y") || !identical(y, 1))
 
 message("** Delayed asynchronous evaluation without globals")
 v1 %<=% { x <- 1 }
-stopifnot(!exists("x"))
+stopifnot(!exists("x") || !identical(x, 1))
 
 message("** Delayed asynchronous evaluation with globals")
 a <- 2
 v2 %<=% { x <- a }
-stopifnot(!exists("x"))
+stopifnot(!exists("x") || !identical(x, a))
 
 message("** Delayed asynchronous evaluation with errors")
 ## Test that async() works when there are errors
 v3 %<=% { x <- 3; stop("Woops!"); x }
-stopifnot(!exists("x"))
+stopifnot(!exists("x") || !identical(x, 3))
 
 message("** Delayed asynchronous evaluation with progress bar (~5s)")
 v4 %<=% {
@@ -64,3 +67,5 @@ mprintf("v4=%s\n", v4)
 
 ## Cleanup
 options(oopts)
+rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+

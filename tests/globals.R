@@ -1,21 +1,24 @@
 library("async")
 library("R.utils")
 
+ovars <- ls(envir=globalenv())
+oopts <- options(warn=1, "async::debug"=FALSE)
+
 findGlobals <- async:::findGlobals
 getGlobals <- async:::getGlobals
 
 ## WORKAROUND: Avoid problem reported in testthat Issue #229, which
 ## causes covr::package_coverage() to given an error. /HB 2015-02-16
-rm(list=c("x", "y", "z", "a", "pathname", "url", "filename", "b", "c"))
+rm(list=c("x", "y", "z", "a", "pathname", "url", "filename", "b", "c", "%<-%"))
 
 
 message("Setting up expressions")
 exprs <- list(
-  A = substitute({ Sys.sleep(5); x <- 0.1 }),
-  B = substitute({ y <- 0.2 }),
-  C = substitute({ z <- a+0.3 }),
-  D = substitute({ pathname <- file.path(dirname(url), filename) }),
-  E = substitute({ b %<-% c })
+  A = substitute({ Sys.sleep(5); x <- 0.1 }, env=list()),
+  B = substitute({ y <- 0.2 }, env=list()),
+  C = substitute({ z <- a+0.3 }, env=list()),
+  D = substitute({ pathname <- file.path(dirname(url), filename) }, env=list()),
+  E = substitute({ b %<-% c }, env=list())
 )
 
 atleast <- list(
@@ -61,3 +64,8 @@ for (kk in seq_along(exprs)) {
 
   mcat("\n")
 }
+
+
+## Cleanup
+options(oopts)
+rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

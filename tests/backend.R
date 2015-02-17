@@ -1,6 +1,7 @@
 R.utils::use()
 use("async")
 
+ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=FALSE)
 
 ## Display current backend() used
@@ -59,4 +60,7 @@ if (!"covr" %in% loadedNamespaces())
 ## Undo everything
 backend(obackend)
 printf("Backend was reset to: %s\n", backend(NULL))
+
+## Cleanup
 options(oopts)
+rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

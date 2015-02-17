@@ -1,16 +1,19 @@
 R.utils::use()
 use("async")
 
-message("*** asyncEvalQ()")
+ovars <- ls(envir=globalenv())
+oopts <- options(warn=1, "async::debug"=TRUE)
 
-oopts <- options(warn=1, "async::debug"=FALSE)
+backend("local")
+
+message("*** asyncEvalQ()")
 
 message("Setting up expressions")
 a <- 1
 exprs <- list(
-  A = substitute({ x <- 0.1 }),
-  B = substitute({ y <- 0.2 }),
-  B = substitute({ z <- a+0.3 })
+  A = substitute({ x <- 0.1 }, env=list()),
+  B = substitute({ y <- 0.2 }, env=list()),
+  B = substitute({ z <- a+0.3 }, env=list())
 )
 mstr(exprs)
 
@@ -22,5 +25,7 @@ mcat("Values/Results:\n")
 values <- as.list(env)
 mstr(values)
 
-## Undo
+
+## Cleanup
 options(oopts)
+rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

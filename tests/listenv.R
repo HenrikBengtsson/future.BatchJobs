@@ -1,4 +1,9 @@
 library("async")
+## Make sure not to clash with R.utils
+`%<-%` <- async::`%<-%`
+
+ovars <- ls(envir=globalenv())
+oopts <- options(warn=1, "async::debug"=FALSE)
 
 x <- listenv()
 print(length(x))
@@ -142,3 +147,7 @@ y <- as.list(z)
 str(y)
 stopifnot(length(y) == 4)
 
+
+## Cleanup
+options(oopts)
+rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

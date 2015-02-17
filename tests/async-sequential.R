@@ -1,6 +1,7 @@
 R.utils::use()
 use("async")
 
+ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
 
 ## Test that async() works when there are no globals
@@ -37,3 +38,4 @@ stopifnot(is.null(res))
 
 ## Cleanup
 options(oopts)
+rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
