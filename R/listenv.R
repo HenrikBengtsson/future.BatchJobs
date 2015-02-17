@@ -66,7 +66,8 @@ names.listenv <- function(x) {
 #' @export
 `names<-.listenv` <- function(x, value) {
   map <- map(x)
-  if (length(value) != length(map)) {
+  if (is.null(value)) {
+  } else if (length(value) != length(map)) {
     stop(sprintf("Number of names does not match the number of elments: %s != %s", length(value), length(map)))
   }
 ##  if (any(duplicated(value))) {

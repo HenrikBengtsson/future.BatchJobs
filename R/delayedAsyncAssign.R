@@ -24,13 +24,6 @@ delayedAsyncAssign <- function(name, expr, assign.env=parent.frame(1)) {
   task <- eval(call, envir=assign.env)
   record(task, name=name)
 
-  ## If an error occurs, we need to be able to troubleshoot it, which
-  ## requires access to the 'env$job' object afterward.  This can be
-  ## saved "somewhere".  One way is to save it using the name 'name'
-  ## and 'envir', e.g. assign(.error_<name>, envir).  This saving
-  ## needs to be done by await().
-##  target <- list(envir=assign.env, name=name)
-
   ## Create delayed assignment for its result.
   ## Here await may throw an error causing the assign value to be a
   ## "delayed" error, which will be thrown each time the variable is
