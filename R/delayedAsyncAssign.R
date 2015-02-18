@@ -14,7 +14,9 @@
 #' @return A delayed assignment which, when evaluated, will retrieve
 #' the value of the asynchronous evaluation.
 #'
-#' @seealso \code{\link{async}()}
+#' @example inst/delayedAsyncAssign_OP.R
+#'
+#' @seealso \code{\link{asyncEvalQ}()}
 #'
 #' @aliases %<=% %=>%
 #' @export
