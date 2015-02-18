@@ -7,17 +7,59 @@
 asyncEvalQ(exprs, ..., envir = parent.frame())
 }
 \arguments{
-\item{exprs}{A list of R expressions.}
+\item{exprs}{A \link[base]{list} of R \link[base]{expression}s.}
 
 \item{...}{Additional arguments passed to \code{asyncBatchEvalQ)}.}
 
-\item{envir}{The environment from where to search for globals.}
+\item{envir}{The \link[base]{environment} from where to search
+for global variables.}
 }
 \value{
 A \code{\link{listenv}} of length \code{length(exprs)}.
 }
 \description{
 Evaluate multiple R expressions asynchronously
+}
+\section{Best practice for using substitute()}{
+
+If using \code{substitute()} to create expressions, as in
+the example below, it is recommended to \emph{always} specify
+argument \code{env} even if no substitutions are indendent, i.e.
+\code{expr <- substitute(..., env=list())}.
+This is because the default value of \code{env} differs when
+called from the \emph{global environment} and other environments.
+For details on this unusual behavior, see the help on
+\code{\link{substitute}()}.
+}
+\examples{
+backend(c("multicore", "local"))
+
+## Setup three expressions
+exprs <- list(
+  A = substitute({ x <- 0.1 }, env=list()),
+  B = substitute({ y <- 0.2 }, env=list()),
+  C = substitute({ z <- a+0.3 }, env=list())
+)
+str(exprs)
+
+## Evaluate expressions asynchronously
+
+# Define global 'a' used in expression 'C'
+a <- 1
+
+lenv <- asyncEvalQ(exprs=exprs)
+message("Number of async evaluations: ", length(env))
+message("Async evaluations names: ", paste(sQuote(names(env)), collapse=", "))
+
+message("Values/Results:")
+
+## Sleep until value for expression 'B' is available
+value <- lenv$B
+message("Value 'B': ", value)
+
+## Sleep until all results are available
+values <- as.list(lenv)
+str(values)
 }
 \keyword{internal}
 
