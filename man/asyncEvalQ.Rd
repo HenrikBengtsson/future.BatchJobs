@@ -48,8 +48,8 @@ str(exprs)
 a <- 1
 
 lenv <- asyncEvalQ(exprs=exprs)
-message("Number of async evaluations: ", length(env))
-message("Async evaluations names: ", paste(sQuote(names(env)), collapse=", "))
+message("Number of async evaluations: ", length(lenv))
+message("Async evaluations names: ", paste(sQuote(names(lenv)), collapse=", "))
 
 message("Values/Results:")
 
