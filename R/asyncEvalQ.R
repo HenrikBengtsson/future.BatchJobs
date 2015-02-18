@@ -19,6 +19,9 @@
 #'
 #' @example inst/asyncEvalQ.R
 #'
+#' @seealso \code{\link{delayedAsyncAssign}()} and
+#' its corresponding operator \code{\link{\%<=\%}}.
+#'
 #' @export
 #' @importFrom R.utils mcat mprint mprintf mstr
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
