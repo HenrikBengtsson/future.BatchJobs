@@ -1,5 +1,3 @@
-# R package: async
-
 Copyright Henrik Bengtsson, 2015
 
 ## Asynchronous evaluation
@@ -416,18 +414,3 @@ It is possible to also specify the length upfront, e.g.
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 [codetools]: cran.r-project.org/package=codetools
-
-## Installation
-Package is only available via [GitHub](https://github.com/UCSF-CBC/async).  Install in R as:
-```r
-source('http://callr.org/install#UCSF-CBC/async')
-```
-
-
-## Software quality
-
-| Resource:     | GitHub        | Travis CI        | Appveyor         |
-| ------------- | ------------------- | ---------------- | ---------------- |
-| _Platforms:_  | _Multiple_          | _Linux_          | _Windows_        |
-| R CMD check   |  |     |  |
-| Test coverage |                     | <a href="https://coveralls.io/r/UCSF-CBC/async"><img src="https://coveralls.io/repos/UCSF-CBC/async/badge.png?branch=develop" alt="Coverage Status"/></a> |                  |

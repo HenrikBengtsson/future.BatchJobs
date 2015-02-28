@@ -3,6 +3,7 @@
 #----------------------------
 ^.svn
 ^.git
+^.make
 README[.]md
 
 #----------------------------
@@ -29,5 +30,6 @@ README[.]md
 ^[.]devel
 ^[.]test
 ^[.]check
+^.*[.]tar[.]gz$
 ^[.]BatchJobs.R
 ^async[0-9]+-files
