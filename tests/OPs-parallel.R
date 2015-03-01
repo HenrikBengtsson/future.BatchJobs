@@ -6,7 +6,7 @@ use("async")
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=FALSE)
 
-backend("interactive")
+backend("local")
 
 rm(list=intersect(c("x", "y"), ls()))
 

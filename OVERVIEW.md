@@ -196,7 +196,7 @@ The asynchronous evaluation done by the [async] package uses the [BatchJobs] pac
 
 * `backend("default")` - use `.BatchJobs.R` configuration file,
    if available. If not, use `"multicore-1"` if supported,
-   otherwise use `"interactive"`
+   otherwise use `"local"`
 * `backend("multicore")` - parallel processing using all available
    cores on the local machine.
 * `backend("multicore-1")` - parallel processing using all but one
@@ -207,11 +207,11 @@ The asynchronous evaluation done by the [async] package uses the [BatchJobs] pac
 * `backend(".BatchJobs.R")` - use `.BatchJobs.R` configuration file.
 
 It is possible to specify a set of possible backends,
-e.g. `backend(c("multicore", "interactive"))`.  The first
+e.g. `backend(c("multicore", "local"))`.  The first
 available/supported backend will be used.
 
 If none of the requested backends work/are supported, the fallback is
-always to use the `"interactive"` which is available on all systems.
+always to use the `"local"` which is available on all systems.
 
 To see what the most recently set backend was, use `backend(NULL)`.
 To reset, use `backend("reset")`

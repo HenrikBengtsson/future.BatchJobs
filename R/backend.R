@@ -25,7 +25,7 @@
 #' From start, there is a single alias:
 #' \itemize{
 #'  \item{\code{default = c(".BatchJobs.R", "multicore-1", "multicore",
-#'                          "interactive", "local", "rscript")}}
+#'                          "local", "interactive", "rscript")}}
 #' }
 #'
 #' @export
@@ -34,7 +34,7 @@
 #' @importFrom R.utils use
 backend <- local({
   aliases = list(
-    default = c(".BatchJobs.R", "multicore-1", "multicore", "interactive", "local", "rscript")
+    default = c(".BatchJobs.R", "multicore-1", "multicore", "local", "interactive", "rscript")
   )
   last = NULL
 
@@ -104,8 +104,8 @@ backend <- local({
       what <- setdiff(what, dropped)
     }
 
-    ## Always fall back to using the 'interactive' configuration
-    if (length(what) == 0L) what <- "interactive"
+    ## Always fall back to using the 'local' configuration
+    if (length(what) == 0L) what <- "local"
 
     ## The final choice
     what <- what[1L]

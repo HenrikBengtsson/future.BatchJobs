@@ -1,4 +1,4 @@
-# R package: async
+# async: Asynchronous Evaluation
 
 Copyright Henrik Bengtsson, 2015
 
@@ -198,7 +198,7 @@ The asynchronous evaluation done by the [async] package uses the [BatchJobs] pac
 
 * `backend("default")` - use `.BatchJobs.R` configuration file,
    if available. If not, use `"multicore-1"` if supported,
-   otherwise use `"interactive"`
+   otherwise use `"local"`
 * `backend("multicore")` - parallel processing using all available
    cores on the local machine.
 * `backend("multicore-1")` - parallel processing using all but one
@@ -209,11 +209,11 @@ The asynchronous evaluation done by the [async] package uses the [BatchJobs] pac
 * `backend(".BatchJobs.R")` - use `.BatchJobs.R` configuration file.
 
 It is possible to specify a set of possible backends,
-e.g. `backend(c("multicore", "interactive"))`.  The first
+e.g. `backend(c("multicore", "local"))`.  The first
 available/supported backend will be used.
 
 If none of the requested backends work/are supported, the fallback is
-always to use the `"interactive"` which is available on all systems.
+always to use the `"local"` which is available on all systems.
 
 To see what the most recently set backend was, use `backend(NULL)`.
 To reset, use `backend("reset")`
@@ -418,7 +418,7 @@ It is possible to also specify the length upfront, e.g.
 [codetools]: cran.r-project.org/package=codetools
 
 ## Installation
-Package is only available via [GitHub](https://github.com/UCSF-CBC/async).  Install in R as:
+R package async is only available via [GitHub](https://github.com/UCSF-CBC/async) and can be installed in R as:
 ```r
 source('http://callr.org/install#UCSF-CBC/async')
 ```
