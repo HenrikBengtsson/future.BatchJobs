@@ -17,12 +17,12 @@ tweakExpression <- function(expr) {
       exprI <- expr[[ii]]
       op <- exprI[[1]]
       if (!is.symbol(op)) next
-      if (op == "%<-%") {
+      if (op == "%<-%" || op == "%<=%") {
         lhs <- exprI[[2]]
         rhs <- exprI[[3]]
         exprF <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
         expr[[ii]] <- exprF
-      } else if (op == "%->%") {
+      } else if (op == "%->%" || op == "%=>%") {
         lhs <- exprI[[3]]
         rhs <- exprI[[2]]
         exprI <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))

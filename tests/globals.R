@@ -18,7 +18,17 @@ exprs <- list(
   B = substitute({ y <- 0.2 }, env=list()),
   C = substitute({ z <- a+0.3 }, env=list()),
   D = substitute({ pathname <- file.path(dirname(url), filename) }, env=list()),
-  E = substitute({ b %<-% c }, env=list())
+  E = substitute({ b %<-% c }, env=list()),
+  F = substitute({
+    a %<-% { runif(1) }
+    b %<-% { rnorm(1) }
+    x <- a*b; abs(x)
+  }, env=list()),
+  G = substitute({
+    a %<=% { runif(1) }
+    b %<=% { rnorm(1) }
+    x <- a*b; abs(x)
+  }, env=list())
 )
 
 atleast <- list(
@@ -26,7 +36,9 @@ atleast <- list(
   B = c(),
   C = c("a"),
   D = c("filename"),
-  E = c("c")
+  E = c("c"),
+  F = c(),
+  G = c()
 )
 
 not <- list(
@@ -34,7 +46,9 @@ not <- list(
   B = c("y"),
   C = c("z"),
   D = c("pathname"),
-  E = c("b")
+  E = c("b"),
+  F = c("a", "b", "x"),
+  G = c("a", "b", "x")
 )
 
 
