@@ -63,7 +63,7 @@ d <- runif(1)
 the third asynchronous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchronous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).  This pause can be avoided using nested asynchronous evaluation (see Section below).
 
 
-_Footnotes_:
+_Footnotes_:  
 (\*) Since the asynchronous environment may be in a separate R session
 on a physically different machine, the "inheritance" of "global"
 variables is achieved by first identifying which variables in the
@@ -73,7 +73,7 @@ This has to be taken into consideration when working with large
 objects, which can take a substantial time to serialize.  Serialized
 objects may also be written to file which then a compute node reads
 back in. The global environments are identified using code inspection,
-cf. the [codetools] package.
+cf. the [codetools] package.  
 (\*\*) There is currently no lazy-evaluation mechanism for global
 variables from asynchronous evaluations.  However, theoretically, one
 could imagine that parts of an asynchronous expression can be
@@ -300,12 +300,20 @@ source('http://callr.org/install#HenrikBengtsson/async')
 
 
 ## Future directions
-If it would be possible to abstract the [BatchJobs] Registry layer
-even further such that the job registry can be distributed on
-disconnected file systems and synchronized via serialization, say,
-over ssh, then one can image to do things such as:
+The above, which is a fully functional prototype, relies 100% on
+[BatchJobs] as the backend.  Unfortunately, BatchJobs has some
+limitations as it stands.  The most important one is the fact that [all
+machines, including the head machine, have to share the same file
+system](https://github.com/tudo-r/BatchJobs/issues/71).  This means
+that it is, for instance, not possible to do asynchronous evaluation
+on remote hosts, e.g. over ssh.  If that would be possible, then one
+can imagine doing things such as:
 ```r
-# The world at your R prompt
+# The world's computer resources at your R prompt
+tasks %<=% {
+  update.packages()
+} %backends% c("local", "cluster", "AmazonEC2", "GoogleCompEngine")
+
 tcga %<=% {
   backend("cluster")
 
@@ -318,7 +326,7 @@ tcga %<=% {
   }
 
   list(a=a, b=b)
-} %backend% "Amazon Web Services"
+} %backend% "AmazonEC2"
 
 hapmap %<=% {
   backend("cluster")
@@ -328,15 +336,34 @@ hapmap %<=% {
   }
 
   normals
-} %backend% "Google Compute Engine"
-
-
-task %<=% {
-  backup_machine()
-} %backend% "@home"
+} %backend% "GoogleCompEngine"
 ```
 Obviously great care needs to be taken in order to minimize the amount
 of data sent back and forth, e.g. returning really large objects.
+
+In order for the above to work, one would have to extend the
+BatchJobs Registry framework to work across file systems, which
+would requiring serialization and communicating over sockets.
+A better approach is probably to instead use the [BiocParallel]
+package as the main framework for backends.  BiocParallel "aims to
+provide a unified interface to existing parallel infrastructure where
+code can be easily executed in different environments".  It already
+has built in support for BatchJobs.  More importantly, it support many
+other backends, including Simple Network of Workstations ("SNOW")
+style clusters. A SNOW cluster consists of a set of local or remote
+workers that communicates with the head node/machine via sockets such
+that data and commands can be transferred across using a serialized
+protocol.  For example, from the BiocParallel vignette:
+```r
+hosts <- c("rhino01", "rhino01", "rhino02")
+param <- SnowParam(workers = hosts, type = "PSOCK")
+Execute FUN 4 times across the workers.
+> FUN <- function(i) system("hostname", intern=TRUE)
+> bplapply(1:4, FUN, BPPARAM = param)
+```
+
+Because of this, the next plan is to update 'async' to work on top of
+BiocParallel instead.
 
 
 ## Appendix
@@ -353,7 +380,11 @@ calls should also use the same configuration).  These settings
 are used by default if available.  They also be explicitly specified
 by `backend(".BatchJobs.R")`.
 
-For example, to configure BatchJobs to distribute computations on a set of known machines (for which you have ssh access), let the `.BatchJobs.R` file contain:
+For example, to configure BatchJobs to distribute computations on a
+set of known machines (for which you have ssh access and that
+[share the same file system as your head
+machine](https://github.com/tudo-r/BatchJobs/issues/71)), let the
+`.BatchJobs.R` file contain:
 ```r
 cluster.functions <- makeClusterFunctionsSSH(
   makeSSHWorker(nodename="n6", max.jobs=2),
@@ -413,4 +444,5 @@ It is possible to also specify the length upfront, e.g.
 [brew]: http://cran.r-project.org/package=brew
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
-[codetools]: cran.r-project.org/package=codetools
+[codetools]: http://cran.r-project.org/package=codetools
+[BiocParallel]: http://bioconductor.org/packages/release/bioc/html/BiocParallel.html
