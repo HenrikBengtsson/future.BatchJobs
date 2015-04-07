@@ -10,10 +10,13 @@ message("*** asyncEvalQ()")
 
 message("Setting up expressions")
 a <- 1
+square <- function(x) x^2
+
 exprs <- list(
   A = substitute({ x <- 0.1 }, env=list()),
   B = substitute({ y <- 0.2 }, env=list()),
-  B = substitute({ z <- a+0.3 }, env=list())
+  C = substitute({ Sys.sleep(5); z <- a+0.3 }, env=list()),
+  D = substitute({ x <- 1; w <- square(a+x) }, env=list())
 )
 mstr(exprs)
 

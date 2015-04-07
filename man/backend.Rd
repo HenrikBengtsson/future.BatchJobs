@@ -39,7 +39,7 @@ To list all registered aliases, use \code{backend("aliases")}.
 From start, there is a single alias:
 \itemize{
  \item{\code{default = c(".BatchJobs.R", "multicore-1", "multicore",
-                         "interactive", "local", "rscript")}}
+                         "local", "interactive", "rscript")}}
 }
 }
 

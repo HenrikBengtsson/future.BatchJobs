@@ -9,7 +9,8 @@ getGlobals <- async:::getGlobals
 
 ## WORKAROUND: Avoid problem reported in testthat Issue #229, which
 ## causes covr::package_coverage() to given an error. /HB 2015-02-16
-rm(list=c("x", "y", "z", "a", "pathname", "url", "filename", "b", "c", "%<-%"))
+rm(list=c("a", "b", "c", "x", "y", "z", "square",
+          "pathname", "url", "filename", "%<-%"))
 
 
 message("Setting up expressions")
@@ -28,7 +29,10 @@ exprs <- list(
     a %<=% { runif(1) }
     b %<=% { rnorm(1) }
     x <- a*b; abs(x)
-  }, env=list())
+  }, env=list()),
+  H = substitute({
+    y <- square(a)
+  })
 )
 
 atleast <- list(
@@ -38,7 +42,8 @@ atleast <- list(
   D = c("filename"),
   E = c("c"),
   F = c(),
-  G = c()
+  G = c(),
+  H = c("a", "square")
 )
 
 not <- list(
@@ -48,13 +53,15 @@ not <- list(
   D = c("pathname"),
   E = c("b"),
   F = c("a", "b", "x"),
-  G = c("a", "b", "x")
+  G = c("a", "b", "x"),
+  H = c()
 )
 
 
 ## Define globals
 a <- 3.14
 c <- 2.71
+square <- function(x) x^2
 filename <- "index.html"
 # Yes, pretend we forget 'url'
 

@@ -1,14 +1,15 @@
 #----------------------------
-# Git and SVN related
+# Git, SVN etc.
 #----------------------------
 ^.svn
 ^.git
 ^.make
+^.editorconfig
 README[.]md
 OVERVIEW[.]md
 
 #----------------------------
-# Travis-CI et al.
+# Travis-CI etc.
 #----------------------------
 ^[.]travis[.]yml$
 ^travis-tool[.]sh$

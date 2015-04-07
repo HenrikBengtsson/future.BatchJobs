@@ -1,7 +1,14 @@
 Package: async
 ==============
 
+Version: 0.1.1 [2015-04-07]
+o BUG FIX: asyncBatchEvalQ() would given "Error in packageVersion(pkg) :
+  package 'R_GlobalEnv'" if the expression had a global function defined
+  in the global environment.  Now asyncBatchEvalQ() does a better jobs
+  in identifying package names.  Added package tests for this case.
+
+
 Version: 0.1.0 [2015-02-07]
-o First prototype of an old idea of asynchronous evaluations with 
+o First prototype of an old idea of asynchronous evaluations with
   delayed assignments.
 o Created.

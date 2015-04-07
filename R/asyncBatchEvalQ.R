@@ -39,6 +39,10 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
 
     ## Drop "missing" packages, e.g. globals in globalenv().
     pkgs <- pkgs[nchar(pkgs) > 0L]
+    ## Drop global environment
+    pkgs <- pkgs[pkgs != "R_GlobalEnv"]
+    ## Keep only names matching loaded namespaces
+    pkgs <- intersect(pkgs, loadedNamespaces())
 
     ## Packages to be loaded
     pkgs <- sort(unique(pkgs))
