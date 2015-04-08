@@ -15,7 +15,7 @@ rm(list=c("a", "b", "c", "x", "y", "z", "square",
 
 message("Setting up expressions")
 exprs <- list(
-  A = substitute({ Sys.sleep(5); x <- 0.1 }, env=list()),
+  A = substitute({ Sys.sleep(1); x <- 0.1 }, env=list()),
   B = substitute({ y <- 0.2 }, env=list()),
   C = substitute({ z <- a+0.3 }, env=list()),
   D = substitute({ pathname <- file.path(dirname(url), filename) }, env=list()),
@@ -32,7 +32,11 @@ exprs <- list(
   }, env=list()),
   H = substitute({
     y <- square(a)
-  })
+  }, env=list()),
+  I = substitute({
+    b <- a
+    a <- 1
+  }, env=list())
 )
 
 atleast <- list(
@@ -43,7 +47,8 @@ atleast <- list(
   E = c("c"),
   F = c(),
   G = c(),
-  H = c("a", "square")
+  H = c("a", "square"),
+  I = c() ## FIXME: Should be c("a"), cf. Issue #5.
 )
 
 not <- list(
@@ -54,7 +59,8 @@ not <- list(
   E = c("b"),
   F = c("a", "b", "x"),
   G = c("a", "b", "x"),
-  H = c()
+  H = c(),
+  I = c()
 )
 
 
