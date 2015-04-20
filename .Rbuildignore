@@ -34,4 +34,5 @@ OVERVIEW[.]md
 ^[.]check
 ^.*[.]tar[.]gz$
 ^[.]BatchJobs.R
+^[.]async
 ^async[0-9]+-files

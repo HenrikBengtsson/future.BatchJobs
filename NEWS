@@ -1,6 +1,10 @@
 Package: async
 ==============
 
+Version: 0.1.2 [2015-04-20]
+o CLEANUP: Now async BatchJobs registries are created in ./.async/
+
+
 Version: 0.1.1 [2015-04-07]
 o BUG FIX: asyncBatchEvalQ() would given "Error in packageVersion(pkg) :
   package 'R_GlobalEnv'" if the expression had a global function defined

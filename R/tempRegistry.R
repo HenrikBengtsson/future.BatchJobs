@@ -2,8 +2,12 @@
 #' @importFrom BatchJobs makeRegistry
 tempRegistry <- local({
   regs <- new.env()
-  function(prefix="async", ...) {
+  function(prefix="async", file.dir=NULL, ...) {
+
     id <- tempvar(prefix=prefix, value=NA, envir=regs)
-    makeRegistry(id=id, ...)
+    if (is.null(file.dir)) {
+      file.dir <- file.path(getwd(), ".async", paste0(id, "-files"))
+    }
+    makeRegistry(id=id, file.dir=file.dir, ...)
   }
 })
