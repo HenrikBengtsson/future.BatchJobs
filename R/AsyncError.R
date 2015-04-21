@@ -1,4 +1,5 @@
 #' Exception class for async-related errors
+#' @aliases AsyncTaskError
 #'
 #' @export
 #' @importFrom R.oo setConstructorS3
