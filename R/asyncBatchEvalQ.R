@@ -26,7 +26,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
   } else if (list(globals)) {
     globals <- globals[!sapply(globals, FUN=is.primitive)]
   } else {
-    throw("Unknown value on argument 'globals': ", mode(globals))
+    stop("Unknown value on argument 'globals': ", mode(globals))
   }
 
   pkgsNeeded <- NULL

@@ -20,7 +20,7 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async
 
   # Argument 'envir':
   if (!is.environment(envir))
-    throw("Argument 'envir' is not an environment: ", class(envir)[1L])
+    stop("Argument 'envir' is not an environment: ", class(envir)[1L])
 
 
   debug <- getOption("async::debug", FALSE)
@@ -160,7 +160,7 @@ finished.AsyncTask <- function(obj, ...) {
 value.AsyncTask <- function(obj, ...) {
   stat <- status(obj)
   if (!"done" %in% stat) {
-    throw(sprintf("%s did not succeed: %s", class(obj)[1L], paste(sQuote(stat), collapse=", ")))
+    throw(AsyncTaskError(sprintf("%s did not succeed: %s", class(obj)[1L], paste(sQuote(stat), collapse=", ")), task=obj))
   }
 
   backend <- obj$backend
@@ -173,7 +173,7 @@ value.AsyncTask <- function(obj, ...) {
 #' @keywords internal
 error.AsyncTask <- function(obj, ...) {
   if (!finished(obj)) {
-    throw(sprintf("%s has not finished yet", class(obj)[1L]))
+    throw(AsyncTaskError(sprintf("%s has not finished yet", class(obj)[1L]), task=obj))
   }
 
   stat <- status(obj)
@@ -296,16 +296,16 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
     } else if ("error" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobError: %s", error(obj))
-      stop(msg, call.=FALSE)
+      throw(AsyncTaskError(msg, task=obj))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      stop(msg, call.=FALSE)
+      throw(AsyncTaskError(msg, task=obj))
     }
   } else {
     cleanup <- FALSE
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
-    stop(msg, call.=FALSE)
+    throw(AsyncTaskError(msg, task=obj))
   }
 
   ## Cleanup?
@@ -351,7 +351,7 @@ delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onM
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        throw(msg)
+        throw(AsyncTaskError(msg, task=obj))
       }
     }
     return(invisible(TRUE))
@@ -375,7 +375,7 @@ delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onM
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        throw(msg)
+        throw(AsyncTaskError(msg, task=obj))
       }
     }
     return(invisible(FALSE))

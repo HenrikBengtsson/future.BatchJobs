@@ -1,7 +1,9 @@
 Package: async
 ==============
 
-Version: 0.1.2 [2015-04-20]
+Version: 0.1.2 [2015-04-21]
+o Added error classes AsyncError and AsyncTaskError with more
+  informative error messages simplifying troubleshooting.
 o CLEANUP: Now async BatchJobs registries are created in ./.async/
 o BUG FIX: Delayed (synchroneous and asynchroneous) assignments to
   listenv:s did not update the internal name-to-variable map, which
