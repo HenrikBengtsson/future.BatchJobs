@@ -3,6 +3,10 @@ Package: async
 
 Version: 0.1.2 [2015-04-20]
 o CLEANUP: Now async BatchJobs registries are created in ./.async/
+o BUG FIX: Delayed (synchroneous and asynchroneous) assignments to
+  listenv:s did not update the internal name-to-variable map, which
+  effectively made such listenv:s object empty (although the assign
+  value was stored internally).
 
 
 Version: 0.1.1 [2015-04-07]

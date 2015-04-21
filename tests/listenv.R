@@ -135,15 +135,14 @@ stopifnot(identical(names(x), c("1", "3")))
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Delayed assignment (infix operator)
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## By names
+## Assign by name
 z <- listenv()
 z$a %<-% { 1 }
 z$c %<-% { 3 }
 print(names(z))
-## FIXME: The infix operator does not assign names. /HB 2015-04-20
-##stopifnot(identical(names(z), c("a", "c")))
+stopifnot(identical(names(z), c("a", "c")))
 
-## By indices
+## Assign by index
 z <- listenv()
 z[[1]] %<-% { 1 }
 z[[3]] %<-% { "Hello world!" }
@@ -153,26 +152,48 @@ stopifnot(length(z) == 3)
 
 ## Add names
 names(z) <- c("a", "b", "c")
-z$b %<-% TRUE
+stopifnot(identical(names(z), c("a", "b", "c")))
+
+## Extract as list
 y <- as.list(z)
 str(y)
 stopifnot(length(y) == 3)
 stopifnot(identical(names(y), c("a", "b", "c")))
 
+## Assign by new name
+z$d %<-% TRUE
+print(names(z))
+stopifnot(identical(names(z), c("a", "b", "c", "d")))
+
+## Assign by existing name
+z$b %<-% TRUE
+print(names(z))
+stopifnot(identical(names(z), c("a", "b", "c", "d")))
 
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Async delayed assignment (infix operator)
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 z <- listenv()
+
+## Assign by index
 z[[1]] %<=% { 2 }
 z[[4]] %<=% { "async!" }
 stopifnot(length(z) == 4)
+
+## Add names
 names(z) <- c("A", "B", "C", "D")
-z$b %<=% TRUE
+stopifnot(identical(names(z), c("A", "B", "C", "D")))
+
+## Assign by name
+z$B %<=% TRUE
+stopifnot(length(z) == 4)
+stopifnot(identical(names(z), c("A", "B", "C", "D")))
+
 y <- as.list(z)
 str(y)
 stopifnot(length(y) == 4)
+stopifnot(identical(names(y), c("A", "B", "C", "D")))
 
 
 ## Cleanup

@@ -112,6 +112,8 @@ as.list.listenv <- function(x, ...) {
 ##  str(list(method="$<-", name=name))
   map <- map(x)
   var <- map[name]
+
+  ## Non-existing variable?
   if (is.na(var)) return(NULL)
 
   get(var, envir=x, inherits=FALSE)
@@ -165,7 +167,7 @@ assignByName.listenv <- function(x, name, value) {
   map <- map(x)
 
   ## Map to an existing or a new element?
-  if (name %in% names(map)) {
+  if (is.element(name, names(map))) {
     var <- map[name]
 
     ## A new variable?
@@ -279,22 +281,25 @@ get_variable <- function(...) UseMethod("get_variable")
 #' @export
 get_variable.listenv <- function(x, name, ...) {
 ##  str(list(method="get_variable", name))
-
   if (length(name) != 1L) {
-    stop("Index must be a scalar: ", length(name))
+    stop("Subscript must be a scalar: ", length(name), .call=FALSE)
   }
 
   map <- map(x)
+
+  ## Existing variable?
   var <- map[name]
   if (!is.na(var)) return(var)
 
+  ## Create new variable
   if (is.character(name)) {
     var <- name
-    ## Append to map
-    map <- c(map, var)
-    names(map)[length(map)] <- var
-    ## Update map
-    map(x) <- map
+
+    ## Non-existing name?
+    if (!is.element(name, names(map))) {
+      map <- c(map, var)
+      names(map)[length(map)] <- var
+    }
   } else if (is.numeric(name)) {
     i <- name
     ## Expand map?
@@ -305,9 +310,12 @@ get_variable.listenv <- function(x, name, ...) {
     ## Create internal variable name
     var <- tempvar(value=value, envir=x, inherits=FALSE)
     map[i] <- var
-    ## Update map
-    map(x) <- map
+  } else {
+    stop("Subscript must be a name or an index: ", mode(name), .call=FALSE)
   }
+
+  ## Update map
+  map(x) <- map
 
   var
 }

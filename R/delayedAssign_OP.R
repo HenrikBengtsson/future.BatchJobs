@@ -17,3 +17,4 @@
   call <- substitute(local(a), list(a=expr))
   delayedAssign(name, eval(call, envir=envir), assign.env=assign.env)
 }
+

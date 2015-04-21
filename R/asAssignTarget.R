@@ -49,14 +49,15 @@
           stop(sprintf("Delayed assignments with subsetting can only be done on a single element at the time, not %d: %s", length(idx), name), call.=FALSE)
         }
 
+        ## Special: listenv:s
+        if (inherits(obj, "listenv")) {
+          ## Get variable name to use
+          idx <- get_variable(obj, idx)
+        }
+
         if (is.character(idx)) {
         } else if (is.numeric(idx)) {
-          if (inherits(obj, "listenv")) {
-            ## Get variable name to use
-            idx <- get_variable(obj, idx)
-          } else {
-            stop(sprintf("Delayed assignments with indexed subsetting can not be done on a %s; only for listenv: %s", sQuote(mode(obj)), name), call.=FALSE)
-          }
+          stop(sprintf("Delayed assignments with indexed subsetting can not be done on a %s: %s", sQuote(mode(obj)), name), call.=FALSE)
         } else {
           stop(sprintf("Invalid subset %s: %s", sQuote(deparse(idx)), name), call.=FALSE)
         }
