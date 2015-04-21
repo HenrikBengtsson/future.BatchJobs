@@ -92,7 +92,7 @@ str(y)
 stopifnot(length(y) == 3)
 
 
-##
+## Mixed names and indices
 x <- listenv()
 x$a <- 1
 x[[3]] <- 3
@@ -123,20 +123,47 @@ var <- get_variable(x, "b")
 stopifnot(var == "b")
 
 
-## Delayed assignment
+## Names where as.integer(names(x)) are integers
+x <- listenv()
+x[["1"]] <- 1
+x[["3"]] <- 3
+print(names(x))
+stopifnot(identical(names(x), c("1", "3")))
+
+
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Delayed assignment (infix operator)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## By names
+z <- listenv()
+z$a %<-% { 1 }
+z$c %<-% { 3 }
+print(names(z))
+## FIXME: The infix operator does not assign names. /HB 2015-04-20
+##stopifnot(identical(names(z), c("a", "c")))
+
+## By indices
 z <- listenv()
 z[[1]] %<-% { 1 }
 z[[3]] %<-% { "Hello world!" }
+print(names(z))
+stopifnot(is.null(names(z)))
 stopifnot(length(z) == 3)
+
+## Add names
 names(z) <- c("a", "b", "c")
 z$b %<-% TRUE
 y <- as.list(z)
 str(y)
 stopifnot(length(y) == 3)
+stopifnot(identical(names(y), c("a", "b", "c")))
 
 
 
-## Async delayed assignment
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Async delayed assignment (infix operator)
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 z <- listenv()
 z[[1]] %<=% { 2 }
 z[[4]] %<=% { "async!" }

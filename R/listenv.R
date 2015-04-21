@@ -149,18 +149,19 @@ as.list.listenv <- function(x, ...) {
 }
 
 
+assignByName <- function(...) UseMethod("assignByName")
 
-#' Set an element of list environment
-#'
-#' @param x A list environment.
-#' @param name Name or index of element
-#' @param value The value to assign to the element
-#'
-#' @aliases [[<-.listenv
-#' @export
-#' @keywords internal
-`$<-.listenv` <- function(x, name, value) {
-##  str(list(method="$<-", name=name, value=value))
+#' @importFrom R.utils hpaste
+assignByName.listenv <- function(x, name, value) {
+  ## Argument 'name':
+  if (length(name) == 0L) {
+    stop("Cannot assign value. Zero-length name.", call.=FALSE)
+  } else if (length(name) > 1L) {
+    stop("Cannot assign value. More than one name specified: ", hpaste(name), call.=FALSE)
+  } else if (nchar(name) == 0L) {
+    stop("Cannot assign value. Empty name specific: ", name, call.=FALSE)
+  }
+
   map <- map(x)
 
   ## Map to an existing or a new element?
@@ -186,33 +187,26 @@ as.list.listenv <- function(x, ...) {
   assign(var, value, envir=x, inherits=FALSE)
 
   invisible(x)
-}
+} # assignByName()
 
-#' @export
-`[[<-.listenv` <- function(x, i, value) {
-##  str(list(method="[[<-", i=i, value=value))
-  if (length(i) != 1L) {
-    stop("Subsetting of more than one element at the time is not allowed for listenv's: ", length(i))
-  }
 
-  if (is.character(i)) {
-    x <- do.call(`$<-`, args=list(x, i, value), envir=parent.frame())
-    return(invisible(x))
-  } else if (is.symbol(i)) {
-    name <- eval(i, envir=parent.frame())
-    x <- do.call(`$<-`, args=list(x, name, value), envir=parent.frame())
-    return(invisible(x))
-  }
+assignByIndex <- function(...) UseMethod("assignByIndex")
 
-  if (!is.numeric(i)) {
-    stop(sprintf("Subsetted [[<- assignment to listenv's is only supported for names and indices, not %s", mode(i)), ecall.=FALSE)
+#' @importFrom R.utils hpaste
+assignByIndex.listenv <- function(x, i, value) {
+  ## Argument 'i':
+  if (length(i) == 0L) {
+    stop("Cannot assign value. Zero-length index.", call.=FALSE)
+  } else if (length(i) > 1L) {
+    stop("Cannot assign value. More than one index specified: ", hpaste(i), call.=FALSE)
+  } else if (!is.finite(i)) {
+    stop("Cannot assign value. Non-finite index: ", i, call.=FALSE)
+  } else if (i < 1L) {
+    stop("Cannot assign value. Negative index: ", i, call.=FALSE)
   }
 
   map <- map(x)
   n <- length(map)
-  if (i < 1L) {
-    stop(sprintf("Negative subscript out of bounds: %d", i), call.=FALSE)
-  }
 
   ## Variable name
   var <- map[i]
@@ -236,6 +230,37 @@ as.list.listenv <- function(x, ...) {
   }
 
   invisible(x)
+} # assignByIndex()
+
+
+
+#' Set an element of list environment
+#'
+#' @param x A list environment.
+#' @param name Name or index of element
+#' @param value The value to assign to the element
+#'
+#' @aliases [[<-.listenv
+#' @export
+#' @keywords internal
+`$<-.listenv` <- function(x, name, value) {
+  assignByName(x, name=name, value=value)
+}
+
+#' @export
+`[[<-.listenv` <- function(x, i, value) {
+##  str(list(method="[[<-", i=i, value=value))
+  if (is.character(i)) {
+    x <- assignByName(x, name=i, value=value)
+  } else if (is.numeric(i)) {
+    x <- assignByIndex(x, i=i, value=value)
+  } else if (is.symbol(i)) {
+    name <- eval(i, envir=parent.frame())
+    x <- assignByName(x, name=name, value=value)
+  } else {
+    stop(sprintf("Subsetted [[<- assignment to listenv's is only supported for names and indices, not %s", mode(i)), call.=FALSE)
+  }
+  return(invisible(x))
 }
 
 

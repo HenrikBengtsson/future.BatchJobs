@@ -1,7 +1,12 @@
-#' Delayed synchroneous evaluation
+#' Delayed synchroneous evaluation ("lazy evaluation")
+#'
+#' Infix operator for delayed ("lazy") synchroneous evaluation
+#' such that the right-hand side (RHS) expression is evaluated
+#' if and only if the left-hand side (LHS) object is requested.
 #'
 #' @usage x %<-% value
 #'
+#' @seealso Internally \link[base]{delayedAssign}() is used.
 #' @export
 `%<-%` <- function(x, value) {
   envir <- parent.frame(1)

@@ -1,6 +1,6 @@
 #' Delayed asynchroneous evaluation
 #'
-#' Operator for delayed assignments while evaluating
+#' Method and infix operators for delayed assignments while evaluating
 #' the statement in the background/in parallel.
 #'
 #' @param name the name of the variable to assign.

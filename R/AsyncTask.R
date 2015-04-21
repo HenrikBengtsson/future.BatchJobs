@@ -20,7 +20,7 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async
 
   # Argument 'envir':
   if (!is.environment(envir))
-    throw("Argument 'envir' is not a list: ", class(envir)[1L])
+    throw("Argument 'envir' is not an environment: ", class(envir)[1L])
 
 
   debug <- getOption("async::debug", FALSE)
