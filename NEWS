@@ -2,6 +2,9 @@ Package: async
 ==============
 
 Version: 0.1.2 [2015-04-21]
+o Now inspect() also accepts complex input such as inspect(a$x),
+  inspect(a[["x"]]) and inspect(a[[1]]).  It also accepts a 
+  character name such as inspect("x", envir=a).
 o Added error classes AsyncError and AsyncTaskError with more
   informative error messages simplifying troubleshooting.
 o CLEANUP: Now async BatchJobs registries are created in ./.async/
