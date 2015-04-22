@@ -196,6 +196,23 @@ stopifnot(length(y) == 4)
 stopifnot(identical(names(y), c("A", "B", "C", "D")))
 
 
+## Potential task name clashes
+u <- listenv()
+v <- listenv()
+
+u$a %<=% 1
+v$a %<=% 2
+
+tu <- inspect(u$a)
+tv <- inspect(v$a)
+## FIXME: inspect() finds the wrong AsyncTask (Issue #12)
+## stopifnot(!identical(tu, tv))
+
+stopifnot(u$a == 1)
+stopifnot(v$a == 2)
+
+
+
 ## Cleanup
 options(oopts)
 rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
