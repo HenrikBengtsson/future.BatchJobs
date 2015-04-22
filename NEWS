@@ -2,9 +2,14 @@ Package: async
 ==============
 
 Version: 0.1.2 [2015-04-21]
+o Now status(), finished() etc. for AsyncTask returns NA in case
+  task backend registry is deleted.  print() does a better job
+  too in this case.
 o Now inspect() also accepts complex input such as inspect(a$x),
-  inspect(a[["x"]]) and inspect(a[[1]]).  It also accepts a 
+  inspect(a[["x"]]) and inspect(a[[1]]).  It also accepts a
   character name such as inspect("x", envir=a).
+o Now await() for AsyncTask gives an more informative error message
+  in case the backend registry was preemptively deleted.
 o Added error classes AsyncError and AsyncTaskError with more
   informative error messages simplifying troubleshooting.
 o CLEANUP: Now async BatchJobs registries are created in ./.async/

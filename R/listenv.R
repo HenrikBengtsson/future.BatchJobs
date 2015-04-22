@@ -6,12 +6,10 @@
 #'
 #' @export
 listenv <- function(length=0L) {
-  .listenv.map <- character(0L)
-
   stopifnot(length >= 0L)
-  .listenv.map <- rep(NA_character_, times=length)
-
-  env <- new.env()
+  metaenv <- new.env(parent=parent.frame())
+  metaenv$.listenv.map <- rep(NA_character_, times=length)
+  env <- new.env(parent=metaenv)
   class(env) <- c("listenv", class(env))
   env
 }
@@ -279,7 +277,7 @@ assignByIndex.listenv <- function(x, i, value) {
 get_variable <- function(...) UseMethod("get_variable")
 
 #' @export
-get_variable.listenv <- function(x, name, ...) {
+get_variable.listenv <- function(x, name, create=TRUE, ...) {
 ##  str(list(method="get_variable", name))
   if (length(name) != 1L) {
     stop("Subscript must be a scalar: ", length(name), .call=FALSE)
@@ -314,8 +312,8 @@ get_variable.listenv <- function(x, name, ...) {
     stop("Subscript must be a name or an index: ", mode(name), .call=FALSE)
   }
 
-  ## Update map
-  map(x) <- map
+  ## Update map?
+  if (create) map(x) <- map
 
   var
 }

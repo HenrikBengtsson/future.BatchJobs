@@ -14,7 +14,7 @@ inspect(var, envir = parent.frame(), inherits = TRUE)
 \item{inherits}{Search parent frames or not.}
 }
 \value{
-An AsyncTask object
+If exists, an AsyncTask object, otherwise NA.
 }
 \description{
 Inspect an asynchroneous variable

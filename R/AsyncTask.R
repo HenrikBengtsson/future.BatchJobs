@@ -102,7 +102,12 @@ print.AsyncTask <- function(x, ...) {
   if ("error" %in% stat) printf("Error: %s\n", error(x))
   printf("Backend:\n")
   backend <- x$backend
-  print(backend$reg)
+  reg <- backend$reg
+  if (isNA(stat)) {
+    printf("%s: Not found (happens when finished and deleted)\n", class(reg))
+  } else {
+    print(reg)
+  }
 }
 
 
@@ -137,7 +142,10 @@ status.AsyncTask <- function(obj, ...) {
   backend <- obj$backend
   reg <- backend$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
-
+  ## Closed and deleted?
+  if (!file_test("-d", reg$file.dir)) {
+    return(NA_character_)
+  }
   id <- backend$id
   status <- getStatus(reg, ids=id)
   status <- (unlist(status) == 1L)
@@ -151,7 +159,10 @@ status.AsyncTask <- function(obj, ...) {
 #' @export
 #' @keywords internal
 finished.AsyncTask <- function(obj, ...) {
-  any(c("done", "error", "expired") %in% status(obj))
+  stat <- status(obj)
+  if (isNA(stat)) return(stat)
+
+  any(c("done", "error", "expired") %in% stat)
 }
 
 
@@ -159,6 +170,8 @@ finished.AsyncTask <- function(obj, ...) {
 #' @keywords internal
 value.AsyncTask <- function(obj, ...) {
   stat <- status(obj)
+  if (isNA(stat)) return(stat)
+
   if (!"done" %in% stat) {
     throw(AsyncTaskError(sprintf("%s did not succeed: %s", class(obj)[1L], paste(sQuote(stat), collapse=", ")), task=obj))
   }
@@ -172,11 +185,13 @@ value.AsyncTask <- function(obj, ...) {
 #' @export
 #' @keywords internal
 error.AsyncTask <- function(obj, ...) {
+  stat <- status(obj)
+  if (isNA(stat)) return(stat)
+
   if (!finished(obj)) {
     throw(AsyncTaskError(sprintf("%s has not finished yet", class(obj)[1L]), task=obj))
   }
 
-  stat <- status(obj)
   if (!"error" %in% stat) return(NULL)
 
   backend <- obj$backend
@@ -258,6 +273,10 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
   while (tries <= maxTries) {
     stat <- status(obj)
     if (debug) mprintf(" Status %d: %s\n", tries, paste(stat, collapse=", "))
+    if (isNA(stat)) {
+      finished <- TRUE
+      break
+    }
     if (any(finish_states %in% stat)) {
       final_state <- intersect(stat, finish_states)
 
@@ -300,6 +319,9 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
+      throw(AsyncTaskError(msg, task=obj))
+    } else if (isNA(stat)) {
+      msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
       throw(AsyncTaskError(msg, task=obj))
     }
   } else {
@@ -393,7 +415,7 @@ delete <- function(...) UseMethod("delete")
 #' @param envir the environment where to search from.
 #' @param inherits Search parent frames or not.
 #'
-#' @return An AsyncTask object
+#' @return If exists, an AsyncTask object, otherwise NA.
 #'
 #' @export
 inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
@@ -442,7 +464,7 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
         ## Special: listenv:s
         if (inherits(obj, "listenv")) {
           ## Get variable name to use
-          idx <- get_variable(obj, idx)
+          idx <- get_variable(obj, idx, create=FALSE)
         }
 
         if (is.character(idx)) {
@@ -462,6 +484,13 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
     } # if (n == 3)
   }
 
-  name <- sprintf(".task_%s", name)
-  get(name, mode="list", envir=envir, inherits=inherits)
+  ## All elements of an listenv is inside the object
+#  if (inherits(envir, "listenv")) inherits <- FALSE
+
+  task <- sprintf(".task_%s", name)
+  if (exists(task, mode="list", envir=envir, inherits=inherits)) {
+    return(get(task, mode="list", envir=envir, inherits=inherits))
+  }
+
+  NA
 }
