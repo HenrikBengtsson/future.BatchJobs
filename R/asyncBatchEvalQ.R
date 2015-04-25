@@ -16,6 +16,12 @@
 asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
   debug <- getOption("async::debug", FALSE)
 
+  ## Default maximum export size is 100 MB for now. /HB 2015-04-25
+  maxSizeOfGlobals <- getOption("async::maxSizeOfGlobals", 100*1024^2)
+  maxSizeOfGlobals <- as.numeric(maxSizeOfGlobals)
+  stopifnot(!is.na(maxSizeOfGlobals), maxSizeOfGlobals > 0)
+
+
   ## Identify globals?
   if (isTRUE(globals)) {
     globals <- getGlobals(exprs, envir=envir, primitive=FALSE, base=FALSE, unlist=TRUE)
@@ -68,6 +74,19 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
     }
 
     if (length(globals) > 0L) {
+      ## Protect against user error exporting too large objects?
+      if (is.finite(maxSizeOfGlobals)) {
+        sizes <- lapply(globals, FUN=object.size)
+        sizes <- unlist(sizes, use.names=TRUE)
+        totalExportSize <- sum(sizes, na.rm=TRUE)
+        if (totalExportSize > maxSizeOfGlobals) {
+          sizes <- sort(sizes, decreasing=TRUE)
+          sizes <- head(sizes, n=3L)
+          largest <- sprintf("%s (%g Mb)", sQuote(names(sizes)), sizes/1024^2)
+          throw(sprintf("The total size of all global objects that need to be exported for the asynchronous expression is %g Mb. This exceeds the maximum allowed size of %g Mb (option 'maxSizeOfGlobals'). The top largest objects are %s", totalExportSize/1024^2, maxSizeOfGlobals/1024^2, hpaste(largest, lastCollapse=" and ")))
+        }
+      }
+
       batchExport(reg, li=globals)
     }
   }

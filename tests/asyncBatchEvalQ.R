@@ -52,6 +52,14 @@ mprintf("d=%g\n", d)
 stopifnot(d == 4)
 
 
+message("Protect against large globals (being exported)")
+oopts2 <- options("async::maxSizeOfGlobals"=100)
+a <- 1:100
+res <- try(b %<=% { x <- a + 1 })
+stopifnot(inherits(res, "try-error"))
+options(oopts2)
+
+
 ## Cleanup
 options(oopts)
 rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
