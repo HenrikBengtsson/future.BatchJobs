@@ -15,7 +15,7 @@ Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
 Author: Henrik Bengtsson [aut, cre, cph]
 Maintainer: Henrik Bengtsson <henrikb@braju.com>
 Description: Easy asynchronous evaluation of R expressions.
-License: LGPL (>= 2.1)
+License: Private for now [will become LGPL (>= 2.1) when published]
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/async
 BugReports: https://github.com/HenrikBengtsson/async/issues
