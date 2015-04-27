@@ -170,7 +170,7 @@ finished.AsyncTask <- function(obj, ...) {
 #' @keywords internal
 value.AsyncTask <- function(obj, ...) {
   stat <- status(obj)
-  if (isNA(stat)) return(NA)
+  if (isNA(stat)) return(NULL)
 
   if (!"done" %in% stat) {
     throw(AsyncTaskError(sprintf("%s did not succeed: %s", class(obj)[1L], paste(sQuote(stat), collapse=", ")), task=obj))
@@ -186,7 +186,7 @@ value.AsyncTask <- function(obj, ...) {
 #' @keywords internal
 error.AsyncTask <- function(obj, ...) {
   stat <- status(obj)
-  if (isNA(stat)) return(NA)
+  if (isNA(stat)) return(NULL)
 
   if (!finished(obj)) {
     throw(AsyncTaskError(sprintf("%s has not finished yet", class(obj)[1L]), task=obj))
