@@ -6,7 +6,7 @@ Imports:
   parallel,
   R.methodsS3 (>= 1.7.0),
   R.oo (>= 1.19.0),
-  R.utils (>= 2.0.0),
+  R.utils (>= 2.0.2),
   codetools (>= 0.2-11),
   BatchJobs (>= 1.6)
 Title: Asynchronous Evaluation
