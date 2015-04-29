@@ -1,5 +1,7 @@
 library("async")
 
+backend("local")
+
 x <- AsyncListEnv(length=3L)
 names(x) <- c("a", "b", "c")
 print(x)

@@ -59,7 +59,10 @@ res <- try(b %<=% { x <- a + 1 })
 stopifnot(inherits(res, "try-error"))
 options(oopts2)
 
-
+message("Cleanup")
 ## Cleanup
 options(oopts)
 rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+
+message("DONE!")
+
