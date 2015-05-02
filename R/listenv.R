@@ -192,6 +192,7 @@ assignByName.listenv <- function(x, name, value) {
 
 assignByIndex <- function(...) UseMethod("assignByIndex")
 
+#' @importFrom R.utils tempvar
 #' @importFrom R.utils hpaste
 assignByIndex.listenv <- function(x, i, value) {
   ## Argument 'i':
@@ -276,6 +277,7 @@ assignByIndex.listenv <- function(x, i, value) {
 #' @keywords internal
 get_variable <- function(...) UseMethod("get_variable")
 
+#' @importFrom R.utils tempvar
 #' @export
 get_variable.listenv <- function(x, name, create=TRUE, ...) {
 ##  str(list(method="get_variable", name))
@@ -306,7 +308,7 @@ get_variable.listenv <- function(x, name, create=TRUE, ...) {
       map <- c(map, extra)
     }
     ## Create internal variable name
-    var <- tempvar(value=value, envir=x, inherits=FALSE)
+    var <- tempvar(value=NULL, envir=x, inherits=FALSE)
     map[i] <- var
   } else {
     stop("Subscript must be a name or an index: ", mode(name), .call=FALSE)
@@ -317,23 +319,3 @@ get_variable.listenv <- function(x, name, create=TRUE, ...) {
 
   var
 }
-
-
-#' @keywords internal
-tempvar <- function(prefix="var", value, envir=parent.frame(), inherits=FALSE) {
-  maxTries <- 1e+06
-  maxInt <- .Machine$integer.max
-  ii <- 0L
-  while (ii < maxTries) {
-    idx <- sample.int(maxInt, size=1L)
-    name <- sprintf("%s%d", prefix, idx)
-    if (!exists(name, envir=envir, inherits=inherits)) {
-      if (!missing(value)) {
-        assign(name, value, envir=envir, inherits=inherits)
-      }
-      return(name)
-    }
-    ii <- ii + 1L
-  }
-  stop(sprintf("Failed to generate a unique non-existing temporary variable with prefix '%s'", prefix), call.=FALSE)
-} # tempvar()
