@@ -2,6 +2,7 @@ Package: async
 ==============
 
 Version: 0.1.4 [2015-05-02]
+o Added print() for listenv:s.
 o CLEANUP: Using tempvar() of R.utils.
 
 

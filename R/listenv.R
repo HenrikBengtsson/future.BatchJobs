@@ -14,6 +14,12 @@ listenv <- function(length=0L) {
   env
 }
 
+#' @export
+print.listenv <- function(x, ...) {
+  s <- sprintf("`%s` with %d elements: %s\n", class(x)[1L], length(x), hpaste(names(x)))
+  cat(s)
+}
+
 #' Variable name map for elements of list environment
 #'
 #' @param x A list environment.
