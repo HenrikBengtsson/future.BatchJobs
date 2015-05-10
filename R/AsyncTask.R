@@ -12,7 +12,7 @@
 #' @export
 #' @export async
 #' @importFrom R.utils mcat mstr mprint mprintf
-#' @importFrom BatchJobs batchMap submitJobs
+#' @importFrom BatchJobs submitJobs
 #' @keywords internal
 AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async::finalize", TRUE)) {
   # Argument 'expr':

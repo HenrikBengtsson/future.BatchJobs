@@ -24,7 +24,6 @@
 #'
 #' @export
 #' @importFrom R.utils mcat mprint mprintf mstr
-#' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 #' @keywords internal
 asyncEvalQ <- function(exprs, ..., envir=parent.frame()) {
   nexprs <- length(exprs)
