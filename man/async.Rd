@@ -27,7 +27,5 @@ await(task, ...)
 \description{
 \code{async()} evaluates an expression asynchroneous and
 \code{await()} retrieves its value.
-
-
 }
 

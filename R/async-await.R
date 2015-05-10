@@ -19,7 +19,6 @@ async <- function(expr, envir=parent.frame()) {
   BatchJobsAsyncTask(expr=expr, envir=envir, substitute=FALSE)
 }
 
-#'
 #' @param task An \code{AsyncTask} object whose value to retrieve.
 #' @param ... Not used.
 #'
