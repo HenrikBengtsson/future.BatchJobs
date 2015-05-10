@@ -45,7 +45,7 @@
         }
 
         ## Validate subetting, i.e. the 'idx'
-        if (length(idx) > 1L) {
+        if (length(idx) != 1L) {
           stop(sprintf("Delayed assignments with subsetting can only be done on a single element at the time, not %d: %s", length(idx), name), call.=FALSE)
         }
 
