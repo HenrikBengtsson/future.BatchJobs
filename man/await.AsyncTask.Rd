@@ -4,10 +4,10 @@
 \alias{await.AsyncTask}
 \title{Retrieves the value of of the asynchronously evaluated expression}
 \usage{
-\method{await}{AsyncTask}(obj, ...)
+\method{await}{AsyncTask}(task, ...)
 }
 \arguments{
-\item{obj}{The asynchronously task}
+\item{task}{The asynchronously task}
 
 \item{...}{Not used.}
 

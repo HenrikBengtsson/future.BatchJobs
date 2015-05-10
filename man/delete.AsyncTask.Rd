@@ -5,10 +5,10 @@
 \alias{delete.AsyncTask}
 \title{Removes an asynchroneous task}
 \usage{
-\method{delete}{AsyncTask}(obj, ...)
+\method{delete}{AsyncTask}(task, ...)
 }
 \arguments{
-\item{obj}{The asynchronously task}
+\item{task}{The asynchronously task}
 
 \item{...}{Not used.}
 
