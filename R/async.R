@@ -1,16 +1,13 @@
-AsyncTask <- BatchJobsAsyncTask
-
 #' Create an asynchroneous task
 #'
 #' @param expr The R expression to be evaluated
-#' @param envir The environment in which global environment
-#' should be located.
-#' @param finalize If TRUE, any underlying registries are
-#' deleted when this object is garbage collected, otherwise not.
+#' @param envir The environment from which global environment
+#'              are search from.
 #'
 #' @return An AsyncTask object
 #'
-#' @aliases AsyncTask
 #' @export
-#' @export AsyncTask
-async <- AsyncTask
+async <- function(expr, envir=parent.frame()) {
+  expr <- substitute(expr)
+  BatchJobsAsyncTask(expr=expr, envir=envir, substitute=FALSE)
+}

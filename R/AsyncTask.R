@@ -1,3 +1,67 @@
+#' Create an asynchroneous task
+#'
+#' @param expr The R expression to be evaluated
+#' @param envir The environment in which global environment
+#' should be located.
+#' @param substitute Controls whether \code{expr} should be
+#' \code{substitute()}:d or not.
+#'
+#' @return An AsyncTask object
+#'
+#' @export
+#' @importFrom R.utils mprint
+#' @keywords internal
+AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
+  if (substitute) expr <- substitute(expr)
+
+  # Argument 'envir':
+  if (!is.environment(envir))
+    stop("Argument 'envir' is not an environment: ", class(envir)[1L])
+
+
+  debug <- getOption("async::debug", FALSE)
+  if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+  if (debug) { mcat("Expression:\n"); mprint(expr) }
+
+##  ## Inject loading of 'async' in case of nested asynchroneous evaluation
+##  expr <- substitute({
+##    R.utils::use("async")
+##    a
+##  }, list(a=expr))
+##  if (debug) { mcat("Expression (injected):\n"); mprint(expr) }
+
+  ## Setup return value
+  obj <- list(
+    expr=expr,
+    envir=envir
+  )
+  structure(obj, class=c("AsyncTask", class(obj)))
+}
+
+add_finalizer <- function(...) UseMethod("add_finalizer")
+
+add_finalizer.AsyncTask <- function(obj, ...) {
+  ## Register finalizer (will clean up registries etc.)
+
+  ## Use a "dummy" environment for GC finalization
+  gcenv <- new.env()
+  gcenv$obj <- obj
+
+  reg.finalizer(gcenv, f=function(gcenv) {
+    obj <- gcenv$obj
+    gcenv$obj <- NULL
+    if (inherits(obj, "AsyncTask") && "async" %in% loadedNamespaces()) {
+      try( delete(obj, onFailure="warning", onMissing="ignore") )
+    }
+  }, onexit=TRUE)
+
+  obj$.gcenv <- gcenv
+  gcenv <- NULL
+
+  invisible(obj)
+}
+
+
 #' Print an AsyncTask
 #'
 #' @param x An AsyncTask object
@@ -113,7 +177,6 @@ record.AsyncTask <- function(task, name) {
 #'
 #' @export
 #' @importFrom R.methodsS3 throw
-#' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
 await.AsyncTask <- function(obj, ...) {

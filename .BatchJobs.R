@@ -1,7 +1,7 @@
 cluster.functions <- local({
   backend <- if (.Platform$OS == "windows") "local" else "multicore"
   backend <- Sys.getenv("R_ASYNC_BACKEND", backend)
-  message("Package 'async' using backend '", backend, "'")
+  message(".BatchJobs.R: Package 'async' using backend '", backend, "'")
 ##  backend <- "tipcc"
 ##  backend <- "cccore070"
   if (backend == "interactive") {
@@ -21,7 +21,7 @@ cluster.functions <- local({
     tmpl <- tmpl[file_test("-f", tmpl)]
     stopifnot(length(tmpl) > 0L)
     tmpl <- tmpl[1L]
-    message("Package 'async' using torque template file'", tmpl, "'")
+    message(".BatchJobs.R: Package 'async' using torque template file'", tmpl, "'")
     makeClusterFunctionsTorque(tmpl)
   } else {
     stop("Unknown backend: ", backend)

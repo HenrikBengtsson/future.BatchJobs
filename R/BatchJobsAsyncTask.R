@@ -3,6 +3,8 @@
 #' @param expr The R expression to be evaluated
 #' @param envir The environment in which global environment
 #' should be located.
+#' @param substitute Controls whether \code{expr} should be
+#' \code{substitute()}:d or not.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
 #'
@@ -12,67 +14,31 @@
 #' @importFrom R.utils mcat mstr mprint mprintf
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async::finalize", TRUE)) {
-  # Argument 'expr':
-  expr <- substitute(expr)
+BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, finalize=getOption("async::finalize", TRUE), launch=TRUE, ...) {
+  if (substitute) expr <- substitute(expr)
 
-  # Argument 'envir':
-  if (!is.environment(envir))
-    stop("Argument 'envir' is not an environment: ", class(envir)[1L])
-
+  ## 1. Setup task
+  obj <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
 
   debug <- getOption("async::debug", FALSE)
+  if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
-  if (!debug) {
-    options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
-  }
-
-  if (debug) { mcat("Expression:\n"); mprint(expr) }
-
-##  ## Inject loading of 'async' in case of nested asynchroneous evaluation
-##  expr <- substitute({
-##    R.utils::use("async")
-##    a
-##  }, list(a=expr))
-##  if (debug) { mcat("Expression (injected):\n"); mprint(expr) }
-
-  ## Create temporary registry
+  ## 2. Add backend to task
   reg <- tempRegistry()
   if (debug) mprint(reg)
-
-  ## Create job
   id <- asyncBatchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
-  if (debug) mprintf("Created job #%d\n", id)
+  obj$backend <- list(reg=reg, id=id)
+  obj <- structure(obj, class=c("BatchJobsAsyncTask", class(obj)))
+  if (debug) mprintf("Created task #%d\n", id)
 
-  ## Setup return value
-  obj <- list(
-    expr=expr,
-    envir=envir,
-    backend=list(reg=reg, id=id)
-  )
-  obj <- structure(obj, class=c("BatchJobsAsyncTask", "AsyncTask"))
+  ## Register finalizer?
+  if (finalize) obj <- add_finalizer(obj)
 
-  ## Register finalizer (will clean up registries
-  if (finalize) {
-    ## Use a "dummy" environment for GC finalization
-    gcenv <- new.env()
-    gcenv$obj <- obj
-
-    reg.finalizer(gcenv, f=function(gcenv) {
-      obj <- gcenv$obj
-      gcenv$obj <- NULL
-      if (inherits(obj, "AsyncTask") && "async" %in% loadedNamespaces()) {
-        try( delete(obj, onFailure="warning", onMissing="ignore") )
-      }
-    }, onexit=TRUE)
-
-    obj$.gcenv <- gcenv
-    gcenv <- NULL
+  ## 3. Launch task?
+  if (launch) {
+    submitJobs(reg, ids=id)
+    if (debug) mprintf("Launched task #%d\n", id)
   }
-
-  ## Submit job
-  submitJobs(reg, ids=id)
-  if (debug) mprintf("Submitted job #%d\n", id)
 
   obj
 }

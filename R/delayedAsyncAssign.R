@@ -4,12 +4,14 @@
 #' the statement in the background/in parallel.
 #'
 #' @param name the name of the variable to assign.
-#' @param expr the R expression to be asynchroneous evaluated and
+#' @param value the R expression to be asynchroneous evaluated and
 #' whose value will be assigned to the variable.
 #' @param envir The environment from which global variables used by
 #' the expression should be search for.
 #' @param assign.env The environment to which the variable should
 #' be assigned.
+#' @param substitute Controls whether \code{expr} should be
+#' \code{substitute()}:d or not.
 #'
 #' @return A delayed assignment which, when evaluated, will retrieve
 #' the value of the asynchronous evaluation.
@@ -21,11 +23,13 @@
 #' @aliases %<=% %=>%
 #' @export
 #' @export %<=% %=>%
-#' @importFrom R.utils mprint
-delayedAsyncAssign <- function(name, expr, envir=parent.frame(), assign.env=envir) {
+delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=envir, substitute=TRUE) {
+  if (substitute) value <- substitute(value)
+
   ## Start asynchroneous evaluation ("job").  Make sure to pass 'envir'
   ## in order for globals to be located properly.
-  call <- substitute(async(a, envir=b), list(a=expr, b=envir))
+  a <- b <- NULL; rm(list=c("a", "b")) ## To please R CMD check
+  call <- substitute(async(a, envir=b), list(a=value, b=envir))
   task <- eval(call, envir=assign.env)
   record(task, name=name)
 
