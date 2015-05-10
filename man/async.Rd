@@ -5,7 +5,7 @@
 \alias{await}
 \title{Explicit asynchroneous evaluation}
 \usage{
-async(expr, envir=parent.frame())
+async(expr, envir = parent.frame(), substitute = TRUE)
 
 await(task, ...)
 }
@@ -13,7 +13,10 @@ await(task, ...)
 \item{expr}{An R expression to be evaluated}
 
 \item{envir}{The environment from which global environment
-             are search from.}
+are search from.}
+
+\item{substitute}{Controls whether \code{expr} should be
+\code{substitute()}:d or not.}
 
 \item{task}{An \code{AsyncTask} object whose value to retrieve.}
 
