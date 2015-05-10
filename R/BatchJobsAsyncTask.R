@@ -8,13 +8,11 @@
 #'
 #' @return An AsyncTask object
 #'
-#' @aliases async
 #' @export
-#' @export async
 #' @importFrom R.utils mcat mstr mprint mprintf
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async::finalize", TRUE)) {
+BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async::finalize", TRUE)) {
   # Argument 'expr':
   expr <- substitute(expr)
 
@@ -52,7 +50,7 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async
     envir=envir,
     backend=list(reg=reg, id=id)
   )
-  obj <- structure(obj, class=c("AsyncTask"))
+  obj <- structure(obj, class=c("BatchJobsAsyncTask", "AsyncTask"))
 
   ## Register finalizer (will clean up registries
   if (finalize) {
@@ -79,8 +77,6 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), finalize=getOption("async
   obj
 }
 
-async <- AsyncTask
-
 
 #' Print an AsyncTask
 #'
@@ -91,7 +87,7 @@ async <- AsyncTask
 #' @importFrom R.utils captureOutput
 #' @importFrom R.utils printf
 #' @keywords internal
-print.AsyncTask <- function(x, ...) {
+print.BatchJobsAsyncTask <- function(x, ...) {
   printf("%s:\n", class(x)[1])
   printf("Expression:\n")
   code <- captureOutput(print(x$expr))
@@ -113,23 +109,6 @@ print.AsyncTask <- function(x, ...) {
 
 #' Status of an AsyncTask
 #'
-#' @param ... Arguments passed to the S3 method
-#'
-#' @return A character vector.
-#'
-#' @aliases finished value error
-#' @export
-#' @export finished
-#' @export value
-#' @export error
-#' @keywords internal
-status <- function(...) UseMethod("status")
-finished <- function(...) UseMethod("finished")
-value <- function(...) UseMethod("value")
-error <- function(...) UseMethod("error")
-
-#' Status of an AsyncTask
-#'
 #' @param obj The asynchronously task
 #' @param ... Not used.
 #'
@@ -138,7 +117,7 @@ error <- function(...) UseMethod("error")
 #' @export
 #' @importFrom BatchJobs getStatus
 #' @keywords internal
-status.AsyncTask <- function(obj, ...) {
+status.BatchJobsAsyncTask <- function(obj, ...) {
   backend <- obj$backend
   reg <- backend$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
@@ -158,17 +137,7 @@ status.AsyncTask <- function(obj, ...) {
 
 #' @export
 #' @keywords internal
-finished.AsyncTask <- function(obj, ...) {
-  stat <- status(obj)
-  if (isNA(stat)) return(NA)
-
-  any(c("done", "error", "expired") %in% stat)
-}
-
-
-#' @export
-#' @keywords internal
-value.AsyncTask <- function(obj, ...) {
+value.BatchJobsAsyncTask <- function(obj, ...) {
   stat <- status(obj)
   if (isNA(stat)) return(NULL)
 
@@ -184,7 +153,7 @@ value.AsyncTask <- function(obj, ...) {
 
 #' @export
 #' @keywords internal
-error.AsyncTask <- function(obj, ...) {
+error.BatchJobsAsyncTask <- function(obj, ...) {
   stat <- status(obj)
   if (isNA(stat)) return(NULL)
 
@@ -201,28 +170,6 @@ error.AsyncTask <- function(obj, ...) {
   msg <- paste(sQuote(msg), collapse=", ")
   msg
 } # error()
-
-
-#' Retrieves the value of of the asynchronously evaluated expression
-#'
-#' @param ... Arguments passed to S3 method.
-#'
-#' @return The value of the evaluated expression.
-#' If an error occurs, an informative Exception is thrown.
-#'
-#' @export
-#' @keywords internal
-await <- function(...) UseMethod("await")
-
-
-#' @keywords internal
-record <- function(...) UseMethod("record")
-record.AsyncTask <- function(task, name) {
-  name <- sprintf(".task_%s", name)
-  task_without_gc <- task
-  task_without_gc$.gcenv <- NULL
-  assign(name, task_without_gc, envir=task$envir)
-}
 
 
 #' Retrieves the value of of the asynchronously evaluated expression
@@ -244,7 +191,7 @@ record.AsyncTask <- function(task, name) {
 #' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+await.BatchJobsAsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   throw <- R.methodsS3::throw
 
   maxTries <- as.integer(maxTries)
@@ -353,11 +300,9 @@ await.AsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTri
 #' @return (invisibly) TRUE if deleted and FALSE otherwise.
 #'
 #' @export
-#' @export delete
-#' @aliases delete
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+delete.BatchJobsAsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
 
@@ -405,92 +350,3 @@ delete.AsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onM
 
   invisible(TRUE)
 } # delete()
-
-delete <- function(...) UseMethod("delete")
-
-
-#' Inspect an asynchroneous variable
-#'
-#' @param var the variable.
-#' @param envir the environment where to search from.
-#' @param inherits Search parent frames or not.
-#'
-#' @return If exists, an AsyncTask object, otherwise NA.
-#'
-#' @export
-inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
-  expr <- substitute(var)
-  if (is.language(expr)) {
-    n <- length(expr)
-    name <- paste(deparse(expr), collapse="")
-    if (n != 1L && n != 3L) {
-      stop("Not a valid variable format: ", name, call.=FALSE)
-    }
-    if (n == 1L) {
-      ## Assignment to a variable name
-      if (!grepl("^[.a-zA-Z]", name)) {
-        stop("Not a valid variable name: ", name, call.=FALSE)
-      }
-    } else if (n == 3L) {
-      ## Assignment to enviroment via $ and [[
-      op <- expr[[1]]
-      if (op == "$" || op == "[[") {
-        ## Target
-        objname <- deparse(expr[[2]])
-        if (!exists(objname, envir=envir, inherits=TRUE)) {
-          stop(sprintf("Object %s not found: %s", sQuote(objname), name), call.=FALSE)
-        }
-        obj <- get(objname, envir=envir, inherits=TRUE)
-
-        ## Subset
-        idx <- expr[[3]]
-        if (is.symbol(idx)) {
-          idx <- deparse(idx)
-          if (op == "[[") {
-            if (!exists(idx, envir=envir, inherits=TRUE)) {
-              stop(sprintf("Object %s not found: %s", sQuote(idx), name), call.=FALSE)
-            }
-            idx <- get(idx, envir=envir, inherits=TRUE)
-          }
-        } else if (is.language(idx)) {
-          idx <- eval(idx, envir=envir)
-        }
-
-        ## Validate subetting, i.e. the 'idx'
-        if (length(idx) > 1L) {
-          stop(sprintf("Inspection can only be done on a single element at the time, not %d: %s", length(idx), name), call.=FALSE)
-        }
-
-        ## Special: listenv:s
-        if (inherits(obj, "listenv")) {
-          ## Get variable name to use
-          idx <- get_variable(obj, idx, create=FALSE)
-        }
-
-        if (is.character(idx)) {
-        } else if (is.numeric(idx)) {
-          stop(sprintf("Inspection with indexed subsetting can not be done on a %s: %s", sQuote(mode(obj)), name), call.=FALSE)
-        } else {
-          stop(sprintf("Invalid subset %s: %s", sQuote(deparse(idx)), name), call.=FALSE)
-        }
-
-        if (is.environment(obj)) {
-          name <- idx
-          envir <- obj
-        } else {
-          stop(sprintf("Inspection can not be done to a %s; only to a variable or an environment: %s", sQuote(mode(obj)), name), call.=FALSE)
-        }
-      }
-    } # if (n == 3)
-  }
-
-  ## All elements of an listenv is inside the object
-#  if (inherits(envir, "listenv")) inherits <- FALSE
-
-  task <- sprintf(".task_%s", name)
-  if (exists(task, mode="list", envir=envir, inherits=inherits)) {
-    return(get(task, mode="list", envir=envir, inherits=inherits))
-  }
-
-  NA
-}
