@@ -1,6 +1,8 @@
 #' Exception class for async-related errors
 #' @aliases AsyncTaskError
 #'
+#' @param ... Passed to \code{\link[R.oo]{Exception}}
+#'
 #' @export
 #' @importFrom R.oo setConstructorS3
 #' @importFrom R.oo extend

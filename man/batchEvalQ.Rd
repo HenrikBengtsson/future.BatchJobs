@@ -10,8 +10,8 @@ batchEvalQ(reg, exprs, local = FALSE, ...)
 \item{reg}{[\code{\link{Registry}}]\cr
 Empty Registry that will store jobs for the mapping.}
 
-\item{exprs}{[\code{\link{expression}}]\cr
-R expressions to evaluate.}
+\item{exprs}{[\code{\link{list}}]\cr
+A list of \code{\link{expression}}:s to evaluate.}
 
 \item{local}{[\code{\link{logical}}[1]]\cr
 If TRUE, the expression is evaluated wrapped in a
@@ -27,8 +27,22 @@ Vector of type \code{integer} with job ids.
 \description{
 Evaluates expressions as jobs on a registry
 }
+\examples{
+reg = makeRegistry(id = "BatchJobsExample", file.dir = tempfile(), seed = 123)
+exprs <- list(
+  A = substitute({
+    rnorm(10)
+  }),
+  B = substitute({
+    rnorm(20)
+  })
+)
+batchEvalQ(reg, exprs)
+print(reg)
+}
 \seealso{
-This function is analogous to
-\code{parallel::\link[parallel]{clusterEvalQ}}.
+This function work analogously to
+\code{parallel::\link[parallel]{clusterEvalQ}} but
+accepts multiple expressions instead of just one.
 }
 
