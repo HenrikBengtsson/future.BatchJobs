@@ -6,13 +6,13 @@
 \alias{AsyncTaskError}
 \title{Exception class for async-related errors}
 \format{\preformatted{function (...)  
- - attr(*, ".env")=<environment: 0x000000000e4176a0> 
+ - attr(*, ".env")=<environment: 0x000000000e41a8e8> 
  - attr(*, "class")= chr [1:2] "Class" "Object"
  - attr(*, "export")= logi TRUE
  - attr(*, "modifiers")= chr [1:2] "public" "class"
 }}
 \usage{
-AsyncError
+AsyncError(...)
 }
 \arguments{
 \item{...}{Passed to \code{\link[R.oo]{Exception}}}

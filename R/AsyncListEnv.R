@@ -41,7 +41,15 @@ print.AsyncListEnv <- function(x, ...) {
   }
 }
 
+#' Inspects all elements of AsyncListEnv
+#'
+#' @param x An AsyncListEnv object
+#' @param ... Arguments passed to \code{inspect()}.
+#'
+#' @return A list of inspect values.
+#'
 #' @export
+#' @keywords internal
 inspectAll <- function(...) UseMethod("inspectAll")
 
 #' @export
