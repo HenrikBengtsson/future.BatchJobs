@@ -16,6 +16,7 @@
 #' @seealso This function is analogous to
 #' \code{parallel::\link[parallel]{clusterEvalQ}}.
 #'
+#' @importFrom BatchJobs batchMap
 #' @export
 batchEvalQ <- function(reg, exprs, local=FALSE, ...) {
   if (local) {
