@@ -43,7 +43,7 @@ is effectively equivalent to
 x %<=% local({ a <- 3.14 })
 ```
 
-I both cases _asynchronous variable_ 'a' will be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchronous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  Asynchronous variable `a` is gone forever.  As a matter of fact, it is _not_ possible for an asynchronous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchronous environment.
+I both cases variable 'a' will be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchronous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to _asynchroneous variable_ `x` in the calling environment.  Local variable `a` is gone forever.  As a matter of fact, it is _not_ possible for an asynchronous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchronous environment.
 
 
 ### Global variables
@@ -156,7 +156,7 @@ retrieved.  For example:
 > 1+2
 [1] 3
 > e
-Error: BatchJobError: 'Error in eval(expr, envir = envir) : Whoops! '
+Error: BatchJobError: 'Error in eval(expr, envir, enclos) : Whoops! ' [DEBUG INFORMATION: ...]
 ```
 This error is rethrown each time `e` is retrieved, so it is not
 possible to "inspect" `e` any further using standard R functions such
