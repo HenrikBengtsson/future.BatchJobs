@@ -4,15 +4,15 @@
 \alias{asyncEvalQ}
 \title{Evaluate multiple R expressions asynchronously}
 \usage{
-asyncEvalQ(exprs, ..., envir = parent.frame())
+asyncEvalQ(exprs, envir = parent.frame(), ...)
 }
 \arguments{
 \item{exprs}{A \link[base]{list} of R \link[base]{expression}s.}
 
-\item{...}{Additional arguments passed to \code{asyncBatchEvalQ)}.}
-
 \item{envir}{The \link[base]{environment} from where to search
 for global variables.}
+
+\item{...}{Not used.}
 }
 \value{
 A \code{\link{listenv}} of length \code{length(exprs)}.
