@@ -209,7 +209,7 @@ assignByIndex.listenv <- function(x, i, value) {
   } else if (!is.finite(i)) {
     stop("Cannot assign value. Non-finite index: ", i, call.=FALSE)
   } else if (i < 1L) {
-    stop("Cannot assign value. Negative index: ", i, call.=FALSE)
+    stop("Cannot assign value. Non-positive index: ", i, call.=FALSE)
   }
 
   map <- map(x)
