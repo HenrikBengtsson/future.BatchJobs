@@ -156,7 +156,7 @@ retrieved.  For example:
 > 1+2
 [1] 3
 > e
-Error: BatchJobError: 'Error in eval(expr, envir = envir) : Whoops! '
+Error: BatchJobError: 'Error in eval(expr, envir, enclos) : Whoops! ' [DEBUG INFORMATION: ...]
 ```
 This error is rethrown each time `e` is retrieved, so it is not
 possible to "inspect" `e` any further using standard R functions such
