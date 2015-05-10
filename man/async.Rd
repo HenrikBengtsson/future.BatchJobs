@@ -31,4 +31,10 @@ are search from.}
 \code{async()} evaluates an expression asynchroneous and
 \code{await()} retrieves its value.
 }
+\details{
+Note that \code{await()} should only be called once, because
+after being called the actual asynchroneous task is removed
+and no longer available for subsequent calls.  If called
+again, an error is thrown.
+}
 

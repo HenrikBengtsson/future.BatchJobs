@@ -23,6 +23,12 @@ async <- function(expr, envir=parent.frame(), substitute=TRUE) {
 #'
 #' @return \code{await()} returns the value of the expression.
 #'
+#' @details
+#' Note that \code{await()} should only be called once, because
+#' after being called the actual asynchroneous task is removed
+#' and no longer available for subsequent calls.  If called
+#' again, an error is thrown.
+#'
 #' @rdname async
 #' @export
 await <- function(task, ...) UseMethod("await")
