@@ -4,12 +4,12 @@
 \alias{await.BatchJobsAsyncTask}
 \title{Retrieves the value of of the asynchronously evaluated expression}
 \usage{
-\method{await}{BatchJobsAsyncTask}(obj, cleanup = TRUE,
+\method{await}{BatchJobsAsyncTask}(task, cleanup = TRUE,
   maxTries = getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES",
   1000)), delta = getOption("async::interval", 1), alpha = 1.01, ...)
 }
 \arguments{
-\item{obj}{The asynchronously task}
+\item{task}{The asynchronously task}
 
 \item{cleanup}{If TRUE, the registry is completely removed upon
 success, otherwise not.}

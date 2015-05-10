@@ -31,34 +31,34 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
 ##  if (debug) { mcat("Expression (injected):\n"); mprint(expr) }
 
   ## Setup return value
-  obj <- list(
+  task <- list(
     expr=expr,
     envir=envir
   )
-  structure(obj, class=c("AsyncTask", class(obj)))
+  structure(task, class=c("AsyncTask", class(task)))
 }
 
 add_finalizer <- function(...) UseMethod("add_finalizer")
 
-add_finalizer.AsyncTask <- function(obj, ...) {
+add_finalizer.AsyncTask <- function(task, ...) {
   ## Register finalizer (will clean up registries etc.)
 
   ## Use a "dummy" environment for GC finalization
   gcenv <- new.env()
-  gcenv$obj <- obj
+  gcenv$task <- task
 
   reg.finalizer(gcenv, f=function(gcenv) {
-    obj <- gcenv$obj
-    gcenv$obj <- NULL
-    if (inherits(obj, "AsyncTask") && "async" %in% loadedNamespaces()) {
-      try( delete(obj, onFailure="warning", onMissing="ignore") )
+    task <- gcenv$task
+    gcenv$task <- NULL
+    if (inherits(task, "AsyncTask") && "async" %in% loadedNamespaces()) {
+      try( delete(task, onFailure="warning", onMissing="ignore") )
     }
   }, onexit=TRUE)
 
-  obj$.gcenv <- gcenv
+  task$.gcenv <- gcenv
   gcenv <- NULL
 
-  invisible(obj)
+  invisible(task)
 }
 
 
@@ -104,7 +104,7 @@ error <- function(...) UseMethod("error")
 
 #' Status of an AsyncTask
 #'
-#' @param obj The asynchronously task
+#' @param task The asynchronously task
 #' @param ... Not used.
 #'
 #' @return A character vector.
@@ -112,14 +112,14 @@ error <- function(...) UseMethod("error")
 #' @export
 #' @importFrom BatchJobs getStatus
 #' @keywords internal
-status.AsyncTask <- function(obj, ...) {
-  stop("Not implemented for class ", class(obj)[1])
+status.AsyncTask <- function(task, ...) {
+  stop("Not implemented for class ", class(task)[1])
 }
 
 #' @export
 #' @keywords internal
-finished.AsyncTask <- function(obj, ...) {
-  stat <- status(obj)
+finished.AsyncTask <- function(task, ...) {
+  stat <- status(task)
   if (isNA(stat)) return(NA)
 
   any(c("done", "error", "expired") %in% stat)
@@ -128,27 +128,15 @@ finished.AsyncTask <- function(obj, ...) {
 
 #' @export
 #' @keywords internal
-value.AsyncTask <- function(obj, ...) {
-  stop("Not implemented for class ", class(obj)[1])
+value.AsyncTask <- function(task, ...) {
+  stop("Not implemented for class ", class(task)[1])
 }
 
 #' @export
 #' @keywords internal
-error.AsyncTask <- function(obj, ...) {
-  stop("Not implemented for class ", class(obj)[1])
+error.AsyncTask <- function(task, ...) {
+  stop("Not implemented for class ", class(task)[1])
 }
-
-
-#' Retrieves the value of of the asynchronously evaluated expression
-#'
-#' @param ... Arguments passed to S3 method.
-#'
-#' @return The value of the evaluated expression.
-#' If an error occurs, an informative Exception is thrown.
-#'
-#' @export
-#' @keywords internal
-await <- function(...) UseMethod("await")
 
 
 #' @keywords internal
@@ -163,7 +151,7 @@ record.AsyncTask <- function(task, name) {
 
 #' Retrieves the value of of the asynchronously evaluated expression
 #'
-#' @param obj The asynchronously task
+#' @param task The asynchronously task
 #' @param cleanup If TRUE, the registry is completely removed upon
 #' success, otherwise not.
 #' @param maxTries The number of tries before giving up.
@@ -179,14 +167,14 @@ record.AsyncTask <- function(task, name) {
 #' @importFrom R.methodsS3 throw
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.AsyncTask <- function(obj, ...) {
-  stop("Not implemented for class ", class(obj)[1])
+await.AsyncTask <- function(task, ...) {
+  stop("Not implemented for class ", class(task)[1])
 }
 
 
 #' Removes an asynchroneous task
 #'
-#' @param obj The asynchronously task
+#' @param task The asynchronously task
 #' @param onFailure Action if failing to delete task.
 #' @param onMissing Action if task does not exist.
 #' @param maxTries The number of tries before giving up.
@@ -202,8 +190,8 @@ await.AsyncTask <- function(obj, ...) {
 #' @aliases delete
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.AsyncTask <- function(obj, ...) {
-  stop("Not implemented for class ", class(obj)[1])
+delete.AsyncTask <- function(task, ...) {
+  stop("Not implemented for class ", class(task)[1])
 }
 
 delete <- function(...) UseMethod("delete")

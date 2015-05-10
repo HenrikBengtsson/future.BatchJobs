@@ -18,7 +18,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
   if (substitute) expr <- substitute(expr)
 
   ## 1. Setup task
-  obj <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
+  task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
 
   debug <- getOption("async::debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
@@ -27,12 +27,12 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
   reg <- tempRegistry()
   if (debug) mprint(reg)
   id <- asyncBatchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
-  obj$backend <- list(reg=reg, id=id)
-  obj <- structure(obj, class=c("BatchJobsAsyncTask", class(obj)))
+  task$backend <- list(reg=reg, id=id)
+  task <- structure(task, class=c("BatchJobsAsyncTask", class(task)))
   if (debug) mprintf("Created task #%d\n", id)
 
   ## Register finalizer?
-  if (finalize) obj <- add_finalizer(obj)
+  if (finalize) task <- add_finalizer(task)
 
   ## 3. Launch task?
   if (launch) {
@@ -40,7 +40,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
     if (debug) mprintf("Launched task #%d\n", id)
   }
 
-  obj
+  task
 }
 
 
@@ -75,7 +75,7 @@ print.BatchJobsAsyncTask <- function(x, ...) {
 
 #' Status of an AsyncTask
 #'
-#' @param obj The asynchronously task
+#' @param task The asynchronously task
 #' @param ... Not used.
 #'
 #' @return A character vector.
@@ -83,8 +83,8 @@ print.BatchJobsAsyncTask <- function(x, ...) {
 #' @export
 #' @importFrom BatchJobs getStatus
 #' @keywords internal
-status.BatchJobsAsyncTask <- function(obj, ...) {
-  backend <- obj$backend
+status.BatchJobsAsyncTask <- function(task, ...) {
+  backend <- task$backend
   reg <- backend$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
   ## Closed and deleted?
@@ -103,15 +103,15 @@ status.BatchJobsAsyncTask <- function(obj, ...) {
 
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(obj, ...) {
-  stat <- status(obj)
+value.BatchJobsAsyncTask <- function(task, ...) {
+  stat <- status(task)
   if (isNA(stat)) return(NULL)
 
   if (!"done" %in% stat) {
-    throw(AsyncTaskError(sprintf("%s did not succeed: %s", class(obj)[1L], paste(sQuote(stat), collapse=", ")), task=obj))
+    throw(AsyncTaskError(sprintf("%s did not succeed: %s", class(task)[1L], paste(sQuote(stat), collapse=", ")), task=task))
   }
 
-  backend <- obj$backend
+  backend <- task$backend
   reg <- backend$reg
   id <- backend$id
   loadResult(reg, id=id)
@@ -119,17 +119,17 @@ value.BatchJobsAsyncTask <- function(obj, ...) {
 
 #' @export
 #' @keywords internal
-error.BatchJobsAsyncTask <- function(obj, ...) {
-  stat <- status(obj)
+error.BatchJobsAsyncTask <- function(task, ...) {
+  stat <- status(task)
   if (isNA(stat)) return(NULL)
 
-  if (!finished(obj)) {
-    throw(AsyncTaskError(sprintf("%s has not finished yet", class(obj)[1L]), task=obj))
+  if (!finished(task)) {
+    throw(AsyncTaskError(sprintf("%s has not finished yet", class(task)[1L]), task=task))
   }
 
   if (!"error" %in% stat) return(NULL)
 
-  backend <- obj$backend
+  backend <- task$backend
   reg <- backend$reg
   id <- backend$id
   msg <- getErrorMessages(reg, ids=id)
@@ -140,7 +140,7 @@ error.BatchJobsAsyncTask <- function(obj, ...) {
 
 #' Retrieves the value of of the asynchronously evaluated expression
 #'
-#' @param obj The asynchronously task
+#' @param task The asynchronously task
 #' @param cleanup If TRUE, the registry is completely removed upon
 #' success, otherwise not.
 #' @param maxTries The number of tries before giving up.
@@ -157,7 +157,7 @@ error.BatchJobsAsyncTask <- function(obj, ...) {
 #' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.BatchJobsAsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   throw <- R.methodsS3::throw
 
   maxTries <- as.integer(maxTries)
@@ -165,8 +165,8 @@ await.BatchJobsAsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("asyn
   debug <- getOption("async::debug", FALSE)
   if (debug) mprintf("Polling...\n")
 
-  expr <- obj$expr
-  backend <- obj$backend
+  expr <- task$expr
+  backend <- task$backend
   reg <- backend$reg
   id <- backend$id
 
@@ -184,7 +184,7 @@ await.BatchJobsAsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("asyn
   interval <- delta
   finished <- FALSE
   while (tries <= maxTries) {
-    stat <- status(obj)
+    stat <- status(task)
     if (debug) mprintf(" Status %d: %s\n", tries, paste(stat, collapse=", "))
     if (isNA(stat)) {
       finished <- TRUE
@@ -224,28 +224,28 @@ await.BatchJobsAsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("asyn
   if (finished) {
     if (debug) { mprint("Results:"); mstr(res) }
     if ("done" %in% stat) {
-      res <- value(obj)
+      res <- value(task)
     } else if ("error" %in% stat) {
       cleanup <- FALSE
-      msg <- sprintf("BatchJobError: %s", error(obj))
-      throw(AsyncTaskError(msg, task=obj))
+      msg <- sprintf("BatchJobError: %s", error(task))
+      throw(AsyncTaskError(msg, task=task))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      throw(AsyncTaskError(msg, task=obj))
+      throw(AsyncTaskError(msg, task=task))
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
-      throw(AsyncTaskError(msg, task=obj))
+      throw(AsyncTaskError(msg, task=task))
     }
   } else {
     cleanup <- FALSE
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
-    throw(AsyncTaskError(msg, task=obj))
+    throw(AsyncTaskError(msg, task=task))
   }
 
   ## Cleanup?
   if (cleanup) {
-    delete(obj, delta=0.5*delta, alpha=alpha, ...)
+    delete(task, delta=0.5*delta, alpha=alpha, ...)
   }
 
   res
@@ -254,7 +254,7 @@ await.BatchJobsAsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("asyn
 
 #' Removes an asynchroneous task
 #'
-#' @param obj The asynchronously task
+#' @param task The asynchronously task
 #' @param onFailure Action if failing to delete task.
 #' @param onMissing Action if task does not exist.
 #' @param maxTries The number of tries before giving up.
@@ -268,12 +268,12 @@ await.BatchJobsAsyncTask <- function(obj, cleanup=TRUE, maxTries=getOption("asyn
 #' @export
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.BatchJobsAsyncTask <- function(obj, onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+delete.BatchJobsAsyncTask <- function(task, onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
 
   ## Identify registry
-  backend <- obj$backend
+  backend <- task$backend
   reg <- backend$reg
   path <- reg$file.dir
 
@@ -284,7 +284,7 @@ delete.BatchJobsAsyncTask <- function(obj, onFailure=c("error", "warning", "igno
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        throw(AsyncTaskError(msg, task=obj))
+        throw(AsyncTaskError(msg, task=task))
       }
     }
     return(invisible(TRUE))
@@ -308,7 +308,7 @@ delete.BatchJobsAsyncTask <- function(obj, onFailure=c("error", "warning", "igno
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        throw(AsyncTaskError(msg, task=obj))
+        throw(AsyncTaskError(msg, task=task))
       }
     }
     return(invisible(FALSE))

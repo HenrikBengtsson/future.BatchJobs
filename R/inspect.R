@@ -76,9 +76,9 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
   ## All elements of an listenv is inside the object
 #  if (inherits(envir, "listenv")) inherits <- FALSE
 
-  task <- sprintf(".task_%s", name)
-  if (exists(task, mode="list", envir=envir, inherits=inherits)) {
-    return(get(task, mode="list", envir=envir, inherits=inherits))
+  taskname <- sprintf(".task_%s", name)
+  if (exists(taskname, mode="list", envir=envir, inherits=inherits)) {
+    return(get(taskname, mode="list", envir=envir, inherits=inherits))
   }
 
   NA

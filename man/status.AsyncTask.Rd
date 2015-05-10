@@ -4,10 +4,10 @@
 \alias{status.AsyncTask}
 \title{Status of an AsyncTask}
 \usage{
-\method{status}{AsyncTask}(obj, ...)
+\method{status}{AsyncTask}(task, ...)
 }
 \arguments{
-\item{obj}{The asynchronously task}
+\item{task}{The asynchronously task}
 
 \item{...}{Not used.}
 }
