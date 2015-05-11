@@ -1,9 +1,9 @@
 #' Evaluate multiple R expressions asynchronously
 #'
 #' @param exprs A \link[base]{list} of R \link[base]{expression}s.
-#' @param ... Additional arguments passed to \code{asyncBatchEvalQ)}.
 #' @param envir The \link[base]{environment} from where to search
 #' for global variables.
+#' @param ... Not used.
 #'
 #' @return A \code{\link{listenv}} of length \code{length(exprs)}.
 #'
@@ -23,9 +23,8 @@
 #' its corresponding operator \code{\link{\%<=\%}}.
 #'
 #' @export
-#' @importFrom R.utils mcat mprint mprintf mstr
 #' @keywords internal
-asyncEvalQ <- function(exprs, ..., envir=parent.frame()) {
+asyncEvalQ <- function(exprs, envir=parent.frame(), ...) {
   nexprs <- length(exprs)
   env <- listenv(length=nexprs)
   names(env) <- names(exprs)
@@ -33,7 +32,7 @@ asyncEvalQ <- function(exprs, ..., envir=parent.frame()) {
   for (ii in seq_len(nexprs)) {
     var <- get_variable(env, ii)
     expr <- exprs[[ii]]
-    delayedAsyncAssign(var, expr, envir=envir, assign.env=env)
+    delayedAsyncAssign(var, expr, envir=envir, assign.env=env, substitute=FALSE)
   }
 
   env

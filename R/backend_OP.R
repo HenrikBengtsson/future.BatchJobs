@@ -13,8 +13,12 @@
   obackend <- backend(NULL)
   on.exit(backend(obackend, quietly=TRUE))
   what <- backend(backend)
-##  mprintf("Using backend: '%s'\n", what)
-##  mprintf("Previous backend: '%s'\n", obackend)
+
+  debug <- getOption("async::debug", FALSE)
+  if (debug) {
+    mprintf("Using backend: '%s'\n", what)
+    mprintf("Previous backend: '%s'\n", obackend)
+  }
 
   eval(lhs, envir=envir)
 }

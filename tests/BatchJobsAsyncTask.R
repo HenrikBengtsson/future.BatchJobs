@@ -1,10 +1,10 @@
-R.utils::use("async")
+library("async")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=FALSE)
 
-expr <- AsyncTask({ x <- 1 })
-print(expr)
+task <- BatchJobsAsyncTask({ x <- 1 })
+print(task)
 
 ## Cleanup
 options(oopts)
