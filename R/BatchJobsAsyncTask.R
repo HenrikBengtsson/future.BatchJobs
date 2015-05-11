@@ -50,22 +50,14 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
 #' @param ... Not used.
 #'
 #' @export
-#' @importFrom R.utils captureOutput
 #' @importFrom R.utils printf
 #' @keywords internal
 print.BatchJobsAsyncTask <- function(x, ...) {
-  printf("%s:\n", class(x)[1])
-  printf("Expression:\n")
-  code <- captureOutput(print(x$expr))
-  code <- paste(sprintf("  %s", code), collapse="\n")
-  printf("%s\n", code)
-  stat <- status(x)
-  printf("Status: %s\n", paste(sQuote(stat), collapse=", "))
-  if ("error" %in% stat) printf("Error: %s\n", error(x))
+  NextMethod("print")
   printf("Backend:\n")
   backend <- x$backend
   reg <- backend$reg
-  if (isNA(stat)) {
+  if (isNA(status(x))) {
     printf("%s: Not found (happens when finished and deleted)\n", class(reg))
   } else {
     print(reg)

@@ -72,7 +72,7 @@ add_finalizer.AsyncTask <- function(task, ...) {
 #' @importFrom R.utils printf
 #' @keywords internal
 print.AsyncTask <- function(x, ...) {
-  printf("%s:\n", class(x)[1])
+  printf("%s:\n", class(x)[1L])
   printf("Expression:\n")
   code <- captureOutput(print(x$expr))
   code <- paste(sprintf("  %s", code), collapse="\n")
@@ -80,8 +80,6 @@ print.AsyncTask <- function(x, ...) {
   stat <- status(x)
   printf("Status: %s\n", paste(sQuote(stat), collapse=", "))
   if ("error" %in% stat) printf("Error: %s\n", error(x))
-  printf("Backend:\n")
-  print(backend)
 }
 
 
