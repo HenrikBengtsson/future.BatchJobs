@@ -7,8 +7,7 @@ o Functions AsyncTask() and delayedAsyncAssign() gained argument
   should  be substitute():d or not.
 o ROBUSTNESS: Added package tests for delayedAsyncAssign().
 o ROBUSTNESS: Package test coverage is 77%.
-o CLEANUP: Internal restructuring preparing to be able to use
-  BiocParallel as a backend factory.
+o CLEANUP: Internal restructuring with more informative classes.
 
 
 Version: 0.1.4 [2015-05-02]
