@@ -1,7 +1,7 @@
 Package: async
 ==============
 
-Version: 0.1.4-9000 [2015-05-10]
+Version: 0.2.0 [2015-05-11]
 o Functions AsyncTask() and delayedAsyncAssign() gained argument
   'substitute' for controlling whether the expression/value 
   should  be substitute():d or not.
