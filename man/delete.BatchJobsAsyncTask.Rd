@@ -4,12 +4,15 @@
 \alias{delete.BatchJobsAsyncTask}
 \title{Removes an asynchroneous task}
 \usage{
-\method{delete}{BatchJobsAsyncTask}(task, onFailure = c("error", "warning",
-  "ignore"), onMissing = c("ignore", "warning", "error"), maxTries = 10L,
+\method{delete}{BatchJobsAsyncTask}(task, onRunning = c("warning", "error",
+  "skip"), onFailure = c("error", "warning", "ignore"),
+  onMissing = c("ignore", "warning", "error"), maxTries = 10L,
   delta = getOption("async::interval", 1), alpha = 1.01, ...)
 }
 \arguments{
 \item{task}{The asynchronously task}
+
+\item{onRunning}{Action if task is running or appears to run.}
 
 \item{onFailure}{Action if failing to delete task.}
 

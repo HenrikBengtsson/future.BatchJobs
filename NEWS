@@ -1,14 +1,20 @@
 Package: async
 ==============
 
-Version: 0.1.4-9000 [2015-05-10]
+Version: 0.2.0-9000 [2015-05-15]
+o ROBUSTNESS: Asynchroneous tasks that still run when R exists
+  will not be stopped and not deleted.  This will allow the tasks
+  running on job clusters to complete.
+o BUG FIX: AsyncTask objects were not assigned to the listenv.
+
+
+Version: 0.2.0 [2015-05-11]
 o Functions AsyncTask() and delayedAsyncAssign() gained argument
-  'substitute' for controlling whether the expression/value 
+  'substitute' for controlling whether the expression/value
   should  be substitute():d or not.
 o ROBUSTNESS: Added package tests for delayedAsyncAssign().
 o ROBUSTNESS: Package test coverage is 77%.
-o CLEANUP: Internal restructuring preparing to be able to use
-  BiocParallel as a backend factory.
+o CLEANUP: Internal restructuring with more informative classes.
 
 
 Version: 0.1.4 [2015-05-02]

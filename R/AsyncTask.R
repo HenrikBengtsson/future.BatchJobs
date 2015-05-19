@@ -51,7 +51,9 @@ add_finalizer.AsyncTask <- function(task, ...) {
     task <- gcenv$task
     gcenv$task <- NULL
     if (inherits(task, "AsyncTask") && "async" %in% loadedNamespaces()) {
-      try( delete(task, onFailure="warning", onMissing="ignore") )
+      try({
+        delete(task, onRunning="skip", onMissing="ignore", onFailure="warning")
+      })
     }
   }, onexit=TRUE)
 
@@ -72,7 +74,7 @@ add_finalizer.AsyncTask <- function(task, ...) {
 #' @importFrom R.utils printf
 #' @keywords internal
 print.AsyncTask <- function(x, ...) {
-  printf("%s:\n", class(x)[1])
+  printf("%s:\n", class(x)[1L])
   printf("Expression:\n")
   code <- captureOutput(print(x$expr))
   code <- paste(sprintf("  %s", code), collapse="\n")
@@ -80,8 +82,6 @@ print.AsyncTask <- function(x, ...) {
   stat <- status(x)
   printf("Status: %s\n", paste(sQuote(stat), collapse=", "))
   if ("error" %in% stat) printf("Error: %s\n", error(x))
-  printf("Backend:\n")
-  print(backend)
 }
 
 
@@ -141,11 +141,11 @@ error.AsyncTask <- function(task, ...) {
 
 #' @keywords internal
 record <- function(...) UseMethod("record")
-record.AsyncTask <- function(task, name) {
+record.AsyncTask <- function(task, name, envir) {
   name <- sprintf(".task_%s", name)
   task_without_gc <- task
   task_without_gc$.gcenv <- NULL
-  assign(name, task_without_gc, envir=task$envir)
+  assign(name, task_without_gc, envir=envir)
 }
 
 
