@@ -31,7 +31,7 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
   a <- b <- NULL; rm(list=c("a", "b")) ## To please R CMD check
   call <- substitute(async(a, envir=b), list(a=value, b=envir))
   task <- eval(call, envir=assign.env)
-  record(task, name=name)
+  record(task, name=name, envir=assign.env)
 
   ## Create delayed assignment for its result.
   ## Here await may throw an error causing the assign value to be a

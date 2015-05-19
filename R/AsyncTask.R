@@ -141,11 +141,11 @@ error.AsyncTask <- function(task, ...) {
 
 #' @keywords internal
 record <- function(...) UseMethod("record")
-record.AsyncTask <- function(task, name) {
+record.AsyncTask <- function(task, name, envir) {
   name <- sprintf(".task_%s", name)
   task_without_gc <- task
   task_without_gc$.gcenv <- NULL
-  assign(name, task_without_gc, envir=task$envir)
+  assign(name, task_without_gc, envir=envir)
 }
 
 

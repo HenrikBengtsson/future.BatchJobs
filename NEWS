@@ -5,6 +5,7 @@ Version: 0.2.0-9000 [2015-05-15]
 o ROBUSTNESS: Asynchroneous tasks that still run when R exists
   will not be stopped and not deleted.  This will allow the tasks
   running on job clusters to complete.
+o BUG FIX: AsyncTask objects were not assigned to the listenv.
 
 
 Version: 0.2.0 [2015-05-11]

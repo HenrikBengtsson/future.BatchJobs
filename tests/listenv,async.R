@@ -38,7 +38,6 @@ v$a %<=% 2
 
 tu <- inspect(u$a)
 tv <- inspect(v$a)
-## FIXME: inspect() finds the wrong AsyncTask (Issue #12)
 stopifnot(!identical(tu, tv))
 
 stopifnot(identical(u$a, 1))
