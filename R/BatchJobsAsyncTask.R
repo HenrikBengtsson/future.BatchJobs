@@ -247,6 +247,7 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
 #' Removes an asynchroneous task
 #'
 #' @param task The asynchronously task
+#' @param onRunning Action if task is running or appears to run.
 #' @param onFailure Action if failing to delete task.
 #' @param onMissing Action if task does not exist.
 #' @param maxTries The number of tries before giving up.
@@ -260,7 +261,8 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
 #' @export
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.BatchJobsAsyncTask <- function(task, onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+  onRunning <- match.arg(onRunning)
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
 
@@ -283,6 +285,21 @@ delete.BatchJobsAsyncTask <- function(task, onFailure=c("error", "warning", "ign
   }
 
 
+  ## Does the task still run?  If so, then...
+  isRunning <- FALSE ## FIX ME: Code here!
+  if (isRunning) {
+    if (onRunning == "skip") return(invisible(TRUE))
+
+    msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running task: %s", sQuote(path))
+    if (onRunning == "warning") {
+      warning(msg)
+      return(invisible(TRUE))
+    } else if (onRunning == "error") {
+      throw(AsyncTaskError(msg, task=task))
+    }
+  }
+
+
   ## Try to delete registry
   interval <- delta
   for (kk in seq_len(maxTries)) {
@@ -293,7 +310,7 @@ delete.BatchJobsAsyncTask <- function(task, onFailure=c("error", "warning", "ign
   }
 
 
-  ## Sucess?
+  ## Success?
   if (file_test("-d", path)) {
     if (onFailure %in% c("warning", "error")) {
       msg <- sprintf("Failed to remove BatchJob registry: %s", sQuote(path))

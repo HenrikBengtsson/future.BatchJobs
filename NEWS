@@ -1,9 +1,15 @@
 Package: async
 ==============
 
+Version: 0.2.0-9000 [2015-05-15]
+o ROBUSTNESS: Asynchroneous tasks that still run when R exists
+  will not be stopped and not deleted.  This will allow the tasks
+  running on job clusters to complete.
+
+
 Version: 0.2.0 [2015-05-11]
 o Functions AsyncTask() and delayedAsyncAssign() gained argument
-  'substitute' for controlling whether the expression/value 
+  'substitute' for controlling whether the expression/value
   should  be substitute():d or not.
 o ROBUSTNESS: Added package tests for delayedAsyncAssign().
 o ROBUSTNESS: Package test coverage is 77%.

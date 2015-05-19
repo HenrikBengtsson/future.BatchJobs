@@ -51,7 +51,9 @@ add_finalizer.AsyncTask <- function(task, ...) {
     task <- gcenv$task
     gcenv$task <- NULL
     if (inherits(task, "AsyncTask") && "async" %in% loadedNamespaces()) {
-      try( delete(task, onFailure="warning", onMissing="ignore") )
+      try({
+        delete(task, onRunning="skip", onMissing="ignore", onFailure="warning")
+      })
     }
   }, onexit=TRUE)
 
