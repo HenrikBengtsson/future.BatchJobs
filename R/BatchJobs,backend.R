@@ -30,6 +30,8 @@
 #'
 #' @export
 #' @importFrom parallel detectCores
+#' @importFrom tools file_path_as_absolute
+#' @importFrom utils file_test
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
 #' @importFrom R.utils use
 backend <- local({
@@ -49,6 +51,7 @@ backend <- local({
     ## Imported functions
     ns <- getNamespace("BatchJobs")
     getBatchJobsConf <- get("getBatchJobsConf", mode="function", envir=ns)
+    sourceConfFiles <- get("sourceConfFiles", mode="function", envir=ns)
     assignConf <- get("assignConf", mode="function", envir=ns)
     readConfs <- get("readConfs", mode="function", envir=ns)
 
@@ -90,6 +93,14 @@ backend <- local({
       what <- unlist(what, use.names=FALSE)
     }
 
+    ## Is a BatchJobs config file specified?
+    if (length(what) == 1L && file_test("-f", what)) {
+      what <- file_path_as_absolute(what)
+      if (!hasUserClusterFunctions()) {
+        stop("The specified file does not specify BatchJobs cluster functions: ", what)
+      }
+    }
+
     ## Is .BatchJobs.R configuration available?
     if (length(what) > 0L && what[1L] == ".BatchJobs.R") {
       if (!hasUserClusterFunctions()) {
@@ -115,7 +126,14 @@ backend <- local({
       warning(sprintf("Some of the preferred backends (%s) are either not available or not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS, sQuote(what)))
     }
 
-    if (what == ".BatchJobs.R") {
+    ## Load specific or global BatchJobs config file?
+    if (file_test("-f", what)) {
+      conf <- sourceConfFiles(what)
+      assignConf(conf)
+      ## Record last used
+      last <<- what
+      return(what)
+    } else if (what == ".BatchJobs.R") {
       if (quietly) {
         suppressPackageStartupMessages(readConfs())
       } else {
@@ -224,13 +242,16 @@ makeClusterFunctionsRscript <- function(parallel=FALSE) {
 # the .BatchJobs.R files that BatchJobs loads.
 #
 #' @importFrom R.utils mprint
-hasUserClusterFunctions <- function(debug=FALSE) {
+hasUserClusterFunctions <- function(pathnames=NULL, debug=FALSE) {
   ns <- getNamespace("BatchJobs")
   findConfigs <- get("findConfigs", mode="function", envir=ns)
   sourceConfFiles <- get("sourceConfFiles", mode="function", envir=ns)
 
-  pathnames <- findConfigs()
-  pathnames <- pathnames[basename(pathnames) != "BatchJobs_global_config.R"]
+  if (is.null(pathnames)) {
+    pathnames <- findConfigs()
+    ## Drop ... ? Where does that file exists? /HB 2015-05-19
+    pathnames <- pathnames[basename(pathnames) != "BatchJobs_global_config.R"]
+  }
   if (debug) mprint(pathnames)
 
   suppressPackageStartupMessages({

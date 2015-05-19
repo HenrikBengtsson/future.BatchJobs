@@ -51,11 +51,24 @@ stopifnot(x == a)
 stopifnot(y == 2*a)
 stopifnot(z == x)
 
-
 ## Assert that the original backend is still in use
 printf("Current backend: %s\n", backend(NULL))
 if (!"covr" %in% loadedNamespaces())
   stopifnot(backend(NULL) == obackend)
+
+
+## Specify BatchJobs config file as backend
+path <- system.file("etc", package="BatchJobs")
+pathname <- file.path(path, "BatchJobs_global_config.R")
+if (file_test("-f", pathname)) {
+  backend(pathname)
+  printf("Current backend: %s\n", backend(NULL))
+
+  backend(cluster=pathname)
+  backend('cluster')
+  printf("Current backend: %s\n", backend(NULL))
+}
+
 
 ## Undo everything
 backend(obackend)
