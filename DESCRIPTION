@@ -1,14 +1,15 @@
 Package: async
-Version: 0.2.0
+Version: 0.2.0-9000
 Depends:
-  R (>= 3.1.2)
+  R (>= 3.1.2),
+  listenv
 Imports:
+  BatchJobs,
+  codetools,
   parallel,
-  R.methodsS3 (>= 1.7.0),
-  R.oo (>= 1.19.0),
-  R.utils (>= 2.0.2),
-  codetools (>= 0.2-11),
-  BatchJobs (>= 1.6)
+  R.methodsS3,
+  R.oo,
+  R.utils
 Title: Asynchronous Evaluation
 Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
                                           email = "henrikb@braju.com"))

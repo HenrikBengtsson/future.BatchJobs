@@ -5,6 +5,7 @@
 #' @return An environment of class `AsyncListEnv` extending `listenv`.
 #'
 #' @export
+#' @importFrom listenv listenv
 AsyncListEnv <- function(...) {
   x <- listenv(...)
   class(x) <- c("AsyncListEnv", class(x))
@@ -17,6 +18,7 @@ AsyncListEnv <- function(...) {
 #' @param ... Not used.
 #'
 #' @export
+#' @importFrom R.utils hpaste
 #' @keywords internal
 print.AsyncListEnv <- function(x, ...) {
   printf("%s:\n", class(x)[1])

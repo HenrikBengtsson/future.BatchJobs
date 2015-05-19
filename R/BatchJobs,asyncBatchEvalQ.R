@@ -10,7 +10,7 @@
 #' @return Vector of type \code{integer} with job ids.
 #'
 #' @export
-#' @importFrom R.utils mcat mprintf mstr
+#' @importFrom R.utils hpaste mcat mprintf mstr
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 #' @keywords internal
 asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...) {
