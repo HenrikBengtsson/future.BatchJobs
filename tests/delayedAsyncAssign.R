@@ -18,3 +18,19 @@ cat(sprintf("b=%s\n", b))
 
 ## The evaluation of 'a' is evaluated at this point
 cat(sprintf("a=%s\n", a))
+
+stopifnot(identical(a, 1))
+stopifnot(identical(b, 2))
+
+
+## Potential task name clashes
+u <- new.env()
+v <- new.env()
+delayedAsyncAssign("a", { 2 }, assign.env=u)
+delayedAsyncAssign("a", { 4 }, assign.env=v)
+
+cat(sprintf("u$a=%s\n", u$a))
+cat(sprintf("v$a=%s\n", v$a))
+
+stopifnot(identical(u$a, 2))
+stopifnot(identical(v$a, 4))
