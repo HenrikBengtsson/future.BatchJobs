@@ -93,19 +93,20 @@ backend <- local({
       what <- unlist(what, use.names=FALSE)
     }
 
-    ## Is a BatchJobs config file specified?
-    if (length(what) == 1L && file_test("-f", what)) {
-      what <- file_path_as_absolute(what)
-      if (!hasUserClusterFunctions()) {
-        stop("The specified file does not specify BatchJobs cluster functions: ", what)
-      }
-    }
-
-    ## Is .BatchJobs.R configuration available?
-    if (length(what) > 0L && what[1L] == ".BatchJobs.R") {
-      if (!hasUserClusterFunctions()) {
-        dropped <- c(dropped, what[1L])
-        what <- what[-1L]
+    ## BatchJobs configuration?
+    if (length(what) > 1L) {
+      ## A "global" or a specific config file?
+      ## NOTE: For a file in the current directory, use ./.BatchJobs.R
+      if (what[1L] == ".BatchJobs.R") {
+        if (!hasUserClusterFunctions()) {
+          dropped <- c(dropped, what[1L])
+          what <- what[-1L]
+        }
+      } else if (file_test("-f", what[1L])) {
+        pathname <- file_path_as_absolute(what[1L])
+        if (!hasUserClusterFunctions(pathname)) {
+          stop("The specified file does not specify BatchJobs cluster functions: ", what[1L])
+        }
       }
     }
 
