@@ -1,4 +1,4 @@
-library("async")
+("async")
 ## Make sure not to clash with R.utils
 `%<-%` <- async::`%<-%`
 backend("local")

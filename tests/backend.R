@@ -69,6 +69,16 @@ if (file_test("-f", pathname)) {
   printf("Current backend: %s\n", backend(NULL))
 }
 
+print(backend(".BatchJobs.R"))
+print(backend("rscript"))
+print(backend("multicore"))
+print(backend("multicore=1"))
+print(backend("multicore-1"))
+print(backend("multicore=999"))
+print(backend("aliases"))
+print(backend("reset"))
+print(backend("default"))
+
 
 ## Undo everything
 backend(obackend)

@@ -1,5 +1,8 @@
 library("async")
 
+ovars <- ls(envir=globalenv())
+oopts <- options(warn=1, "async::debug"=TRUE)
+
 delayedAssign("a", {
   ## This message will be outputted
   cat("Delayed assignment evaluated\n")
@@ -34,3 +37,8 @@ cat(sprintf("v$a=%s\n", v$a))
 
 stopifnot(identical(u$a, 2))
 stopifnot(identical(v$a, 4))
+
+
+## Cleanup
+options(oopts)
+rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

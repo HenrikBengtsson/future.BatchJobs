@@ -94,7 +94,7 @@ backend <- local({
     }
 
     ## BatchJobs configuration?
-    if (length(what) > 1L) {
+    if (length(what) >= 1L) {
       ## A "global" or a specific config file?
       ## NOTE: For a file in the current directory, use ./.BatchJobs.R
       if (what[1L] == ".BatchJobs.R") {
