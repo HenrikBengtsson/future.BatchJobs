@@ -36,6 +36,8 @@
 #'
 #'  \item \code{"multicore"} -
 #'    parallel processing using all available cores on the local machine.
+#'    The number of available cores is inferred using
+#'    \code{\link{availableCores}()}.
 #'    Note: Multicore processing is not supported on Windows.
 #'    If explicitly specified, then an informative warning will be given,
 #'    and it will be ignored.
@@ -63,7 +65,6 @@
 #'            "multicore", "local", "interactive"))}.
 #'
 #' @export
-#' @importFrom parallel detectCores
 #' @importFrom tools file_path_as_absolute
 #' @importFrom utils file_test
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
@@ -181,19 +182,19 @@ backend <- local({
 
     conf <- getBatchJobsConf()
     if (grepl("^multicore", what)) {
-      ncpus0 <- detectCores()
+      ncpus0 <- availableCores()
       if (grepl("^multicore=", what)) {
         ncpus <- suppressWarnings(as.integer(gsub("^multicore=", "", what)))
         if (!is.finite(ncpus) || ncpus < 1L) {
           stop("Invalid number of cores specified: ", sQuote(what))
         }
         if (ncpus > ncpus0) {
-          warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available accoring to parallel::detectCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
+          warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available accoring to availableCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
         }
       } else {
         ncpus <- ncpus0
         if (ncpus == 1L) {
-          warning(sprintf("This system has only a single core (either it's old machine or parallel::detectCores() returns an incorrect value) available for the '%s' backend.", what))
+          warning(sprintf("This system has only a single core (either it's old machine or availableCores() returns an incorrect value) available for the '%s' backend.", what))
         } else {
           ## Leave one some cores for other things?
           if (grepl("^multicore=", what)) {
