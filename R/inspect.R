@@ -10,7 +10,12 @@
 #' @importFrom listenv get_variable
 inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
   expr <- substitute(var)
-  if (is.language(expr)) {
+  if (is.character(expr)) {
+    name <- expr
+    if (length(name) > 1L) {
+      stop(sprintf("Inspection can only be done on a single element at the time, not %d: %s", length(name), hpaste(name, collapse=", ")), call.=FALSE)
+    }
+  } else if (is.language(expr)) {
     n <- length(expr)
     name <- paste(deparse(expr), collapse="")
     if (n != 1L && n != 3L) {
