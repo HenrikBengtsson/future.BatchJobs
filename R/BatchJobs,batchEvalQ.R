@@ -18,6 +18,7 @@
 #' accepts multiple expressions instead of just one.
 #'
 #' @examples
+#' library(BatchJobs)
 #' reg = makeRegistry(id = "BatchJobsExample", file.dir = tempfile(), seed = 123)
 #' exprs <- list(
 #'   A = substitute({

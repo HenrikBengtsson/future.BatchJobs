@@ -1,32 +1,66 @@
 #' Switch backend to be used for asynchronous processing
 #'
 #' @param what
-#'   A \code{character} \code{vector} of preferred backend to be used.
-#'   If \code{NULL}, the currently default backend is returned.
-#'   If \code{"aliases"}, all registered aliases are returned.
-#'   If \code{"default"}, the default backend according to alias
-#'      \code{"default"} is used (see below).
+#'   A \code{character} \code{vector} of preferred backends to be used.
+#'   See Section Details below for supported backends.
+#'   If \code{NULL} (default), the currently default backend is returned.
 #'   If \code{"reset"}, the backend is reset to \code{"default"}.
+#'   If \code{"default"}, the default backend according to alias
+#'      \code{"default"} is used (see Details).
+#'   If \code{"aliases"}, all registered aliases are returned.
 #' @param ... Named character arguments specifying custom aliases
 #'            for character sets of backends.
-#' @param quietly If TRUE, messages are supressed.
+#' @param quietly If TRUE, messages are suppressed.
 #'
 #' @return Returns the name of the backend used, or a list of named aliases.
 #'
-#' @note The Windows operating system does not support the 'multicore'
-#' backend, which then will be ignored.  If explicitly specified, then
-#' an informative warning will be given.
-#'
-#' @section Aliases:
-#' A backend alias is single character representing a character vector
-#' of backend strings.  Aliases can be set by specifying a named
-#' character vector, e.g. \code{backend(spare=c("multicore-2", "local"))}.
-#' To list all registered aliases, use \code{backend("aliases")}.
-#' From start, there is a single alias:
+#' @details
 #' \itemize{
-#'  \item{\code{default = c(".BatchJobs.R", "multicore-1", "multicore",
-#'                          "local", "interactive", "rscript")}}
+#'  \item \code{".BatchJobs.R"} -
+#'    fully configurable batch processing based on a {.BatchJobs.R}
+#'    configuration file (searched for in the current directory and
+#'    if not found there then in the home directory).
+#'    Alternatively, one can specify a specific pathname, e.g.
+#'    \code{backend("~/shared/.BatchJobs.R")}.#
+#'
+#'  \item \code{"interactive"} -
+#'    non-parallel processing in the \emph{current} R session (but still
+#'    with all calls effectively evaluated as within \code{local()}).
+#'    \emph{This backend is always supported.}
+#'
+#'  \item \code{"local"} -
+#'    non-parallel processing in a separate R process.
+#'    \emph{This backend is always supported.}
+#'    \emph{This is the fallback used if none of the requested
+#'          backends are supported.}
+#'
+#'  \item \code{"multicore"} -
+#'    parallel processing using all available cores on the local machine.
+#'    Note: Multicore processing is not supported on Windows.
+#'    If explicitly specified, then an informative warning will be given,
+#'    and it will be ignored.
+#'
+#'  \item \code{"multicore=<n>"} -
+#'    as \code{"multicore"}, but uses (at most) \code{<n>} cores, e.g.
+#'    \code{backend("multicore=4")}.
+#'  \item \code{"multicore-<d>"} -
+#'    as \code{"multicore"}, but uses \code{<d>} less cores, e.g.
+#'    \code{backend("multicore-2")} to use all but two cores
+#'    (and always at least one).
 #' }
+#'
+#' In addition specify an individual backend, e.g. \code{backend("multicore")},
+#' it is also possible to specify a set of possible backends to use, e.g.
+#' \code{backend(c(".BatchJobs.R", "multicore"))}.
+#' The first supported backend will be used.
+#' If none are supported, then the \code{"local"} backend will be used.
+#'
+#' It is possible to define a custom set of backends using "aliases".
+#' For instance, \code{backend(spare=c("multicore-2", "local"))}
+#' \emph{defines} the \code{"spare"} backend \emph{set}.  To use this set,
+#' do \code{backend("spare")}.  One predefined alias set exists at startup,
+#' i.e. \code{backend(default = c(".BatchJobs.R", "multicore-1",
+#'            "multicore", "local", "interactive"))}.
 #'
 #' @export
 #' @importFrom parallel detectCores
@@ -36,7 +70,8 @@
 #' @importFrom R.utils use
 backend <- local({
   aliases = list(
-    default = c(".BatchJobs.R", "multicore-1", "multicore", "local", "interactive", "rscript")
+    default = c(".BatchJobs.R", "multicore-1", "multicore",
+                "local", "interactive") ## , "rscript")
   )
   last = NULL
 
@@ -44,11 +79,10 @@ backend <- local({
     ## Attach BatchJobs here, because it will attach itself later
     ## anyways and then it will load its own default settings and
     ## override whatever settings we use here.
-    oopts <- options(BatchJobs.load.config=FALSE)
-    on.exit(options(oopts))
-    use("BatchJobs")
+#    oopts <- options(BatchJobs.load.config=FALSE)
+#    on.exit(options(oopts))
 
-    ## Imported functions
+    ## Imported private functions from BatchJobs
     ns <- getNamespace("BatchJobs")
     getBatchJobsConf <- get("getBatchJobsConf", mode="function", envir=ns)
     sourceConfFiles <- get("sourceConfFiles", mode="function", envir=ns)
@@ -177,10 +211,10 @@ backend <- local({
       conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus)
     } else if (what == "local") {
       conf$cluster.functions = makeClusterFunctionsLocal()
-    } else if (what == "rscript") {
-      conf$cluster.functions = makeClusterFunctionsRscript()
     } else if (what == "interactive") {
       conf$cluster.functions = makeClusterFunctionsInteractive()
+    } else if (what == "rscript") {
+      conf$cluster.functions = makeClusterFunctionsRscript()
     } else {
       stop("Unknown backend: ", sQuote(what))
     }

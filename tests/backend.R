@@ -70,14 +70,15 @@ if (file_test("-f", pathname)) {
 }
 
 print(backend(".BatchJobs.R"))
-print(backend("rscript"))
+print(backend("interactive"))
+print(backend("local"))
 print(backend("multicore"))
 print(backend("multicore=1"))
 print(backend("multicore-1"))
 print(backend("multicore=999"))
 print(backend("aliases"))
-print(backend("reset"))
 print(backend("default"))
+print(backend("reset"))
 
 
 ## Undo everything

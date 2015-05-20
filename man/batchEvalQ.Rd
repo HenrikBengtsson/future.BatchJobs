@@ -28,6 +28,7 @@ Vector of type \code{integer} with job ids.
 Evaluates expressions as jobs on a registry
 }
 \examples{
+library(BatchJobs)
 reg = makeRegistry(id = "BatchJobsExample", file.dir = tempfile(), seed = 123)
 exprs <- list(
   A = substitute({
