@@ -10,6 +10,10 @@
 #' \itemize{
 #'  \item \code{"PBS"} -
 #'    Query Torque/PBS environment variable \code{PBS_NUM_PPN}.
+#'    Depending on PBS system configuration, this \emph{resource} parameter
+#'    may or may not default to one.  It can be specified when submitting
+#'    a job as in, for instance, \code{qsub -l nodes=4:ppn=2}, which
+#'    requests four nodes each with two cores.
 #'  \item \code{"system"} -
 #'    Query \code{\link[parallel]{detectCores}()}.
 #' }
