@@ -1,4 +1,5 @@
 ## Helper function for %<-%, %<=%, ...
+#' @importFrom listenv listenv get_variable
 .asAssignTarget <- function(expr, envir=parent.frame()) {
   res <- list(envir=envir, name=NULL)
 

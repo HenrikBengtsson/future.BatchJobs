@@ -7,6 +7,7 @@
 #' @return If exists, an AsyncTask object, otherwise NA.
 #'
 #' @export
+#' @importFrom listenv get_variable
 inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
   expr <- substitute(var)
   if (is.language(expr)) {

@@ -2,6 +2,7 @@ Package: async
 ==============
 
 Version: 0.2.0-9000 [2015-05-19]
+o CLEANUP: Moved identification of globals to new 'globals' package.
 o CLEANUP: Moved list environments to new 'listenv' package.
 o ROBUSTNESS: Asynchroneous tasks that still run when R exists
   will not be stopped and not deleted.  This will allow the tasks

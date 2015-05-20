@@ -10,6 +10,7 @@
 #' @return Vector of type \code{integer} with job ids.
 #'
 #' @export
+#' @importFrom globals getGlobals
 #' @importFrom R.utils hpaste mcat mprintf mstr
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 #' @keywords internal
@@ -24,7 +25,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
 
   ## Identify globals?
   if (isTRUE(globals)) {
-    globals <- getGlobals(exprs, envir=envir, primitive=FALSE, base=FALSE, unlist=TRUE)
+    globals <- getGlobals(exprs, envir=envir, tweak=tweakExpression, primitive=FALSE, base=FALSE, unlist=TRUE)
     if (debug) {
       mcat("Identified (non-primitive non-\"base\") globals:\n")
       mstr(globals)

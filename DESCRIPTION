@@ -5,7 +5,7 @@ Depends:
   listenv
 Imports:
   BatchJobs,
-  codetools,
+  globals,
   parallel,
   R.methodsS3,
   R.oo,
