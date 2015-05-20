@@ -4,11 +4,12 @@
 \alias{availableCores}
 \title{Get number of available cores on current machine}
 \usage{
-availableCores(sources = c("PBS", "system"))
+availableCores(methods = getOption("availableCoresMethods", c("PBS",
+  "system")))
 }
 \arguments{
-\item{sources}{A character vector specifying which sources to use
-   to infer the number of available cores (and in what order).}
+\item{methods}{A character vector specifying how to infer the number
+of available cores (and in what order).}
 }
 \value{
 Return a positive integer equal or greater to one.
@@ -17,7 +18,7 @@ Return a positive integer equal or greater to one.
 Get number of available cores on current machine
 }
 \details{
-The following sources for inferring the number of cores are supported:
+The following methods for inferring the number of cores are supported:
 \itemize{
  \item \code{"PBS"} -
    Query Torque/PBS environment variable \code{PBS_NUM_PPN}.
