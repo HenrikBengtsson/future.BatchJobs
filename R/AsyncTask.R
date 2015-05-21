@@ -79,9 +79,10 @@ print.AsyncTask <- function(x, ...) {
   code <- captureOutput(print(x$expr))
   code <- paste(sprintf("  %s", code), collapse="\n")
   printf("%s\n", code)
-  stat <- status(x)
-  printf("Status: %s\n", paste(sQuote(stat), collapse=", "))
-  if ("error" %in% stat) printf("Error: %s\n", error(x))
+  ## Ask for status once
+  status <- status(x)
+  printf("Status: %s\n", paste(sQuote(status), collapse=", "))
+  if ("error" %in% status) printf("Error: %s\n", error(x))
 }
 
 
@@ -91,14 +92,20 @@ print.AsyncTask <- function(x, ...) {
 #'
 #' @return A character vector.
 #'
-#' @aliases finished value error
+#' @aliases finished completed failed expired value error
 #' @export
 #' @export finished
+#' @export completed
+#' @export failed
+#' @export expired
 #' @export value
 #' @export error
 #' @keywords internal
 status <- function(...) UseMethod("status")
 finished <- function(...) UseMethod("finished")
+completed <- function(...) UseMethod("completed")
+failed <- function(...) UseMethod("failed")
+expired <- function(...) UseMethod("expired")
 value <- function(...) UseMethod("value")
 error <- function(...) UseMethod("error")
 
@@ -119,10 +126,33 @@ status.AsyncTask <- function(task, ...) {
 #' @export
 #' @keywords internal
 finished.AsyncTask <- function(task, ...) {
-  stat <- status(task)
-  if (isNA(stat)) return(NA)
+  status <- status(task)
+  if (isNA(status)) return(NA)
+  any(c("done", "error", "expired") %in% status)
+}
 
-  any(c("done", "error", "expired") %in% stat)
+#' @export
+#' @keywords internal
+completed.AsyncTask <- function(task, ...) {
+  status <- status(task)
+  if (isNA(status)) return(NA)
+  ("done" %in% status) && !any(c("error", "expired") %in% status)
+}
+
+#' @export
+#' @keywords internal
+failed.AsyncTask <- function(task, ...) {
+  status <- status(task)
+  if (isNA(status)) return(NA)
+  any("error" %in% status)
+}
+
+#' @export
+#' @keywords internal
+expired.AsyncTask <- function(task, ...) {
+  status <- status(task)
+  if (isNA(status)) return(NA)
+  any("expired" %in% status)
 }
 
 

@@ -33,13 +33,22 @@ print.AsyncListEnv <- function(x, ...) {
     printf("Finished tasks: [%d] %s\n", length(idxs), hpaste(sQuote(labels)))
   }
 
-  idxs <- which(!sapply(error(x), FUN=is.null))
+  idxs <- which(failed(x))
   if (length(idxs) == 0L) {
-    printf("Errored tasks: [0] <none>\n")
+    printf("Failed tasks: [0] <none>\n")
   } else {
     labels <- names(idxs)
     if (is.null(labels)) labels <- idxs
-    printf("Errored tasks: [%d] %s\n", length(idxs), hpaste(sQuote(labels)))
+    printf("Failed tasks: [%d] %s\n", length(idxs), hpaste(sQuote(labels)))
+  }
+
+  idxs <- which(expired(x))
+  if (length(idxs) == 0L) {
+    printf("Expired tasks: [0] <none>\n")
+  } else {
+    labels <- names(idxs)
+    if (is.null(labels)) labels <- idxs
+    printf("Expired tasks: [%d] %s\n", length(idxs), hpaste(sQuote(labels)))
   }
 }
 
@@ -65,6 +74,7 @@ inspectAll.AsyncListEnv <- function(x, ...) {
   res
 }
 
+
 #' @export
 status.AsyncListEnv <- function(x, ...) {
   nx <- length(x)
@@ -87,6 +97,45 @@ finished.AsyncListEnv <- function(x, ...) {
     task <- inspect(x[[kk]], ...)
     if (inherits(task, "AsyncTask"))
       res[kk] <- finished(task)
+  }
+  res
+}
+
+#' @export
+completed.AsyncListEnv <- function(x, ...) {
+  nx <- length(x)
+  res <- logical(length=nx)
+  names(res) <- names(x)
+  for (kk in seq_len(nx)) {
+    task <- inspect(x[[kk]], ...)
+    if (inherits(task, "AsyncTask"))
+      res[kk] <- completed(task)
+  }
+  res
+}
+
+#' @export
+failed.AsyncListEnv <- function(x, ...) {
+  nx <- length(x)
+  res <- logical(length=nx)
+  names(res) <- names(x)
+  for (kk in seq_len(nx)) {
+    task <- inspect(x[[kk]], ...)
+    if (inherits(task, "AsyncTask"))
+      res[kk] <- failed(task)
+  }
+  res
+}
+
+#' @export
+expired.AsyncListEnv <- function(x, ...) {
+  nx <- length(x)
+  res <- logical(length=nx)
+  names(res) <- names(x)
+  for (kk in seq_len(nx)) {
+    task <- inspect(x[[kk]], ...)
+    if (inherits(task, "AsyncTask"))
+      res[kk] <- expired(task)
   }
   res
 }

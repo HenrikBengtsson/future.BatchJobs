@@ -1,3 +1,4 @@
+library("R.utils")
 library("async")
 
 ovars <- ls(envir=globalenv())
@@ -17,13 +18,23 @@ print(x)
 tasks <- inspectAll(x)
 print(tasks)
 
-print(error(x))
+## Wait for all jobs to finish
+while (!all(finished(x))) { Sys.sleep(0.5) }
+if (any(failed(x))) print(error(x))
+
+
 x[[2]] %<=% { 2 }
 
+print(x)
 print(status(x))
 print(finished(x))
-print(error(x))
+print(failed(x))
+print(expired(x))
 print(value(x))
+
+## Wait for all jobs to finish
+while (!all(finished(x))) { Sys.sleep(0.5) }
+if (any(failed(x))) print(error(x))
 
 
 ## Cleanup

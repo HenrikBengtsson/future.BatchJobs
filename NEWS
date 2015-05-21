@@ -2,6 +2,7 @@ Package: async
 ==============
 
 Version: 0.2.0-9000 [2015-05-19]
+o Added completed() and failed(), expired().
 o Any flavor of backend("multicore") is based on availableCores().
 o Added availableCores() for identifying the number of available cores.
   The default is to acknowledged the assigned number of cores by
