@@ -213,7 +213,7 @@ available/supported backend will be used.
 If none of the requested backends work/are supported, the fallback is
 always to use the `"local"` which is available on all systems.
 
-To see what the most recently set backend was, use `backend(NULL)`.
+To see what the most recently set backend was, use `backend()`.
 To reset, use `backend("reset")`
 (which is equivalent to `backend("default")`).
 
@@ -254,7 +254,7 @@ backend("cluster")
 
 
 ### Evaluate asynchronous expression on specific backend
-Asynchronous expressions are processed by the default backend as given by `backend(NULL)`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
+Asynchronous expressions are processed by the default backend as given by `backend()`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
 ```r
 a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore-2"
 b %<=% { Sys.sleep(2); rnorm(1) } %backend% "cluster"
