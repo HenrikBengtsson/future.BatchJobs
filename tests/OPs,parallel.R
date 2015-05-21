@@ -65,6 +65,20 @@ mprintf("v4=%s\n", v4)
 #stopifnot(v4 == 4)
 
 
+
+message("** Nested asynchronous evaluation")
+a %<=% {
+  b %<-% 1
+  c %<=% 2
+  3 %->% d
+  4 %=>% e
+  b + c + d + e
+}
+mprintf("a=%s\n", a)
+stopifnot(a == 10)
+
+
+
 ## Cleanup
 options(oopts)
 rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
