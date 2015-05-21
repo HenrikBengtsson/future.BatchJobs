@@ -14,6 +14,17 @@ x[[2]] %<=% { stop("Wow!"); 2 }
 x[[3]] %<=% { list(foo=3, bar=letters) }
 print(x)
 
+tasks <- inspectAll(x)
+print(tasks)
+
+print(error(x))
+x[[2]] %<=% { 2 }
+
+print(status(x))
+print(finished(x))
+print(error(x))
+print(value(x))
+
 
 ## Cleanup
 options(oopts)

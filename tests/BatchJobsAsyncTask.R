@@ -6,6 +6,10 @@ oopts <- options(warn=1, "async::debug"=TRUE)
 task <- BatchJobsAsyncTask({ x <- 1 })
 print(task)
 
+try(print(delete(task)))
+try(print(delete(task)))
+
+
 ## Cleanup
 options(oopts)
 rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

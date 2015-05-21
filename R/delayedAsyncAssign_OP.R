@@ -9,8 +9,8 @@
   delayedAsyncAssign(name, expr, envir=parent.frame(), assign.env=assign.env, substitute=FALSE)
 }
 
-`%=>%` <- function(x, value) {
-  expr <- substitute(x)
+`%=>%` <- function(value, x) {
+  expr <- substitute(value)
 
   envir <- parent.frame(1)
   target <- .asAssignTarget(substitute(x), envir=envir)

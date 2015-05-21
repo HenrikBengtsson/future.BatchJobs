@@ -7,8 +7,8 @@
 #' @usage x %<-% value
 #'
 #' @seealso Internally \link[base]{delayedAssign}() is used.
-#' @export
 #' @aliases %->%
+#' @export
 #' @export %->%
 `%<-%` <- function(x, value) {
   envir <- parent.frame(1)

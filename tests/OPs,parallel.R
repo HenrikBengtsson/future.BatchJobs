@@ -20,6 +20,15 @@ mprint(ls())
 print(exists("y"))
 stopifnot(!exists("y") || !identical(y, 1))
 
+{ print("Starting"); y <- 1; print("Finished"); y } %->% v0
+mprint(ls())
+mprintf("v0=%s\n", v0)
+stopifnot(v0 == 1)
+mprint(ls())
+print(exists("y"))
+stopifnot(!exists("y") || !identical(y, 1))
+
+
 message("** Delayed asynchronous evaluation without globals")
 v1 %<=% { x <- 1 }
 stopifnot(!exists("x") || !identical(x, 1))
@@ -65,6 +74,20 @@ mprintf("v4=%s\n", v4)
 #stopifnot(v4 == 4)
 
 
+message("** Left-to-right assignments")
+a %<-% 1
+mprintf("a=%s\n", a)
+1 %->% b
+mprintf("b=%s\n", b)
+stopifnot(b == a)
+
+c %<=% 1
+mprintf("c=%s\n", c)
+1 %=>% d
+mprintf("d=%s\n", d)
+stopifnot(d == c)
+
+
 
 message("** Nested asynchronous evaluation")
 a %<=% {
@@ -77,6 +100,9 @@ a %<=% {
 mprintf("a=%s\n", a)
 stopifnot(a == 10)
 
+{ a + 1 } %=>% b
+mprintf("b=%s\n", b)
+stopifnot(b == a + 1)
 
 
 ## Cleanup
