@@ -43,21 +43,6 @@ stopifnot(!identical(tu, tv))
 stopifnot(identical(u$a, 1))
 stopifnot(identical(v$a, 2))
 
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-## Inspect AsyncTasks
-## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-x <- listenv()
-x$a %<=% { 1 }
-
-t1 <- inspect("a", envir=x)
-t2 <- inspect(a, envir=x)
-t3 <- inspect(x[["a"]])
-t4 <- inspect(x$a)
-t5 <- inspect(x[[1]])
-stopifnot(identical(t2, t1), identical(t3, t2), identical(t4, t3), identical(t5, t4))
-
-
-
 
 ## Cleanup
 options(oopts)

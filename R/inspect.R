@@ -47,8 +47,10 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
             }
             idx <- get(idx, envir=envir, inherits=TRUE)
           }
-        } else if (is.language(idx)) {
-          idx <- eval(idx, envir=envir)
+        }
+
+        if (!is.numeric(idx) && !is.character(idx)) {
+          stop(sprintf("Invalid subset argument of type %s: %s", sQuote(typeof(idx)), name), call.=FALSE)
         }
 
         ## Validate subetting, i.e. the 'idx'
@@ -59,7 +61,7 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
         ## Special: listenv:s
         if (inherits(obj, "listenv")) {
           ## Get variable name to use
-          idx <- get_variable(obj, idx, create=FALSE)
+          idx <- get_variable(obj, idx, mustExist=TRUE)
         }
 
         if (is.character(idx)) {
