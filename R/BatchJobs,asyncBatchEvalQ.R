@@ -30,11 +30,17 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, envir=parent.frame(), ...)
       mcat("Identified (non-primitive non-\"base\") globals:\n")
       mstr(globals)
     }
-  } else if (list(globals)) {
+  }
+
+
+  if (is.list(globals)) {
+    ## Drop built-in functions
     globals <- globals[!sapply(globals, FUN=is.primitive)]
-  } else {
+  } else if (!is.null(globals)) {
     stop("Unknown value on argument 'globals': ", mode(globals))
   }
+
+
 
   pkgsNeeded <- NULL
   if (is.list(globals) && length(globals) > 0L) {

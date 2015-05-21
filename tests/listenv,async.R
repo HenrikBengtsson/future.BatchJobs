@@ -2,7 +2,7 @@ library("async")
 backend("local")
 
 ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=FALSE)
+oopts <- options(warn=1, "async::debug"=TRUE)
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Async delayed assignment (infix operator)

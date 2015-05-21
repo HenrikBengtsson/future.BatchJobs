@@ -2,7 +2,7 @@ R.utils::use()
 use("async")
 
 ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=FALSE)
+oopts <- options(warn=1, "async::debug"=TRUE)
 
 ## Display current backend() used
 obackend <- backend(NULL)

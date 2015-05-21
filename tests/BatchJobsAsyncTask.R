@@ -1,7 +1,7 @@
 library("async")
 
 ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=FALSE)
+oopts <- options(warn=1, "async::debug"=TRUE)
 
 task <- BatchJobsAsyncTask({ x <- 1 })
 print(task)
