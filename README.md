@@ -127,7 +127,7 @@ variable or an environment: x$a
 ```
 
 If _indexed subsetting_ is needed for assignments, one can instead use
-_"list environments"_ (implemented by the async package), which
+_"list environments"_ (implemented by the [listenv] package), which
 emulates some of the index subsetting that lists have.  For example,
 ```r
 x <- listenv()
@@ -408,40 +408,7 @@ For further details and examples on how to configure BatchJobs,
 see the [BatchJobs configuration] wiki page.
 
 
-## Indexing using list environments
-The async package provides _list environments_, which is a class of
-environments that emulates part of what can be done with lists,
-specifically they supports _subsetting by indices_.  For example,
-```r
-> x <- listenv()
-> x[[1]] <- { 1 }
-> x[[3]] <- { "Hello world!" }
-> length(x)
-3
-> seq_along(x)
-[1] 1 2 3
-> names(x) <- c("a", "b", "c")
-> x$b <- TRUE
-> x[[1]]
-1
-> as.list(x)
-$a
-[1] 1
-
-$b
-[1] TRUE
-
-$c
-[1] "Hello world!"
-```
-
-It is possible to also specify the length upfront, e.g.
-```r
-> x <- listenv(length=4)
-> seq_along(x)
-[1] 1 2 3 4
-```
-
+[listenv]: https://github.com/HenrikBengtsson/listenv/
 [async]: https://github.com/UCSF-CBC/async/
 [brew]: http://cran.r-project.org/package=brew
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
@@ -461,5 +428,5 @@ source('http://callr.org/install#UCSF-CBC/async')
 | Resource:     | GitHub        | Travis CI        | Appveyor         |
 | ------------- | ------------------- | ---------------- | ---------------- |
 | _Platforms:_  | _Multiple_          | _Linux_          | _Windows_        |
-| R CMD check   |  |     |  |
+| R CMD check   |  | <a href="https://travis-ci.org/UCSF-CBC/async"><img src="https://travis-ci.org/UCSF-CBC/async.svg" alt="Build status"></a>    | <a href="https://ci.appveyor.com/project/UCSF-CBC/async"><img src="https://ci.appveyor.com/api/projects/status/github/UCSF-CBC/async" alt="Build status"></a> |
 | Test coverage |                     | <a href="https://coveralls.io/r/UCSF-CBC/async"><img src="https://coveralls.io/repos/UCSF-CBC/async/badge.png?branch=develop" alt="Coverage Status"/></a> |                  |
