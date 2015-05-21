@@ -30,11 +30,11 @@ print(status(x))
 print(finished(x))
 print(failed(x))
 print(expired(x))
-print(value(x))
 
 ## Wait for all jobs to finish
 while (!all(finished(x))) { Sys.sleep(0.5) }
 if (any(failed(x))) print(error(x))
+print(value(x))
 
 
 ## Cleanup
