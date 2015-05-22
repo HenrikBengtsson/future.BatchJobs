@@ -1,7 +1,9 @@
 ## Helper function for %<-%, %<=%, ...
 #' @importFrom listenv listenv get_variable
-.asAssignTarget <- function(expr, envir=parent.frame()) {
-  res <- list(envir=envir, name=NULL)
+asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
+  if (substitute) expr <- substitute(expr)
+
+  res <- list(envir=envir, name="", idx=NA_integer_, exists=NA)
 
   if (is.symbol(expr)) {
     ## Assignment to variable specified as a symbol
@@ -52,11 +54,23 @@
 
         ## Special: listenv:s
         if (inherits(obj, "listenv")) {
-          ## Get variable name to use
-          idx <- get_variable(obj, idx)
+          names <- names(obj)
+          if (is.numeric(idx)) {
+            res$idx <- idx
+            res$exists <- (idx >= 1 && idx <= length(obj))
+            idx <- names[idx]
+            if (length(idx) == 0L) idx <- ""
+          } else if (is.character(idx)) {
+            if (!nzchar(idx)) {
+              stop("Invalid indexing. Index must not be an empty name.")
+            }
+            res$idx <- match(idx, names)
+            res$exists <- !is.na(res$idx)
+          }
         }
 
         if (is.character(idx)) {
+          res$name <- idx
         } else if (is.numeric(idx)) {
           stop(sprintf("Delayed assignments with indexed subsetting can not be done on a %s: %s", sQuote(mode(obj)), name), call.=FALSE)
         } else {
@@ -64,7 +78,6 @@
         }
 
         if (is.environment(obj)) {
-          res$name <- idx
           res$envir <- obj
         } else {
           stop(sprintf("Delayed assignments can not be done to a %s; only to a variable or an environment: %s", sQuote(mode(obj)), name), call.=FALSE)
@@ -75,9 +88,15 @@
     }
   }
 
+  if (is.na(res$exists)) {
+    res$exists <- exists(res$name, envir=res$envir, inherits=TRUE)
+  }
+
   ## Sanity check
   stopifnot(is.environment(res$envir))
   stopifnot(is.character(res$name))
+  stopifnot(is.null(res$idx) || is.numeric(res$idx))
+  stopifnot(is.logical(res$exists), !is.na(res$exists))
 
   res
 }
