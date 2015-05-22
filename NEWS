@@ -1,7 +1,9 @@
 Package: async
 ==============
 
-Version: 0.2.0-9000 [2015-05-19]
+Version: 0.2.0-9000 [2015-05-20]
+o Now inspect() returns all tasks if only the enviroment is specified,
+  e.g. inspect(x) vs inspect(x$a).
 o Added completed() and failed(), expired().
 o Any flavor of backend("multicore") is based on availableCores().
 o Added availableCores() for identifying the number of available cores.
