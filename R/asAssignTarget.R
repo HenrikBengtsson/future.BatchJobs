@@ -50,6 +50,12 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
         ## Validate subetting, i.e. the 'idx'
         if (length(idx) != 1L) {
           stop(sprintf("Delayed assignments with subsetting can only be done on a single element at the time, not %d: %s", length(idx), name), call.=FALSE)
+        } else if (is.na(idx)) {
+          stop("Invalid indexing. Index must not be a missing value.")
+        } else if (is.character(idx)) {
+          if (!nzchar(idx)) {
+            stop("Invalid indexing. Index must not be an empty name.")
+          }
         }
 
         ## Special: listenv:s
@@ -61,11 +67,8 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
             idx <- names[idx]
             if (length(idx) == 0L) idx <- ""
           } else if (is.character(idx)) {
-            if (!nzchar(idx)) {
-              stop("Invalid indexing. Index must not be an empty name.")
-            }
             res$idx <- match(idx, names)
-            res$exists <- !is.na(res$idx)
+            res$exists <- !is.na(res$idx) && !is.na(map(obj)[res$idx])
           }
         }
 
