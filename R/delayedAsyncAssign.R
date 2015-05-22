@@ -26,19 +26,34 @@
 delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=envir, substitute=TRUE) {
   if (substitute) value <- substitute(value)
 
-  ## Start asynchroneous evaluation ("job").  Make sure to pass 'envir'
-  ## in order for globals to be located properly.
+  ## Name of "future" (task) to be save in parallel to the
+  ## "promise" variable
+  future_name <- sprintf(".task_%s", name)
+  if (exists(future_name, envir=envir)) {
+    msg <- sprintf("A task / future with name %s already exists in environment %s: %s", sQuote(future_name), sQuote(environmentName(envir)), hpaste(ls(envir=envir, all.names=TRUE)))
+##    warning(msg)
+  }
+
+  ## "Eagerly" start asynchroneous evaluation (task / "future").
+  ## NOTE: We make sure to pass 'envir' in order for globals to
+  ## be located properly.
   a <- b <- NULL; rm(list=c("a", "b")) ## To please R CMD check
   call <- substitute(async(a, envir=b), list(a=value, b=envir))
   task <- eval(call, envir=assign.env)
-  record(task, name=name, envir=assign.env)
 
-  ## Create delayed assignment for its result.
+  ## Assign task ("future") to assignment environment
+  task_without_gc <- task
+  task_without_gc$.gcenv <- NULL
+  assign(future_name, task_without_gc, envir=envir)
+
+  ## Create delayed assignment ("promise") for its result.
   ## Here await may throw an error causing the assign value to be a
   ## "delayed" error, which will be thrown each time the variable is
   ## retrieved.
   env <- new.env()
   env$job <- task
   delayedAssign(name, await(task, cleanup=TRUE),
-                eval.env=env, assign.env=assign.env)
+                      eval.env=env, assign.env=assign.env)
+
+  invisible(env)
 }

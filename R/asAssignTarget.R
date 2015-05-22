@@ -1,5 +1,5 @@
 ## Helper function for %<-%, %<=%, ...
-#' @importFrom listenv listenv get_variable
+#' @importFrom listenv listenv get_variable map
 asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
   if (substitute) expr <- substitute(expr)
 
@@ -102,4 +102,4 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
   stopifnot(is.logical(res$exists), !is.na(res$exists))
 
   res
-}
+} # asAssignTarget()

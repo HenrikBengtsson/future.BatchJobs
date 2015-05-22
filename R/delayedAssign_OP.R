@@ -1,3 +1,4 @@
+#' @importFrom listenv get_variable
 delayedAssignInternal <- function(target, expr, envir=parent.frame()) {
   target <- asAssignTarget(target, envir=envir)
   assign.env <- target$envir

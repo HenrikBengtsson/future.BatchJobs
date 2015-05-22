@@ -114,4 +114,5 @@ inspect <- function(var=NULL, envir=parent.frame(), inherits=TRUE) {
   }
 
   NA
-}
+} # inspect()
+

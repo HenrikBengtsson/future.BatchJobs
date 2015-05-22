@@ -172,11 +172,6 @@ error.AsyncTask <- function(task, ...) {
 #' @keywords internal
 record <- function(...) UseMethod("record")
 record.AsyncTask <- function(task, name, envir) {
-  ## For listenv:s, the task should be named as the internal
-  ## listenv variable, not by its name (which may not exist)
-  if (inherits(envir, "listenv")) {
-    name <- get_variable(envir, name=name)
-  }
   name <- sprintf(".task_%s", name)
   task_without_gc <- task
   task_without_gc$.gcenv <- NULL

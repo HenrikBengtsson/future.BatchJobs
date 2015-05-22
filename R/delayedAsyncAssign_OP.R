@@ -1,21 +1,40 @@
-`%<=%` <- function(x, value) {
-  expr <- substitute(value)
-
-  envir <- parent.frame(1)
-  target <- .asAssignTarget(substitute(x), envir=envir)
+#' @importFrom listenv get_variable
+delayedAsyncAssignInternal <- function(target, expr, envir=parent.frame()) {
+  target <- asAssignTarget(target, envir=envir)
   assign.env <- target$envir
   name <- target$name
 
-  delayedAsyncAssign(name, expr, envir=parent.frame(), assign.env=assign.env, substitute=FALSE)
+  name <- target$name
+  if (inherits(target$envir, "listenv")) {
+    if (target$exists) {
+      name <- get_variable(target$envir, name, mustExist=TRUE, create=FALSE)
+    } else {
+      if (nzchar(name)) {
+        name <- get_variable(target$envir, name, mustExist=FALSE, create=TRUE)
+      } else if (is.finite(target$idx)) {
+        name <- get_variable(target$envir, target$idx, mustExist=FALSE, create=TRUE)
+      } else {
+        stop("INTERNAL ERROR: Zero length variable name and unknown index.")
+      }
+    }
+  }
+
+  delayedAsyncAssign(name, expr, envir=envir, assign.env=assign.env, substitute=FALSE)
+} # delayedAsyncAssignInternal()
+
+
+`%<=%` <- function(x, value) {
+  target <- substitute(x)
+  expr <- substitute(value)
+  envir <- parent.frame(1)
+  force(envir)
+  delayedAsyncAssignInternal(target, expr, envir=envir)
 }
 
 `%=>%` <- function(value, x) {
+  target <- substitute(x)
   expr <- substitute(value)
-
   envir <- parent.frame(1)
-  target <- .asAssignTarget(substitute(x), envir=envir)
-  assign.env <- target$envir
-  name <- target$name
-
-  delayedAsyncAssign(name, expr, envir=parent.frame(), assign.env=assign.env, substitute=FALSE)
+  force(envir)
+  delayedAsyncAssignInternal(target, expr, envir=envir)
 }
