@@ -4,7 +4,8 @@
 \alias{asyncBatchEvalQ}
 \title{A batch map function for R expressions}
 \usage{
-asyncBatchEvalQ(reg, exprs, globals = TRUE, envir = parent.frame(), ...)
+asyncBatchEvalQ(reg, exprs, globals = TRUE, pkgs = NULL,
+  envir = parent.frame(), ...)
 }
 \arguments{
 \item{reg}{A Registry.}
@@ -13,6 +14,10 @@ asyncBatchEvalQ(reg, exprs, globals = TRUE, envir = parent.frame(), ...)
 
 \item{globals}{A named list of R objects to be loaded by each job.
 If TRUE, globals are automatically searched for.}
+
+\item{pkgs}{A character vector of package names to use.
+This set will be extended with packages inferred from
+the list of globals.}
 
 \item{envir}{The environment where to search for globals.}
 
