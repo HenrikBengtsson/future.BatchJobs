@@ -1,5 +1,7 @@
 ## Helper function for %<-%, %<=%, ...
 #' @importFrom listenv listenv get_variable map
+#' @export
+#' @keywords internal
 asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
   if (substitute) expr <- substitute(expr)
   exprS <- paste(deparse(expr), collapse="")
