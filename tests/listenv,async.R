@@ -8,16 +8,16 @@ oopts <- options(warn=1, "async::debug"=TRUE)
 ## Async delayed assignment (infix operator)
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 z <- listenv()
-stopifnot(is.null(names(z)))
+stopifnot(length(names(z)) == 0)
 
 message("*** %<=% on listenv: Assign by index")
 z[[1]] %<=% { 2 }
 stopifnot(length(z) == 1)
-stopifnot(is.null(names(z)))
+stopifnot(length(names(z)) == 0)
 
 z[[4]] %<=% { "async!" }
 stopifnot(length(z) == 4)
-stopifnot(is.null(names(z)))
+stopifnot(length(names(z)) == 0)
 
 message("*** %<=% on listenv: Update names")
 names(z) <- c("A", "B", "C", "D")
@@ -48,7 +48,6 @@ tv <- inspect(v$a)
 stopifnot(!identical(tu, tv))
 
 tu <- inspect(u$a)
-## FIXME (again)
 stopifnot(!identical(tu, tv))
 
 stopifnot(identical(u$a, 1))
