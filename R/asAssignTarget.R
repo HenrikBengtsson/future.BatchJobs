@@ -31,7 +31,13 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
         if (!exists(objname, envir=envir, inherits=TRUE)) {
           stop(sprintf("Object %s not found: %s", sQuote(objname), sQuote(name)), call.=FALSE)
         }
+
         obj <- get(objname, envir=envir, inherits=TRUE)
+        if (!is.environment(obj)) {
+          stop(sprintf("Delayed assignments can not be done to a %s; only to a variable or an environment: %s", sQuote(mode(obj)), sQuote(name)), call.=FALSE)
+        }
+        res$envir <- obj
+
 
         ## Subset
         idx <- expr[[3]]
@@ -78,12 +84,6 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
           stop(sprintf("Delayed assignments with indexed subsetting can not be done on a %s: %s", sQuote(mode(obj)), sQuote(name)), call.=FALSE)
         } else {
           stop(sprintf("Invalid subset %s: %s", sQuote(deparse(idx)), sQuote(name)), call.=FALSE)
-        }
-
-        if (is.environment(obj)) {
-          res$envir <- obj
-        } else {
-          stop(sprintf("Delayed assignments can not be done to a %s; only to a variable or an environment: %s", sQuote(mode(obj)), sQuote(name)), call.=FALSE)
         }
       } else {
         stop("Not a valid target for a delayed assignment: ", sQuote(name), call.=FALSE)
