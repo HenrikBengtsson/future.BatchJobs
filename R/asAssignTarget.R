@@ -106,6 +106,14 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
     if (is.character(subset)) res$name <- subset
   }
 
+
+  ## Identify index?
+  if (is.na(res$idx) && nzchar(res$name) && inherits(res$envir, "listenv")) {
+    envir <- res$envir
+    res$idx <- match(res$name, names(envir))
+    res$exists <- !is.na(res$idx) && !is.na(map(envir)[res$idx])
+  }
+
   ## Validate
   if (is.na(res$idx) && !nzchar(res$name)) {
     stop("Invalid subset: ", sQuote(exprS), call.=TRUE)

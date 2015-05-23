@@ -35,7 +35,17 @@ stopifnot(identical(target$envir, environment()),
 ## - - - - - - - - - - - - - - - - - - - - - - - - - -
 message("*** environment")
 x <- new.env()
+
+target <- asAssignTarget(x, substitute=TRUE)
+str(target)
+stopifnot(identical(target$envir, environment()),
+          target$name == "x", is.na(target$idx), target$exists)
+
 target <- asAssignTarget(x$a, substitute=TRUE)
+str(target)
+stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), !target$exists)
+
+target <- asAssignTarget("a", envir=x, substitute=TRUE)
 str(target)
 stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), !target$exists)
 
@@ -61,6 +71,12 @@ stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), tar
 ## - - - - - - - - - - - - - - - - - - - - - - - - - -
 message("*** listenv")
 x <- listenv()
+
+target <- asAssignTarget(x, substitute=TRUE)
+str(target)
+stopifnot(identical(target$envir, environment()),
+          target$name == "x", is.na(target$idx), target$exists)
+
 target <- asAssignTarget(x$a, substitute=TRUE)
 str(target)
 stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), !target$exists)
@@ -85,6 +101,11 @@ x$a <- 1
 target <- asAssignTarget(x$a, substitute=TRUE)
 str(target)
 stopifnot(identical(target$envir, x), target$name == "a", target$idx  == 1, target$exists)
+
+target <- asAssignTarget("a", envir=x, substitute=TRUE)
+str(target)
+stopifnot(identical(target$envir, x), target$name == "a", target$idx  == 1, target$exists)
+
 stopifnot(x$a == 1)
 stopifnot(x[[1]] == 1)
 
