@@ -8,7 +8,7 @@
 #' @return An AsyncTask object (or NA).
 #'
 #' @export
-#' @importFrom listenv map
+#' @importFrom listenv map parse_env_subset
 inspect <- function(var=NULL, envir=parent.frame(), mustExist=FALSE) {
   res <- NA_character_
 
@@ -43,13 +43,13 @@ inspect <- function(var=NULL, envir=parent.frame(), mustExist=FALSE) {
   ## Inspect all elements in environment?
   if (is.null(expr)) {
     res <- lapply(seq_along(envir), FUN=function(idx) {
-      target <- parseEnvSubset(idx, envir=envir, substitute=FALSE)
+      target <- parse_env_subset(idx, envir=envir, substitute=FALSE)
       get_task(target)
     })
     names(res) <- names(envir)
     return(res)
   }
 
-  target <- parseEnvSubset(expr, envir=envir, substitute=FALSE)
+  target <- parse_env_subset(expr, envir=envir, substitute=FALSE)
   get_task(target)
 }

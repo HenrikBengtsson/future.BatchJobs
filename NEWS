@@ -2,7 +2,7 @@ Package: async
 ==============
 
 Version: 0.3.0-9000 [2015-05-22]
-o CLEANUP: Now inspect() utilizes asAssignTarget().
+o CLEANUP: Moved more internal code to the 'listenv' package.
 
 
 Version: 0.3.0 [2015-05-21]

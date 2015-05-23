@@ -1,6 +1,6 @@
-#' @importFrom listenv get_variable
+#' @importFrom listenv get_variable parse_env_subset
 delayedAssignInternal <- function(target, expr, envir=parent.frame(), substitute=FALSE) {
-  target <- parseEnvSubset(target, envir=envir, substitute=substitute)
+  target <- parse_env_subset(target, envir=envir, substitute=substitute)
   assign.env <- target$envir
 
   name <- target$name
