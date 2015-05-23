@@ -23,6 +23,7 @@
 #' its corresponding operator \code{\link{\%<=\%}}.
 #'
 #' @export
+#' @importFrom listenv listenv get_variable
 #' @keywords internal
 asyncEvalQ <- function(exprs, envir=parent.frame(), ...) {
   nexprs <- length(exprs)

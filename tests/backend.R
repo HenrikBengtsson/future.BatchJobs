@@ -2,7 +2,7 @@ R.utils::use()
 use("async")
 
 ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=FALSE)
+oopts <- options(warn=1, "async::debug"=TRUE)
 
 ## Display current backend() used
 obackend <- backend(NULL)
@@ -51,11 +51,35 @@ stopifnot(x == a)
 stopifnot(y == 2*a)
 stopifnot(z == x)
 
-
 ## Assert that the original backend is still in use
 printf("Current backend: %s\n", backend(NULL))
 if (!"covr" %in% loadedNamespaces())
   stopifnot(backend(NULL) == obackend)
+
+
+## Specify BatchJobs config file as backend
+path <- system.file("etc", package="BatchJobs")
+pathname <- file.path(path, "BatchJobs_global_config.R")
+if (file_test("-f", pathname)) {
+  backend(pathname)
+  printf("Current backend: %s\n", backend(NULL))
+
+  backend(cluster=pathname)
+  backend('cluster')
+  printf("Current backend: %s\n", backend(NULL))
+}
+
+print(backend(".BatchJobs.R"))
+print(backend("interactive"))
+print(backend("local"))
+print(backend("multicore"))
+print(backend("multicore=1"))
+print(backend("multicore-1"))
+print(backend("multicore=999"))
+print(backend("aliases"))
+print(backend("default"))
+print(backend("reset"))
+
 
 ## Undo everything
 backend(obackend)

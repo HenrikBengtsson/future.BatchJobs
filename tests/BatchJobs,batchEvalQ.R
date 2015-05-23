@@ -2,7 +2,7 @@ library("BatchJobs")
 library("async")
 
 ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=FALSE)
+oopts <- options(warn=1, "async::debug"=TRUE)
 
 tempRegistry <- async:::tempRegistry
 
@@ -46,6 +46,22 @@ res <- submitJobs(reg, ids=ids)
 print(res)
 
 showStatus(reg)
+
+
+message("*** Evaluation in a local({ ... }) call or not")
+reg <- tempRegistry()
+ids <- batchEvalQ(reg, exprs=list(expr), local=TRUE)
+print(ids)
+res <- submitJobs(reg, ids=ids)
+print(res)
+
+reg <- tempRegistry()
+ids <- batchEvalQ(reg, exprs=list(expr), local=FALSE)
+print(ids)
+res <- submitJobs(reg, ids=ids)
+print(res)
+
+
 
 ## Cleanup
 options(oopts)

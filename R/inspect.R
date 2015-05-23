@@ -7,9 +7,32 @@
 #' @return If exists, an AsyncTask object, otherwise NA.
 #'
 #' @export
-inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
+#' @importFrom listenv get_variable
+inspect <- function(var=NULL, envir=parent.frame(), inherits=FALSE) {
   expr <- substitute(var)
-  if (is.language(expr)) {
+
+  ## Inspect all elements in environment?
+  if (is.null(expr)) {
+    res <- lapply(seq_along(envir), FUN=function(idx) {
+      expr <- substitute(inspect(idx, envir=envir, inherits=inherits),
+              list(idx=idx, inherits=inherits))
+      eval(expr)
+    })
+    names(res) <- names(envir)
+    return(res)
+  }
+
+  if (is.character(expr) || is.numeric(expr)) {
+    name <- expr
+    if (length(name) > 1L) {
+      stop(sprintf("Inspection can only be done on a single element at the time, not %d: %s", length(name), hpaste(name, collapse=", ")), call.=FALSE)
+    }
+
+    ## Special: listenv:s
+    if (inherits(envir, "listenv")) {
+      name <- get_variable(envir, name, mustExist=TRUE)
+    }
+  } else if (is.language(expr)) {
     n <- length(expr)
     name <- paste(deparse(expr), collapse="")
     if (n != 1L && n != 3L) {
@@ -19,6 +42,16 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
       ## Assignment to a variable name
       if (!grepl("^[.a-zA-Z]", name)) {
         stop("Not a valid variable name: ", name, call.=FALSE)
+      }
+
+      if (!exists(name, envir=envir, inherits=TRUE)) {
+        stop(sprintf("Object %s not found: %s", sQuote(name), name), call.=FALSE)
+      }
+      obj <- get(name, envir=envir, inherits=TRUE)
+
+      ## Special case inspect(env) => inspect(NULL, envir=env)
+      if (inherits(obj, "environment")) {
+        return(inspect(NULL, envir=obj, inherits=inherits))
       }
     } else if (n == 3L) {
       ## Assignment to enviroment via $ and [[
@@ -41,8 +74,10 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
             }
             idx <- get(idx, envir=envir, inherits=TRUE)
           }
-        } else if (is.language(idx)) {
-          idx <- eval(idx, envir=envir)
+        }
+
+        if (!is.numeric(idx) && !is.character(idx)) {
+          stop(sprintf("Invalid subset argument of type %s: %s", sQuote(typeof(idx)), name), call.=FALSE)
         }
 
         ## Validate subetting, i.e. the 'idx'
@@ -53,7 +88,7 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
         ## Special: listenv:s
         if (inherits(obj, "listenv")) {
           ## Get variable name to use
-          idx <- get_variable(obj, idx, create=FALSE)
+          idx <- get_variable(obj, idx, mustExist=TRUE)
         }
 
         if (is.character(idx)) {
@@ -73,13 +108,11 @@ inspect <- function(var, envir=parent.frame(), inherits=TRUE) {
     } # if (n == 3)
   }
 
-  ## All elements of an listenv is inside the object
-#  if (inherits(envir, "listenv")) inherits <- FALSE
-
   taskname <- sprintf(".task_%s", name)
   if (exists(taskname, mode="list", envir=envir, inherits=inherits)) {
     return(get(taskname, mode="list", envir=envir, inherits=inherits))
   }
 
   NA
-}
+} # inspect()
+

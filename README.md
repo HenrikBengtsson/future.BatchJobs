@@ -43,7 +43,7 @@ is effectively equivalent to
 x %<=% local({ a <- 3.14 })
 ```
 
-I both cases variable 'a' will be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchronous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to _asynchroneous variable_ `x` in the calling environment.  Local variable `a` is gone forever.  As a matter of fact, it is _not_ possible for an asynchronous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchronous environment.
+I both cases _asynchronous variable_ 'a' will be assigned value `3.14` in a "local" environment.  Since this is the last value in the expression, it is also the value of the asynchronous expression, which is therefore also the value "returned" (in R there is no need to "return" values; it is always the last value of the expression that will be used).  This is the value that will be assigned to variable `x` in the calling environment.  Asynchronous variable `a` is gone forever.  As a matter of fact, it is _not_ possible for an asynchronous expression to assign variables in the calling environment, i.e. assignments such as `<-`, `<<-` and `assign()` only affects the asynchronous environment.
 
 
 ### Global variables
@@ -127,7 +127,7 @@ variable or an environment: x$a
 ```
 
 If _indexed subsetting_ is needed for assignments, one can instead use
-_"list environments"_ (implemented by the async package), which
+_"list environments"_ (implemented by the [listenv] package), which
 emulates some of the index subsetting that lists have.  For example,
 ```r
 x <- listenv()
@@ -156,7 +156,7 @@ retrieved.  For example:
 > 1+2
 [1] 3
 > e
-Error: BatchJobError: 'Error in eval(expr, envir, enclos) : Whoops! ' [DEBUG INFORMATION: ...]
+Error: BatchJobError: 'Error in eval(expr, envir = envir) : Whoops! '
 ```
 This error is rethrown each time `e` is retrieved, so it is not
 possible to "inspect" `e` any further using standard R functions such
@@ -215,7 +215,7 @@ available/supported backend will be used.
 If none of the requested backends work/are supported, the fallback is
 always to use the `"local"` which is available on all systems.
 
-To see what the most recently set backend was, use `backend(NULL)`.
+To see what the most recently set backend was, use `backend()`.
 To reset, use `backend("reset")`
 (which is equivalent to `backend("default")`).
 
@@ -256,7 +256,7 @@ backend("cluster")
 
 
 ### Evaluate asynchronous expression on specific backend
-Asynchronous expressions are processed by the default backend as given by `backend(NULL)`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
+Asynchronous expressions are processed by the default backend as given by `backend()`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
 ```r
 a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore-2"
 b %<=% { Sys.sleep(2); rnorm(1) } %backend% "cluster"
@@ -297,6 +297,8 @@ str(as.list(files))
 This package is only available via GitHub.  Install in R as:
 
 ```s
+source('http://callr.org/install#HenrikBengtsson/listenv')
+source('http://callr.org/install#HenrikBengtsson/global')
 source('http://callr.org/install#HenrikBengtsson/async')
 ```
 
@@ -408,40 +410,7 @@ For further details and examples on how to configure BatchJobs,
 see the [BatchJobs configuration] wiki page.
 
 
-## Indexing using list environments
-The async package provides _list environments_, which is a class of
-environments that emulates part of what can be done with lists,
-specifically they supports _subsetting by indices_.  For example,
-```r
-> x <- listenv()
-> x[[1]] <- { 1 }
-> x[[3]] <- { "Hello world!" }
-> length(x)
-3
-> seq_along(x)
-[1] 1 2 3
-> names(x) <- c("a", "b", "c")
-> x$b <- TRUE
-> x[[1]]
-1
-> as.list(x)
-$a
-[1] 1
-
-$b
-[1] TRUE
-
-$c
-[1] "Hello world!"
-```
-
-It is possible to also specify the length upfront, e.g.
-```r
-> x <- listenv(length=4)
-> seq_along(x)
-[1] 1 2 3 4
-```
-
+[listenv]: https://github.com/HenrikBengtsson/listenv/
 [async]: https://github.com/UCSF-CBC/async/
 [brew]: http://cran.r-project.org/package=brew
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
@@ -461,5 +430,5 @@ source('http://callr.org/install#UCSF-CBC/async')
 | Resource:     | GitHub        | Travis CI        | Appveyor         |
 | ------------- | ------------------- | ---------------- | ---------------- |
 | _Platforms:_  | _Multiple_          | _Linux_          | _Windows_        |
-| R CMD check   |  |     |  |
+| R CMD check   |  | <a href="https://travis-ci.org/UCSF-CBC/async"><img src="https://travis-ci.org/UCSF-CBC/async.svg" alt="Build status"></a>    | <a href="https://ci.appveyor.com/project/UCSF-CBC/async"><img src="https://ci.appveyor.com/api/projects/status/github/UCSF-CBC/async" alt="Build status"></a> |
 | Test coverage |                     | <a href="https://coveralls.io/r/UCSF-CBC/async"><img src="https://coveralls.io/repos/UCSF-CBC/async/badge.png?branch=develop" alt="Coverage Status"/></a> |                  |
