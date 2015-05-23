@@ -1,10 +1,14 @@
 library("async")
-asAssignTarget <- async:::asAssignTarget
+#asAssignTarget <- async:::asAssignTarget
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
 if (exists("x")) rm(list="x")
 
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Variable in global/parent environment
+## - - - - - - - - - - - - - - - - - - - - - - - - - -
 target <- asAssignTarget(x, substitute=TRUE)
 str(target)
 stopifnot(identical(target$envir, environment()),
@@ -85,7 +89,21 @@ stopifnot(x[[3]] == 3)
 print(names(x))
 stopifnot(identical(names(x), c("a", "", "")))
 
+
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - -
+## Exception handling
+## - - - - - - - - - - - - - - - - - - - - - - - - - -
+res <- try(target <- asAssignTarget("x", substitute=TRUE), silent=TRUE)
+stopifnot(inherits(res, "try-error"))
+
+res <- try(target <- asAssignTarget("x", substitute=FALSE), silent=TRUE)
+stopifnot(inherits(res, "try-error"))
+
 res <- try(target <- asAssignTarget(x[[""]], substitute=TRUE), silent=TRUE)
+stopifnot(inherits(res, "try-error"))
+
+res <- try(target <- asAssignTarget("_a", substitute=TRUE), silent=TRUE)
 stopifnot(inherits(res, "try-error"))
 
 

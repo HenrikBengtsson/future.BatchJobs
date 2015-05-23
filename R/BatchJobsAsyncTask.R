@@ -80,9 +80,8 @@ status.BatchJobsAsyncTask <- function(task, ...) {
   reg <- backend$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
   ## Closed and deleted?
-  if (!file_test("-d", reg$file.dir)) {
-    return(NA_character_)
-  }
+  if (!file_test("-d", reg$file.dir)) return(NA_character_)
+
   id <- backend$id
   status <- getStatus(reg, ids=id)
   status <- (unlist(status) == 1L)

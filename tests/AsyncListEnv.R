@@ -45,6 +45,7 @@ x[[2]] %<=% { 2 }
 print(x)
 print(status(x))
 print(finished(x))
+print(completed(x))
 print(failed(x))
 print(expired(x))
 
