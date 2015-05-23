@@ -17,7 +17,7 @@
 #' For details on this unusual behavior, see the help on
 #' \code{\link{substitute}()}.
 #'
-#' @example inst/asyncEvalQ.R
+#' @example incl/asyncEvalQ.R
 #'
 #' @seealso \code{\link{delayedAsyncAssign}()} and
 #' its corresponding operator \code{\link{\%<=\%}}.

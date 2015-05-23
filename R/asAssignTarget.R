@@ -1,12 +1,20 @@
-## Helper function for %<-%, %<=%, ...
+#' Helper function to infer target from expression and environment
+#'
+#' @param expr An expression.
+#' @param envir An environment.
+#' @param substitute If TRUE, then the expression is
+#'        \code{substitute()}:ed, otherwise not.
+#'
+#' @return A named list.
+#'
 #' @importFrom listenv listenv get_variable map
 #' @export
 #' @keywords internal
-asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
+asAssignTarget <- function(expr, envir=parent.frame(), substitute=TRUE) {
   if (substitute) expr <- substitute(expr)
-  exprS <- paste(deparse(expr), collapse="")
+  code <- paste(deparse(expr), collapse="")
 
-  res <- list(envir=envir, name="", subset=NULL, idx=NA_integer_, exists=NA)
+  res <- list(envir=envir, name="", subset=NULL, idx=NA_integer_, exists=NA, code=code)
 
   if (is.symbol(expr)) {
     ## Variable specified as a symbol
@@ -26,11 +34,11 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
   } else {
     n <- length(expr)
     if (n != 1L && n != 3L) {
-      stop("Invalid syntax: ", sQuote(exprS), call.=FALSE)
+      stop("Invalid syntax: ", sQuote(code), call.=FALSE)
     }
 
     if (n == 1L) {
-      res$name <- exprS
+      res$name <- code
     } else if (n == 3L) {
       ## Assignment to enviroment via $ and [[
       op <- expr[[1]]
@@ -38,12 +46,12 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
         ## Target
         objname <- deparse(expr[[2]])
         if (!exists(objname, envir=envir, inherits=TRUE)) {
-          stop(sprintf("Object %s not found: %s", sQuote(objname), sQuote(exprS)), call.=FALSE)
+          stop(sprintf("Object %s not found: %s", sQuote(objname), sQuote(code)), call.=FALSE)
         }
 
         obj <- get(objname, envir=envir, inherits=TRUE)
         if (!is.environment(obj)) {
-          stop(sprintf("Subsetting can not be done on a %s; only to an environment: %s", sQuote(mode(obj)), sQuote(exprS)), call.=FALSE)
+          stop(sprintf("Subsetting can not be done on a %s; only to an environment: %s", sQuote(mode(obj)), sQuote(code)), call.=FALSE)
         }
         res$envir <- obj
 
@@ -53,7 +61,7 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
           subset <- deparse(subset)
           if (op == "[[") {
             if (!exists(subset, envir=envir, inherits=TRUE)) {
-              stop(sprintf("Object %s not found: %s", sQuote(subset), sQuote(exprS)), call.=FALSE)
+              stop(sprintf("Object %s not found: %s", sQuote(subset), sQuote(code)), call.=FALSE)
             }
             subset <- get(subset, envir=envir, inherits=TRUE)
           }
@@ -62,7 +70,7 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
         }
         res$subset <- subset
       } else {
-        stop("Invalid syntax: ", sQuote(exprS), call.=FALSE)
+        stop("Invalid syntax: ", sQuote(code), call.=FALSE)
       } # if (op == ...)
     } # if (n == ...)
   }
@@ -77,7 +85,7 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
   subset <- res$subset
   if (!is.null(subset)) {
     if (length(subset) != 1L) {
-      stop(sprintf("Subsetting can only be done on a single element at the time, not %d: %s", length(subset), sQuote(exprS)), call.=FALSE)
+      stop(sprintf("Subsetting can only be done on a single element at the time, not %d: %s", length(subset), sQuote(code)), call.=FALSE)
     } else if (is.na(subset)) {
       stop("Invalid subsetting. Subset must not be a missing value.")
     } else if (is.character(subset)) {
@@ -85,7 +93,7 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
         stop("Invalid subset. Subset must not be an empty name.")
       }
     } else if (!is.numeric(subset)) {
-      stop(sprintf("Invalid subset of type %s: %s", sQuote(typeof(subset)), sQuote(exprS)), call.=FALSE)
+      stop(sprintf("Invalid subset of type %s: %s", sQuote(typeof(subset)), sQuote(code)), call.=FALSE)
     }
 
 
@@ -116,7 +124,8 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
 
   ## Validate
   if (is.na(res$idx) && !nzchar(res$name)) {
-    stop("Invalid subset: ", sQuote(exprS), call.=TRUE)
+      str(res)
+    stop("Invalid subset: ", sQuote(code), call.=TRUE)
   }
 
   if (is.na(res$exists)) {

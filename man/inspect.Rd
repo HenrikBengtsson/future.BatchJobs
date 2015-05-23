@@ -4,17 +4,18 @@
 \alias{inspect}
 \title{Inspect an asynchroneous variable}
 \usage{
-inspect(var = NULL, envir = parent.frame(), inherits = FALSE)
+inspect(var = NULL, envir = parent.frame(), mustExist = FALSE)
 }
 \arguments{
 \item{var}{the variable.}
 
 \item{envir}{the environment where to search from.}
 
-\item{inherits}{Search parent frames or not.}
+\item{mustExist}{If TRUE and the variable does not exists, then
+an informative error is thrown, otherwise NA is returned.}
 }
 \value{
-If exists, an AsyncTask object, otherwise NA.
+An AsyncTask object (or NA).
 }
 \description{
 Inspect an asynchroneous variable
