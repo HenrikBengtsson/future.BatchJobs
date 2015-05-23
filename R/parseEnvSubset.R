@@ -10,7 +10,7 @@
 #' @importFrom listenv listenv get_variable map
 #' @export
 #' @keywords internal
-asAssignTarget <- function(expr, envir=parent.frame(), substitute=TRUE) {
+parseEnvSubset <- function(expr, envir=parent.frame(), substitute=TRUE) {
   if (substitute) expr <- substitute(expr)
   code <- paste(deparse(expr), collapse="")
 
@@ -139,4 +139,4 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=TRUE) {
   stopifnot(is.logical(res$exists), !is.na(res$exists))
 
   res
-} # asAssignTarget()
+} # parseEnvSubset()

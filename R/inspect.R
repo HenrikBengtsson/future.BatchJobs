@@ -43,13 +43,13 @@ inspect <- function(var=NULL, envir=parent.frame(), mustExist=FALSE) {
   ## Inspect all elements in environment?
   if (is.null(expr)) {
     res <- lapply(seq_along(envir), FUN=function(idx) {
-      target <- asAssignTarget(idx, envir=envir, substitute=FALSE)
+      target <- parseEnvSubset(idx, envir=envir, substitute=FALSE)
       get_task(target)
     })
     names(res) <- names(envir)
     return(res)
   }
 
-  target <- asAssignTarget(expr, envir=envir, substitute=FALSE)
+  target <- parseEnvSubset(expr, envir=envir, substitute=FALSE)
   get_task(target)
 }

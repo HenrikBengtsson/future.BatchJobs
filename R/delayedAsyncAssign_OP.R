@@ -1,6 +1,6 @@
 #' @importFrom listenv get_variable
 delayedAsyncAssignInternal <- function(target, expr, envir=parent.frame(), substitute=FALSE) {
-  target <- asAssignTarget(target, envir=envir, substitute=substitute)
+  target <- parseEnvSubset(target, envir=envir, substitute=substitute)
   assign.env <- target$envir
   name <- target$name
 
