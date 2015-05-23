@@ -4,7 +4,7 @@
 \alias{inspect}
 \title{Inspect an asynchroneous variable}
 \usage{
-inspect(var = NULL, envir = parent.frame(), inherits = TRUE)
+inspect(var = NULL, envir = parent.frame(), inherits = FALSE)
 }
 \arguments{
 \item{var}{the variable.}

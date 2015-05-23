@@ -24,6 +24,7 @@
 #' @export
 #' @export %<=% %=>%
 delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=envir, substitute=TRUE) {
+  stopifnot(is.character(name), !is.na(name), nzchar(name))
   if (substitute) value <- substitute(value)
 
   ## Name of "future" (task) to be save in parallel to the
@@ -44,7 +45,7 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
   ## Assign task ("future") to assignment environment
   task_without_gc <- task
   task_without_gc$.gcenv <- NULL
-  assign(future_name, task_without_gc, envir=envir)
+  assign(future_name, task_without_gc, envir=assign.env)
 
   ## Create delayed assignment ("promise") for its result.
   ## Here await may throw an error causing the assign value to be a

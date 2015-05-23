@@ -8,7 +8,7 @@
 #'
 #' @export
 #' @importFrom listenv get_variable
-inspect <- function(var=NULL, envir=parent.frame(), inherits=TRUE) {
+inspect <- function(var=NULL, envir=parent.frame(), inherits=FALSE) {
   expr <- substitute(var)
 
   ## Inspect all elements in environment?

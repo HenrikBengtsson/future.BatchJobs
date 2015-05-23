@@ -49,7 +49,7 @@ stopifnot(!identical(tu, tv))
 
 tu <- inspect(u$a)
 ## FIXME (again)
-#stopifnot(!identical(tu, tv))
+stopifnot(!identical(tu, tv))
 
 stopifnot(identical(u$a, 1))
 stopifnot(identical(v$a, 2))
