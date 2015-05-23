@@ -16,7 +16,7 @@
 #' @return A delayed assignment which, when evaluated, will retrieve
 #' the value of the asynchronous evaluation.
 #'
-#' @example inst/delayedAsyncAssign_OP.R
+#' @example incl/delayedAsyncAssign_OP.R
 #'
 #' @seealso \code{\link{asyncEvalQ}()}
 #'

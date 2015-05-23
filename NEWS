@@ -1,9 +1,13 @@
 Package: async
 ==============
 
+Version: 0.3.0-9000 [2015-05-22]
+o CLEANUP: Now inspect() utilizes asAssignTarget().
+
+
 Version: 0.3.0 [2015-05-21]
-o Now inspect() returns all tasks if only the enviroment is specified,
-  e.g. inspect(x) vs inspect(x$a).
+o Now inspect(envir=x) returns all tasks if only the environment
+  is specified, e.g. inspect(envir=x) vs inspect(x$a).
 o Added completed() and failed(), expired().
 o Any flavor of backend("multicore") is based on availableCores().
 o Added availableCores() for identifying the number of available cores.

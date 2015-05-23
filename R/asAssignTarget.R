@@ -1,27 +1,44 @@
-## Helper function for %<-%, %<=%, ...
+#' Helper function to infer target from expression and environment
+#'
+#' @param expr An expression.
+#' @param envir An environment.
+#' @param substitute If TRUE, then the expression is
+#'        \code{substitute()}:ed, otherwise not.
+#'
+#' @return A named list.
+#'
 #' @importFrom listenv listenv get_variable map
-asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
+#' @export
+#' @keywords internal
+asAssignTarget <- function(expr, envir=parent.frame(), substitute=TRUE) {
   if (substitute) expr <- substitute(expr)
+  code <- paste(deparse(expr), collapse="")
 
-  res <- list(envir=envir, name="", idx=NA_integer_, exists=NA)
+  res <- list(envir=envir, name="", subset=NULL, idx=NA_integer_, exists=NA, code=code)
 
   if (is.symbol(expr)) {
-    ## Assignment to variable specified as a symbol
-    name <- deparse(expr)
-    res$name <- name
+    ## Variable specified as a symbol
+    res$name <- deparse(expr)
+  } else if (is.character(expr)) {
+    ## Variable specified as a name
+    if (length(expr) > 1L) {
+      stop(sprintf("Does specify a single variable, but %d: %s", length(expr), hpaste(sQuote(expr), collapse=", ")), call.=FALSE)
+    }
+    res$name <- expr
+  } else if (is.numeric(expr)) {
+    ## Variable specified as a subset of envir
+    if (length(expr) > 1L) {
+      stop(sprintf("Does specify a single index, but %d: %s", length(expr), hpaste(sQuote(expr), collapse=", ")), call.=FALSE)
+    }
+    res$subset <- expr
   } else {
     n <- length(expr)
-    name <- paste(deparse(expr), collapse="")
     if (n != 1L && n != 3L) {
-      stop("Not a valid variable name for delayed assignments: ", sQuote(name), call.=FALSE)
+      stop("Invalid syntax: ", sQuote(code), call.=FALSE)
     }
 
     if (n == 1L) {
-      ## Assignment to a variable name
-      if (!grepl("^[.a-zA-Z]", name)) {
-        stop("Not a valid variable name: ", sQuote(name), call.=FALSE)
-      }
-      res$name <- name
+      res$name <- code
     } else if (n == 3L) {
       ## Assignment to enviroment via $ and [[
       op <- expr[[1]]
@@ -29,66 +46,86 @@ asAssignTarget <- function(expr, envir=parent.frame(), substitute=FALSE) {
         ## Target
         objname <- deparse(expr[[2]])
         if (!exists(objname, envir=envir, inherits=TRUE)) {
-          stop(sprintf("Object %s not found: %s", sQuote(objname), sQuote(name)), call.=FALSE)
+          stop(sprintf("Object %s not found: %s", sQuote(objname), sQuote(code)), call.=FALSE)
         }
+
         obj <- get(objname, envir=envir, inherits=TRUE)
+        if (!is.environment(obj)) {
+          stop(sprintf("Subsetting can not be done on a %s; only to an environment: %s", sQuote(mode(obj)), sQuote(code)), call.=FALSE)
+        }
+        res$envir <- obj
 
         ## Subset
-        idx <- expr[[3]]
-        if (is.symbol(idx)) {
-          idx <- deparse(idx)
+        subset <- expr[[3]]
+        if (is.symbol(subset)) {
+          subset <- deparse(subset)
           if (op == "[[") {
-            if (!exists(idx, envir=envir, inherits=TRUE)) {
-              stop(sprintf("Object %s not found: %s", sQuote(idx), sQuote(name)), call.=FALSE)
+            if (!exists(subset, envir=envir, inherits=TRUE)) {
+              stop(sprintf("Object %s not found: %s", sQuote(subset), sQuote(code)), call.=FALSE)
             }
-            idx <- get(idx, envir=envir, inherits=TRUE)
+            subset <- get(subset, envir=envir, inherits=TRUE)
           }
-        } else if (is.language(idx)) {
-          idx <- eval(idx, envir=envir)
+        } else if (is.language(subset)) {
+          subset <- eval(subset, envir=envir)
         }
-
-        ## Validate subetting, i.e. the 'idx'
-        if (length(idx) != 1L) {
-          stop(sprintf("Delayed assignments with subsetting can only be done on a single element at the time, not %d: %s", length(idx), sQuote(name)), call.=FALSE)
-        } else if (is.na(idx)) {
-          stop("Invalid indexing. Index must not be a missing value.")
-        } else if (is.character(idx)) {
-          if (!nzchar(idx)) {
-            stop("Invalid indexing. Index must not be an empty name.")
-          }
-        }
-
-        ## Special: listenv:s
-        if (inherits(obj, "listenv")) {
-          names <- names(obj)
-          if (is.numeric(idx)) {
-            res$idx <- idx
-            res$exists <- (idx >= 1 && idx <= length(obj))
-            idx <- names[idx]
-            if (length(idx) == 0L) idx <- ""
-          } else if (is.character(idx)) {
-            res$idx <- match(idx, names)
-            res$exists <- !is.na(res$idx) && !is.na(map(obj)[res$idx])
-          }
-        }
-
-        if (is.character(idx)) {
-          res$name <- idx
-        } else if (is.numeric(idx)) {
-          stop(sprintf("Delayed assignments with indexed subsetting can not be done on a %s: %s", sQuote(mode(obj)), sQuote(name)), call.=FALSE)
-        } else {
-          stop(sprintf("Invalid subset %s: %s", sQuote(deparse(idx)), sQuote(name)), call.=FALSE)
-        }
-
-        if (is.environment(obj)) {
-          res$envir <- obj
-        } else {
-          stop(sprintf("Delayed assignments can not be done to a %s; only to a variable or an environment: %s", sQuote(mode(obj)), sQuote(name)), call.=FALSE)
-        }
+        res$subset <- subset
       } else {
-        stop("Not a valid target for a delayed assignment: ", sQuote(name), call.=FALSE)
+        stop("Invalid syntax: ", sQuote(code), call.=FALSE)
+      } # if (op == ...)
+    } # if (n == ...)
+  }
+
+
+  ## Validat name, iff any
+  name <- res$name
+  if (nzchar(name) && !grepl("^[.a-zA-Z]+", name)) stop("Not a valid variable name: ", sQuote(name), call.=FALSE)
+
+
+  ## Validate subsetting, e.g. x[[1]], x[["a"]], and x$a, iff any
+  subset <- res$subset
+  if (!is.null(subset)) {
+    if (length(subset) != 1L) {
+      stop(sprintf("Subsetting can only be done on a single element at the time, not %d: %s", length(subset), sQuote(code)), call.=FALSE)
+    } else if (is.na(subset)) {
+      stop("Invalid subsetting. Subset must not be a missing value.")
+    } else if (is.character(subset)) {
+      if (!nzchar(subset)) {
+        stop("Invalid subset. Subset must not be an empty name.")
+      }
+    } else if (!is.numeric(subset)) {
+      stop(sprintf("Invalid subset of type %s: %s", sQuote(typeof(subset)), sQuote(code)), call.=FALSE)
+    }
+
+
+    ## Special: listenv:s
+    envir <- res$envir
+    if (inherits(envir, "listenv")) {
+      names <- names(envir)
+      if (is.numeric(subset)) {
+        res$idx <- subset
+        res$exists <- (res$idx >= 1 && res$idx <= length(envir))
+        res$name <- names[subset]
+        if (length(res$name) == 0L) res$name <- ""
+      } else if (is.character(subset)) {
+        res$idx <- match(subset, names)
+        res$exists <- !is.na(res$idx) && !is.na(map(envir)[res$idx])
       }
     }
+    if (is.character(subset)) res$name <- subset
+  }
+
+
+  ## Identify index?
+  if (is.na(res$idx) && nzchar(res$name) && inherits(res$envir, "listenv")) {
+    envir <- res$envir
+    res$idx <- match(res$name, names(envir))
+    res$exists <- !is.na(res$idx) && !is.na(map(envir)[res$idx])
+  }
+
+  ## Validate
+  if (is.na(res$idx) && !nzchar(res$name)) {
+      str(res)
+    stop("Invalid subset: ", sQuote(code), call.=TRUE)
   }
 
   if (is.na(res$exists)) {
