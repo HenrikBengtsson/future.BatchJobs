@@ -1,5 +1,5 @@
 library("async")
-asAssignTarget <- async:::asAssignTarget
+#asAssignTarget <- async:::asAssignTarget
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
@@ -10,6 +10,11 @@ if (exists("x")) rm(list="x")
 ## Variable in global/parent environment
 ## - - - - - - - - - - - - - - - - - - - - - - - - - -
 target <- asAssignTarget(x, substitute=TRUE)
+str(target)
+stopifnot(identical(target$envir, environment()),
+          target$name == "x", is.na(target$idx), !target$exists)
+
+target <- asAssignTarget("x", substitute=TRUE)
 str(target)
 stopifnot(identical(target$envir, environment()),
           target$name == "x", is.na(target$idx), !target$exists)
@@ -39,6 +44,10 @@ target <- asAssignTarget(x[["a"]], substitute=TRUE)
 str(target)
 stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), !target$exists)
 
+target <- asAssignTarget("a", envir=x, substitute=TRUE)
+str(target)
+stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), !target$exists)
+
 res <- try(target <- asAssignTarget(x[[1]], substitute=TRUE), silent=TRUE)
 stopifnot(inherits(res, "try-error"))
 
@@ -58,6 +67,10 @@ str(target)
 stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), !target$exists)
 
 target <- asAssignTarget(x[["a"]], substitute=TRUE)
+str(target)
+stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), !target$exists)
+
+target <- asAssignTarget("a", envir=x, substitute=TRUE)
 str(target)
 stopifnot(identical(target$envir, x), target$name == "a", is.na(target$idx), !target$exists)
 
@@ -94,12 +107,6 @@ stopifnot(identical(names(x), c("a", "", "")))
 ## - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Exception handling
 ## - - - - - - - - - - - - - - - - - - - - - - - - - -
-res <- try(target <- asAssignTarget("x", substitute=TRUE), silent=TRUE)
-stopifnot(inherits(res, "try-error"))
-
-res <- try(target <- asAssignTarget("x", substitute=FALSE), silent=TRUE)
-stopifnot(inherits(res, "try-error"))
-
 res <- try(target <- asAssignTarget(x[[""]], substitute=TRUE), silent=TRUE)
 stopifnot(inherits(res, "try-error"))
 
