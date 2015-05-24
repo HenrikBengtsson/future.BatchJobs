@@ -12,13 +12,11 @@ tweakExpression <- function(expr) {
       if (op == "%<-%" || op == "%<=%") {
         lhs <- exprI[[2]]
         rhs <- exprI[[3]]
-        exprF <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
-        expr[[ii]] <- exprF
+        expr[[ii]] <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
       } else if (op == "%->%" || op == "%=>%") {
         lhs <- exprI[[3]]
         rhs <- exprI[[2]]
-        exprI <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
-        expr[[ii]] <- exprI
+        expr[[ii]] <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
       }
     }, error=function(ex) {})
   }

@@ -1,6 +1,6 @@
-#' @importFrom listenv get_variable
-delayedAssignInternal <- function(target, expr, envir=parent.frame()) {
-  target <- asAssignTarget(target, envir=envir)
+#' @importFrom listenv get_variable parse_env_subset
+delayedAssignInternal <- function(target, expr, envir=parent.frame(), substitute=FALSE) {
+  target <- parse_env_subset(target, envir=envir, substitute=substitute)
   assign.env <- target$envir
 
   name <- target$name
@@ -18,6 +18,7 @@ delayedAssignInternal <- function(target, expr, envir=parent.frame()) {
     }
   }
 
+  a <- NULL; rm(list="a"); # To please R CMD check
   call <- substitute(local(a), list(a=expr))
   delayedAssign(name, eval(call, envir=envir), assign.env=assign.env)
 } # delayedAssignInternal()
@@ -39,12 +40,12 @@ delayedAssignInternal <- function(target, expr, envir=parent.frame()) {
   target <- substitute(x)
   expr <- substitute(value)
   envir <- parent.frame(1)
-  delayedAssignInternal(target, expr, envir=envir)
+  delayedAssignInternal(target, expr, envir=envir, substitute=FALSE)
 }
 
 `%->%` <- function(value, x) {
   target <- substitute(x)
   expr <- substitute(value)
   envir <- parent.frame(1)
-  delayedAssignInternal(target, expr, envir=envir)
+  delayedAssignInternal(target, expr, envir=envir, substitute=FALSE)
 }

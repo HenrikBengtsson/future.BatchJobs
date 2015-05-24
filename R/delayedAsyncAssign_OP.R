@@ -1,6 +1,6 @@
-#' @importFrom listenv get_variable
-delayedAsyncAssignInternal <- function(target, expr, envir=parent.frame()) {
-  target <- asAssignTarget(target, envir=envir)
+#' @importFrom listenv get_variable parse_env_subset
+delayedAsyncAssignInternal <- function(target, expr, envir=parent.frame(), substitute=FALSE) {
+  target <- parse_env_subset(target, envir=envir, substitute=substitute)
   assign.env <- target$envir
   name <- target$name
 
@@ -27,14 +27,12 @@ delayedAsyncAssignInternal <- function(target, expr, envir=parent.frame()) {
   target <- substitute(x)
   expr <- substitute(value)
   envir <- parent.frame(1)
-  force(envir)
-  delayedAsyncAssignInternal(target, expr, envir=envir)
+  delayedAsyncAssignInternal(target, expr, envir=envir, substitute=FALSE)
 }
 
 `%=>%` <- function(value, x) {
   target <- substitute(x)
   expr <- substitute(value)
   envir <- parent.frame(1)
-  force(envir)
-  delayedAsyncAssignInternal(target, expr, envir=envir)
+  delayedAsyncAssignInternal(target, expr, envir=envir, substitute=FALSE)
 }
