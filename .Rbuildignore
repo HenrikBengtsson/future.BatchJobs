@@ -1,22 +1,21 @@
 #----------------------------
-# Git, SVN etc.
+# Git and SVN related
 #----------------------------
 ^.svn
 ^.git
 ^.make
-^.editorconfig
-README[.]md
 OVERVIEW[.]md
+README[.]md
 
 #----------------------------
-# Travis-CI etc.
+# Travis-CI et al.
 #----------------------------
 ^[.]travis[.]yml$
 ^travis-tool[.]sh$
 ^pkg-build[.]sh$
 ^appveyor[.]yml$
 ^covr-utils.R$
-^[.]coveralls[.]R$
+^[.]covr[.]R$
 
 #----------------------------
 # R related
@@ -33,6 +32,10 @@ OVERVIEW[.]md
 ^[.]test
 ^[.]check
 ^.*[.]tar[.]gz$
-^[.]BatchJobs.R
-^[.]async
-^async[0-9]+-files
+
+#----------------------------
+# Package specific
+#----------------------------
+^[.]BatchJobs[.]R$
+[.]async
+
