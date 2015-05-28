@@ -427,8 +427,8 @@ source('http://callr.org/install#UCSF-CBC/async')
 
 ## Software quality
 
-| Resource:     | GitHub        | Travis CI        | Appveyor         |
-| ------------- | ------------------- | ---------------- | ---------------- |
-| _Platforms:_  | _Multiple_          | _Linux_          | _Windows_        |
-| R CMD check   |  | <a href="https://travis-ci.org/UCSF-CBC/async"><img src="https://travis-ci.org/UCSF-CBC/async.svg" alt="Build status"></a>    | <a href="https://ci.appveyor.com/project/UCSF-CBC/async"><img src="https://ci.appveyor.com/api/projects/status/github/UCSF-CBC/async" alt="Build status"></a> |
-| Test coverage |                     | <a href="https://coveralls.io/r/UCSF-CBC/async"><img src="https://coveralls.io/repos/UCSF-CBC/async/badge.png?branch=develop" alt="Coverage Status"/></a> |                  |
+| Resource:     | GitHub        | Travis CI     | Appveyor         |
+| ------------- | ------------------- | ------------- | ---------------- |
+| _Platforms:_  | _Multiple_          | _Linux_       | _Windows_        |
+| R CMD check   |  | <a href="https://travis-ci.org/UCSF-CBC/async"><img src="https://travis-ci.org/UCSF-CBC/async.svg" alt="Build status"></a> | <a href="https://ci.appveyor.com/project/UCSF-CBC/async"><img src="https://ci.appveyor.com/api/projects/status/github/UCSF-CBC/async?svg=true" alt="Build status"></a> |
+| Test coverage |                     | <a href="https://coveralls.io/r/UCSF-CBC/async"><img src="https://coveralls.io/repos/UCSF-CBC/async/badge.svg?branch=develop" alt="Coverage Status"/></a>   |                  |
