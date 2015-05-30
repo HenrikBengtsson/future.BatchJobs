@@ -2,7 +2,6 @@
 % Please edit documentation in R/Future.R
 \name{future}
 \alias{future}
-\alias{isResolved}
 \title{Evaluates an expression asynchroneously}
 \usage{
 future(expr, envir = parent.frame(), substitute = TRUE, ...,
@@ -21,7 +20,7 @@ is evaluated.}
 
 \item{...}{Additional arguments passed to the "evaluator".}
 
-\item{evalutator}{The actual function that evaluates
+\item{evaluator}{The actual function that evaluates
 \code{expr} and returns a future.  The evaluator function
 should accept argument \code{substitute=FALSE}.}
 }

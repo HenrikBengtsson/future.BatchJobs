@@ -11,7 +11,7 @@
 #' @param object An R object of a class that implements the Future API.
 #' @param ... Not used.
 #'
-#' @return An object of class \code{Future}.
+#' @return An object of class Future.
 #'
 #' @seealso
 #' Any function may return a Future.
@@ -25,6 +25,7 @@
 #' requested.
 #'
 #' @export
+#' @name Future-class
 Future <- function(object, ...) {
   structure(object, class=c(class(object), "Future"))
 }
@@ -99,7 +100,7 @@ isResolved <- function(...) UseMethod("isResolved")
 #' @param substitute If TRUE, argument \code{expr} is
 #' \code{\link[base]{substitute}()}:ed, otherwise not.
 #' @param ... Additional arguments passed to the "evaluator".
-#' @param evalutator The actual function that evaluates
+#' @param evaluator The actual function that evaluates
 #' \code{expr} and returns a future.  The evaluator function
 #' should accept argument \code{substitute=FALSE}.
 #'
@@ -108,8 +109,7 @@ isResolved <- function(...) UseMethod("isResolved")
 #' @example incl/future.R
 #'
 #' @export
-#' @export isResolved
-#' @aliases isResolved
+#' @name future
 future <- function(expr, envir=parent.frame(), substitute=TRUE, ..., evaluator=getOption("future", async)) {
   if (substitute) expr <- substitute(expr)
 
