@@ -41,6 +41,7 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Future API
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 #' @export
 #' @keywords internal
 isResolved.AsyncTask <- function(task, ...) {
@@ -48,8 +49,6 @@ isResolved.AsyncTask <- function(task, ...) {
     completed(task)
   }, error = function(ex) FALSE)
 }
-
-# value() needs to be implemented by subclass
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

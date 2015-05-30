@@ -15,7 +15,7 @@
 #'
 #' @seealso
 #' Any function may return a Future.
-#' One such function is \code{\link{async}()}, which asynchroneously
+#' One such function is \code{\link{future}()}, which asynchroneously
 #' evaluates an R expression and returns a future, which the can be
 #' inspected for being resolved or not and when resolved can have its
 #' value retrieved.
@@ -28,6 +28,8 @@
 Future <- function(object, ...) {
   structure(object, class=c(class(object), "Future"))
 }
+
+
 
 
 #' Gets the value of a future
@@ -79,3 +81,48 @@ isResolved.Future <- function(future, ...) {
 }
 
 isResolved <- function(...) UseMethod("isResolved")
+
+
+#' Evaluates an expression asynchroneously
+#'
+#' Asynchroneously evaluates an R expression and returns a future,
+#' which the can be inspected for being resolved or not and when
+#' resolved can have its value retrieved.
+#' Ideally the evaluator used is \emph{non-blocking} (returns
+#' immediately), but it is not required.
+#'
+#' @param expr An R \link[base]{expression}.
+#' @param envir The \link{environment} from where global
+#' objects should be identified.  Depending on "evaluator",
+#' it may also be the environment in which the expression
+#' is evaluated.
+#' @param substitute If TRUE, argument \code{expr} is
+#' \code{\link[base]{substitute}()}:ed, otherwise not.
+#' @param ... Additional arguments passed to the "evaluator".
+#' @param evalutator The actual function that evaluates
+#' \code{expr} and returns a future.  The evaluator function
+#' should accept argument \code{substitute=FALSE}.
+#'
+#' @return A \link{Future}.
+#'
+#' @example incl/future.R
+#'
+#' @export
+#' @export isResolved
+#' @aliases isResolved
+future <- function(expr, envir=parent.frame(), substitute=TRUE, ..., evaluator=getOption("future", async)) {
+  if (substitute) expr <- substitute(expr)
+
+  if (!is.function(evaluator)) {
+    stop("Argument 'evaluator' must be a function: ", typeof(evaluator))
+  }
+
+  future <- evaluator(expr, envir=envir, substitute=FALSE, ...)
+
+  ## Assert that a future was returned
+  if (!inherits(future, "Future")) {
+    stop("Argument 'evaluator' specifies a function that does not return a Future object: ", paste(sQuote(class(future)), collapse=", "))
+  }
+
+  future
+}

@@ -35,11 +35,12 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
 ##    warning(msg)
   }
 
-  ## "Eagerly" start asynchroneous evaluation (task / "future").
+  ## Asynchroneously evaluate expression/value as a "future"
+  ## and assign its value to a variable as a "promise".
   ## NOTE: We make sure to pass 'envir' in order for globals to
   ## be located properly.
   a <- b <- NULL; rm(list=c("a", "b")) ## To please R CMD check
-  call <- substitute(async(a, envir=b), list(a=value, b=envir))
+  call <- substitute(future(a, envir=b), list(a=value, b=envir))
   task <- eval(call, envir=assign.env)
 
   ## Assign task ("future") to assignment environment
