@@ -22,7 +22,8 @@ is evaluated.}
 
 \item{evaluator}{The actual function that evaluates
 \code{expr} and returns a future.  The evaluator function
-should accept argument \code{substitute=FALSE}.}
+should accept all the same arguments as this function
+(except \code{evaluator}).}
 }
 \value{
 A \link{Future}.
