@@ -34,9 +34,27 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
     expr=expr,
     envir=envir
   )
-  structure(task, class=c("AsyncTask", class(task)))
+  task <- structure(task, class=c("AsyncTask", class(task)))
+  Future(task)
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Future API
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#' @export
+#' @keywords internal
+isResolved.AsyncTask <- function(task, ...) {
+  tryCatch({
+    completed(task)
+  }, error = function(ex) FALSE)
+}
+
+# value() needs to be implemented by subclass
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# AsyncTask specific
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 add_finalizer <- function(...) UseMethod("add_finalizer")
 
 add_finalizer.AsyncTask <- function(task, ...) {
@@ -97,7 +115,6 @@ print.AsyncTask <- function(x, ...) {
 #' @export completed
 #' @export failed
 #' @export expired
-#' @export value
 #' @export error
 #' @keywords internal
 status <- function(...) UseMethod("status")
@@ -105,8 +122,8 @@ finished <- function(...) UseMethod("finished")
 completed <- function(...) UseMethod("completed")
 failed <- function(...) UseMethod("failed")
 expired <- function(...) UseMethod("expired")
-value <- function(...) UseMethod("value")
 error <- function(...) UseMethod("error")
+
 
 #' Status of an AsyncTask
 #'
@@ -128,6 +145,7 @@ finished.AsyncTask <- function(task, ...) {
   if (isNA(status)) return(NA)
   any(c("done", "error", "expired") %in% status)
 }
+
 
 #' @export
 #' @keywords internal
@@ -153,12 +171,6 @@ expired.AsyncTask <- function(task, ...) {
   any("expired" %in% status)
 }
 
-
-#' @export
-#' @keywords internal
-value.AsyncTask <- function(task, ...) {
-  stop("Not implemented for class ", class(task)[1])
-}
 
 #' @export
 #' @keywords internal

@@ -92,11 +92,20 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 } # status()
 
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Future API
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(task, ...) {
+value.BatchJobsAsyncTask <- function(task, onCondition=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
+  onCondition <- match.arg(onCondition)
+  onMissing <- match.arg(onMissing)
+
   stat <- status(task)
-  if (isNA(stat)) return(NULL)
+  if (isNA(stat)) {
+    if (onMissing == "default") return(default)
+    stop(sprintf("The value no longer exists (or never existed) for Future of class ", paste(sQuote(class(task)), collapse=", ")))
+  }
 
   if (!"done" %in% stat) {
     throw(AsyncTaskError(sprintf("%s did not succeed: %s", class(task)[1L], paste(sQuote(stat), collapse=", ")), task=task))
@@ -108,6 +117,10 @@ value.BatchJobsAsyncTask <- function(task, ...) {
   loadResult(reg, id=id)
 } # value()
 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# AsyncTask API
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #' @export
 #' @keywords internal
 error.BatchJobsAsyncTask <- function(task, ...) {

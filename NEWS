@@ -2,6 +2,10 @@ Package: async
 ==============
 
 Version: 0.3.1-9000 [2015-05-27]
+o FORMALIZATION: Added a minimalistic Future API.
+
+
+Version: 0.3.1-9000 [2015-05-27]
 o BUG FIX: asynchroneous evaluation of { a <<- 1 } no longer
   identifies 'a' as a global variable that needs to be exported.
 
