@@ -45,4 +45,8 @@ print(isResolved(f))
 y <- value(f)
 print(y)
 }
+\seealso{
+The default evaluator function, which can be changed by setting
+option \code{"future"}, is \code{\link{async}()}.
+}
 

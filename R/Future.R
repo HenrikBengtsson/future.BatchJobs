@@ -108,6 +108,10 @@ isResolved <- function(...) UseMethod("isResolved")
 #'
 #' @example incl/future.R
 #'
+#' @seealso
+#' The default evaluator function, which can be changed by setting
+#' option \code{"future"}, is \code{\link{async}()}.
+#'
 #' @export
 #' @name future
 future <- function(expr, envir=parent.frame(), substitute=TRUE, ..., evaluator=getOption("future", async)) {
