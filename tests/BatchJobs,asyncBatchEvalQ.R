@@ -1,5 +1,5 @@
-R.utils::use()
-use("async")
+library("async")
+library("R.utils")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
@@ -53,7 +53,7 @@ stopifnot(d == 4)
 
 
 message("Protect against large globals (being exported)")
-oopts2 <- options("async::maxSizeOfGlobals"=100)
+oopts2 <- options(future=async, "async::maxSizeOfGlobals"=100)
 a <- 1:100
 res <- try(b %<=% { x <- a + 1 })
 stopifnot(inherits(res, "try-error"))
