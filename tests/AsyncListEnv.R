@@ -54,7 +54,14 @@ print(tasks)
 
 message("*** AsyncListEnv: Wait for asynchroneous evaluation to complete")
 ## Wait for all jobs to finish
-while (!all(finished(x))) { cat("."); Sys.sleep(1) }; cat("\n")
+count <- 0L
+while (!all(finished(x)) && count < 10L) {
+  cat(".")
+  Sys.sleep(1)
+  count <- count + 1L
+}
+cat("\n")
+stopifnot(all(finished(x)))
 if (any(failed(x))) print(error(x))
 
 
@@ -69,7 +76,14 @@ print(failed(x))
 print(expired(x))
 
 ## Wait for all jobs to finish
-while (!all(finished(x))) { Sys.sleep(0.5) }
+count <- 0L
+while (!all(finished(x)) && count < 10L) {
+  cat(".")
+  Sys.sleep(1)
+  count <- count + 1L
+}
+cat("\n")
+stopifnot(all(finished(x)))
 if (any(failed(x))) print(error(x))
 print(value(x))
 
