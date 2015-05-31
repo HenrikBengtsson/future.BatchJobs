@@ -73,6 +73,9 @@ value <- function(...) UseMethod("value")
 #' This method needs to be implemented by the class that implement
 #' the Future API.  The implementation must never throw an error,
 #' but only return either TRUE or FALSE.
+#' It should also be possible to use the method for polling the
+#' future until it is resolved (without having to wait infinitly long),
+#' e.g. \code{while (!isResolved(future)) Sys.sleep(5)}.
 #'
 #' @export
 #' @export isResolved
@@ -89,8 +92,8 @@ isResolved <- function(...) UseMethod("isResolved")
 #' Asynchroneously evaluates an R expression and returns a future,
 #' which the can be inspected for being resolved or not and when
 #' resolved can have its value retrieved.
-#' Ideally the evaluator used is \emph{non-blocking} (returns
-#' immediately), but it is not required.
+#' It is recommended that the future (evaluator) is \emph{non-blocking}
+#' (returns immediately), but it is not required.
 #'
 #' @param expr An R \link[base]{expression}.
 #' @param envir The \link{environment} from where global
