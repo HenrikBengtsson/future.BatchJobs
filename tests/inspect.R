@@ -1,7 +1,7 @@
 library("async")
 
 ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
+oopts <- options(future=async, warn=1, "async::debug"=TRUE)
 
 
 x <- listenv()

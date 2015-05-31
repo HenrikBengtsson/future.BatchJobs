@@ -31,7 +31,7 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
   ## "promise" variable
   future_name <- sprintf(".task_%s", name)
   if (exists(future_name, envir=envir)) {
-    msg <- sprintf("A task / future with name %s already exists in environment %s: %s", sQuote(future_name), sQuote(environmentName(envir)), hpaste(ls(envir=envir, all.names=TRUE)))
+    msg <- sprintf("A future with name %s already exists in environment %s: %s", sQuote(future_name), sQuote(environmentName(envir)), hpaste(ls(envir=envir, all.names=TRUE)))
 ##    warning(msg)
   }
 
@@ -41,21 +41,27 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
   ## be located properly.
   a <- b <- NULL; rm(list=c("a", "b")) ## To please R CMD check
   call <- substitute(future(a, envir=b), list(a=value, b=envir))
-  task <- eval(call, envir=assign.env)
+  future <- eval(call, envir=assign.env)
 
-  ## Assign task ("future") to assignment environment
-  task_without_gc <- task
-  task_without_gc$.gcenv <- NULL
-  assign(future_name, task_without_gc, envir=assign.env)
+  ## Assign future to assignment environment
+  future_without_gc <- future
+  future_without_gc$.gcenv <- NULL
+  assign(future_name, future_without_gc, envir=assign.env)
 
-  ## Create delayed assignment ("promise") for its result.
-  ## Here await may throw an error causing the assign value to be a
+  ## Create a promise for the future's value.
+  ## Here value may throw an error causing the assign value to be a
   ## "delayed" error, which will be thrown each time the variable is
   ## retrieved.
   env <- new.env()
-  env$job <- task
-  delayedAssign(name, await(task, cleanup=TRUE),
-                      eval.env=env, assign.env=assign.env)
+  env$job <- future
+  delayedAssign(name, {
+    if (inherits(future, "AsyncTask")) {
+      value <- await(future, cleanup=TRUE)
+    } else {
+      value <- value(future)
+    }
+    value
+  }, eval.env=env, assign.env=assign.env)
 
   invisible(env)
 }
