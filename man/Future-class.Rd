@@ -13,7 +13,7 @@ Future(object, ...)
 \item{...}{Not used.}
 }
 \value{
-An object of class Future.
+An object of class \code{Future}.
 }
 \description{
 A \emph{future} is an abstraction for a \emph{value} that may

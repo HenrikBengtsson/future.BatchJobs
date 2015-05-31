@@ -2,10 +2,10 @@
 % Please edit documentation in R/Future.R
 \name{future}
 \alias{future}
-\title{Evaluates an expression asynchroneously}
+\title{Asynchroneously evaluates an expression whose value should be available at some point in the future}
 \usage{
 future(expr, envir = parent.frame(), substitute = TRUE, ...,
-  evaluator = getOption("future", async))
+  evaluator = getOption("future", lazyfuture))
 }
 \arguments{
 \item{expr}{An R \link[base]{expression}.}
@@ -32,22 +32,23 @@ A \link{Future}.
 Asynchroneously evaluates an R expression and returns a future,
 which the can be inspected for being resolved or not and when
 resolved can have its value retrieved.
-It is recommended that the future (evaluator) is \emph{non-blocking}
-(returns immediately), but it is not required.
 }
 \examples{
 f <- future({
-  Sys.sleep(3)
-  42L
+  a <- 7
+  b <- 3
+  c <- 2
+  a * b * c
 })
 
-print(f)
 print(isResolved(f))
 y <- value(f)
 print(y)
 }
 \seealso{
-The default evaluator function, which can be changed by setting
-option \code{"future"}, is \code{\link{async}()}.
+It is recommended that the evaluator is \emph{non-blocking}
+(returns immediately), but it is not required.
+The default evaluator function is \code{\link{lazyfuture}()},
+but can be changed via option \code{"future"}.
 }
 

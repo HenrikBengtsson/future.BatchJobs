@@ -11,7 +11,7 @@
 #' @param object An R object of a class that implements the Future API.
 #' @param ... Not used.
 #'
-#' @return An object of class Future.
+#' @return An object of class \code{Future}.
 #'
 #' @seealso
 #' Any function may return a Future.
@@ -87,13 +87,11 @@ isResolved.Future <- function(future, ...) {
 isResolved <- function(...) UseMethod("isResolved")
 
 
-#' Evaluates an expression asynchroneously
+#' Asynchroneously evaluates an expression whose value should be available at some point in the future
 #'
 #' Asynchroneously evaluates an R expression and returns a future,
 #' which the can be inspected for being resolved or not and when
 #' resolved can have its value retrieved.
-#' It is recommended that the future (evaluator) is \emph{non-blocking}
-#' (returns immediately), but it is not required.
 #'
 #' @param expr An R \link[base]{expression}.
 #' @param envir The \link{environment} from where global
@@ -113,12 +111,15 @@ isResolved <- function(...) UseMethod("isResolved")
 #' @example incl/future.R
 #'
 #' @seealso
-#' The default evaluator function, which can be changed by setting
-#' option \code{"future"}, is \code{\link{async}()}.
+#' It is recommended that the evaluator is \emph{non-blocking}
+#' (returns immediately), but it is not required.
+#
+#' The default evaluator function is \code{\link{lazyfuture}()},
+#' but can be changed via option \code{"future"}.
 #'
 #' @export
 #' @name future
-future <- function(expr, envir=parent.frame(), substitute=TRUE, ..., evaluator=getOption("future", async)) {
+future <- function(expr, envir=parent.frame(), substitute=TRUE, ..., evaluator=getOption("future", lazyfuture)) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.function(evaluator)) {

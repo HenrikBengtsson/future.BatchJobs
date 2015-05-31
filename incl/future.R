@@ -1,9 +1,10 @@
 f <- future({
-  Sys.sleep(3)
-  42L
+  a <- 7
+  b <- 3
+  c <- 2
+  a * b * c
 })
 
-print(f)
 print(isResolved(f))
 y <- value(f)
 print(y)
