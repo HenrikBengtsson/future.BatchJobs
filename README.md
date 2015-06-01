@@ -298,7 +298,7 @@ This package is only available via GitHub.  Install in R as:
 
 ```s
 source('http://callr.org/install#HenrikBengtsson/listenv')
-source('http://callr.org/install#HenrikBengtsson/global')
+source('http://callr.org/install#HenrikBengtsson/globals')
 source('http://callr.org/install#HenrikBengtsson/async')
 ```
 
