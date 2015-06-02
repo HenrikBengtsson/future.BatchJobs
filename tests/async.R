@@ -1,8 +1,9 @@
-R.utils::use()
-use("async")
+library("async")
+library("R.utils")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
+obe <- backend(c("multicore=2", "local"))
 
 ## Test that async() works when there are no globals
 t1 <- async({ x <- 1 })

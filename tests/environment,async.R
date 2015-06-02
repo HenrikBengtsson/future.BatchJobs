@@ -1,8 +1,8 @@
 library("async")
-backend("interactive")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
+obe <- backend(c("multicore=2", "local"))
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Async delayed assignment (infix operator)

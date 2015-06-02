@@ -1,20 +1,21 @@
-library("R.utils")
 library("async")
+library("R.utils")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(future=async, warn=1, "async::debug"=TRUE)
-
-backend("local")
+obe <- backend(c("multicore=2", "local"))
 
 message("*** AsyncListEnv: Allocation (empty)")
 x <- AsyncListEnv()
 print(x)
 stopifnot(is.na(inspect(x[[1]])))
 
+
 message("*** AsyncListEnv: Assignment by name")
 x$a <- 1
 stopifnot(is.na(inspect(x$a)))
 stopifnot(is.na(inspect(x[[1]])))
+
 
 message("*** AsyncListEnv: Assignment by index")
 x[[1]] <- 1.1
@@ -30,6 +31,7 @@ x <- AsyncListEnv(length=3L)
 names(x) <- c("a", "b", "c")
 print(x)
 
+
 message("*** AsyncListEnv: Asynchroneous evaluation (by name)")
 x$a %<=% { 1 }
 x$b %<=% { stop("Wow!"); 2 }
@@ -39,6 +41,7 @@ print(x)
 message("*** AsyncListEnv: Inspection")
 tasks <- inspect(envir=x)
 print(tasks)
+
 
 message("*** AsyncListEnv: Asynchroneous evaluation (by index)")
 x[[1]] %<=% { 1 }
@@ -50,18 +53,6 @@ print(x)
 message("*** AsyncListEnv: Inspection")
 tasks <- inspect(envir=x)
 print(tasks)
-
-
-message("*** AsyncListEnv: Wait for asynchroneous evaluation to complete")
-## Wait for all jobs to finish
-count <- 0L
-while (!all(finished(x)) && count < 10L) {
-  cat(".")
-  Sys.sleep(1)
-  count <- count + 1L
-}
-cat("\n")
-stopifnot(all(finished(x)))
 if (any(failed(x))) print(error(x))
 
 
@@ -74,20 +65,11 @@ print(finished(x))
 print(completed(x))
 print(failed(x))
 print(expired(x))
-
-## Wait for all jobs to finish
-count <- 0L
-while (!all(finished(x)) && count < 10L) {
-  cat(".")
-  Sys.sleep(1)
-  count <- count + 1L
-}
-cat("\n")
-stopifnot(all(finished(x)))
 if (any(failed(x))) print(error(x))
 print(value(x))
 
 
 ## Cleanup
+backend(obe)
 options(oopts)
 rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

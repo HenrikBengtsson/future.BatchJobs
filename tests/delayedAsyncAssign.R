@@ -2,6 +2,7 @@ library("async")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
+obe <- backend(c("multicore=2", "local"))
 
 delayedAssign("a", {
   ## This message will be outputted

@@ -5,8 +5,7 @@ use("async")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
-
-backend("interactive")
+obe <- backend(c("multicore=2", "local"))
 
 message("** Non-asynchronous assignment to environment")
 env <- new.env()

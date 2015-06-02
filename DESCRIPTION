@@ -4,7 +4,7 @@ Depends:
   R (>= 3.1.2),
   listenv
 Imports:
-  BatchJobs,
+  BatchJobs (>= 1.6.0),
   globals,
   parallel,
   R.methodsS3,

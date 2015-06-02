@@ -3,8 +3,7 @@ use("async")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
-
-backend("local")
+obe <- backend(c("multicore=2", "local"))
 
 message("*** asyncEvalQ()")
 

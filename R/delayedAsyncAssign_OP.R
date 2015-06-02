@@ -2,14 +2,13 @@
 delayedAsyncAssignInternal <- function(target, expr, envir=parent.frame(), substitute=FALSE) {
   target <- parse_env_subset(target, envir=envir, substitute=substitute)
   assign.env <- target$envir
-  name <- target$name
 
   name <- target$name
   if (inherits(target$envir, "listenv")) {
     if (target$exists) {
-      name <- get_variable(target$envir, name, mustExist=TRUE, create=FALSE)
+      name <- get_variable(target$envir, target$idx, mustExist=TRUE, create=FALSE)
     } else {
-      if (nzchar(name)) {
+      if (!is.na(name) && nzchar(name)) {
         name <- get_variable(target$envir, name, mustExist=FALSE, create=TRUE)
       } else if (is.finite(target$idx)) {
         name <- get_variable(target$envir, target$idx, mustExist=FALSE, create=TRUE)

@@ -6,9 +6,9 @@ delayedAssignInternal <- function(target, expr, envir=parent.frame(), substitute
   name <- target$name
   if (inherits(target$envir, "listenv")) {
     if (target$exists) {
-      name <- get_variable(target$envir, name, mustExist=TRUE, create=FALSE)
+      name <- get_variable(target$envir, target$idx, mustExist=TRUE, create=FALSE)
     } else {
-      if (nzchar(name)) {
+      if (!is.na(name) && nzchar(name)) {
         name <- get_variable(target$envir, name, mustExist=FALSE, create=TRUE)
       } else if (is.finite(target$idx)) {
         name <- get_variable(target$envir, target$idx, mustExist=FALSE, create=TRUE)
