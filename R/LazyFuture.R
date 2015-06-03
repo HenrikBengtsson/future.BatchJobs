@@ -34,8 +34,8 @@ isResolved.LazyFuture <- function(future, ...) {
 #' A lazy future represents a future whose value will be resolved at the time when it is requested
 #'
 #' A lazy future is a future that uses lazy evaluation, which means
-#' that its value is only computed and resolved at the time when the
-#' value is requested.  This means that the future will not be resolved
+#' that its \emph{value is only computed and resolved at the time when the
+#' value is requested}.  This means that the future will not be resolved
 #' if the value is never requested.
 #'
 #' @param expr An R \link[base]{expression}.
@@ -50,9 +50,18 @@ isResolved.LazyFuture <- function(future, ...) {
 #'
 #' @return A \link{LazyFuture}.
 #'
-#' @example incl/future.R
+#' @example incl/lazyfuture.R
 #'
 #' @details
+#' Note that the "lazy future" strategy also applies to any global variables
+#' used in the expression, i.e. if the value of a global variables changes
+#' between the time point the lazy future was created and its acutally
+#' resolvement, then the value will be based on the most recent value of
+#' global variable (not the value at the time the future was created).
+#' This is a special "feature" due to the "lazy" (delayed) evaluation of
+#' this particular future.  Ideally, globals are resolved at the time when
+#' the future is created.  See example for an illustration of this.
+#'
 #' This function can be registered as the default \link{future} evaluator,
 #' i.e. \code{options(future=lazyfuture)}.
 #'

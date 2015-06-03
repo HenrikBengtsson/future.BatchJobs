@@ -27,25 +27,39 @@ A \link{LazyFuture}.
 }
 \description{
 A lazy future is a future that uses lazy evaluation, which means
-that its value is only computed and resolved at the time when the
-value is requested.  This means that the future will not be resolved
+that its \emph{value is only computed and resolved at the time when the
+value is requested}.  This means that the future will not be resolved
 if the value is never requested.
 }
 \details{
+Note that the "lazy future" strategy also applies to any global variables
+used in the expression, i.e. if the value of a global variables changes
+between the time point the lazy future was created and its acutally
+resolvement, then the value will be based on the most recent value of
+global variable (not the value at the time the future was created).
+This is a special "feature" due to the "lazy" (delayed) evaluation of
+this particular future.  Ideally, globals are resolved at the time when
+the future is created.  See example for an illustration of this.
+
 This function can be registered as the default \link{future} evaluator,
 i.e. \code{options(future=lazyfuture)}.
 }
 \examples{
-f <- future({
-  a <- 7
+## A global variable
+a <- 0
+f <- lazyfuture({
   b <- 3
   c <- 2
   a * b * c
 })
 
-print(isResolved(f))
-y <- value(f)
-print(y)
+## Since 'a' is a global variable in _lazy_ future 'f',
+## which still hasn't been resolved, any changes to
+## 'a' until 'f' is resolved, will affect its value.
+a <- 7
+v <- value(f)
+print(v)
+stopifnot(v == 42)
 }
 \seealso{
 Internally, \code{\link[base]{delayedAssign}()} is utilized to
