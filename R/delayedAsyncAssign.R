@@ -64,14 +64,7 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
   ## retrieved.
   env <- new.env()
   env$job <- future
-  delayedAssign(name, {
-    if (inherits(future, "AsyncTask")) {
-      value <- await(future, cleanup=TRUE)
-    } else {
-      value <- value(future)
-    }
-    value
-  }, eval.env=env, assign.env=assign.env)
+  delayedAssign(name, value(future), eval.env=env, assign.env=assign.env)
 
   invisible(future)
 }
