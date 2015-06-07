@@ -20,7 +20,7 @@ A lazy future represents a \link{Future} whose value will be resolved at the tim
 }
 \seealso{
 To evaluate an expression using "lazy future", see function
-\code{\link{lazyfuture}()}, or alternatively, use the
+\code{\link{lazy}()}, or alternatively, use the
 infix assignment operator \code{\link{\%<-\%}}.
 }
 

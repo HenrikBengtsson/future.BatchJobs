@@ -2,6 +2,7 @@ Package: async
 ==============
 
 Version: 0.3.1-9000 [2015-05-27]
+o Now delayedAsyncAssign() returns a Future.
 o FORMALIZATION: Added a minimalistic Future API.
 o BUG FIX: The existance of .BatchJobs.R would override
   whatever backend was already set by backend().

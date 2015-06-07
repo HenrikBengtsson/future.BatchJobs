@@ -114,12 +114,12 @@ isResolved <- function(...) UseMethod("isResolved")
 #' It is recommended that the evaluator is \emph{non-blocking}
 #' (returns immediately), but it is not required.
 #
-#' The default evaluator function is \code{\link{lazyfuture}()},
+#' The default evaluator function is \code{\link{lazy}()},
 #' but can be changed via option \code{"future"}.
 #'
 #' @export
 #' @name future
-future <- function(expr, envir=parent.frame(), substitute=TRUE, ..., evaluator=getOption("future", lazyfuture)) {
+future <- function(expr, envir=parent.frame(), substitute=TRUE, ..., evaluator=getOption("future", lazy)) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.function(evaluator)) {

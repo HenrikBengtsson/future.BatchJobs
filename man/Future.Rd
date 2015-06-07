@@ -5,7 +5,7 @@
 \title{Asynchroneously evaluates an expression whose value should be available at some point in the future}
 \usage{
 future(expr, envir = parent.frame(), substitute = TRUE, ...,
-  evaluator = getOption("future", lazyfuture))
+  evaluator = getOption("future", lazy))
 }
 \arguments{
 \item{expr}{An R \link[base]{expression}.}
@@ -48,7 +48,7 @@ print(y)
 \seealso{
 It is recommended that the evaluator is \emph{non-blocking}
 (returns immediately), but it is not required.
-The default evaluator function is \code{\link{lazyfuture}()},
+The default evaluator function is \code{\link{lazy}()},
 but can be changed via option \code{"future"}.
 }
 

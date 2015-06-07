@@ -12,7 +12,7 @@
 inspect <- function(var=NULL, envir=parent.frame(), mustExist=FALSE) {
   res <- NA_character_
 
-  get_task <- function(target) {
+  get_future <- function(target) {
     if (!target$exists) {
       msg <- sprintf("Variable not found: %s", target$code)
       if (mustExist) stop(msg, call.=FALSE)
@@ -27,16 +27,16 @@ inspect <- function(var=NULL, envir=parent.frame(), mustExist=FALSE) {
       name <- target$name
     }
 
-    taskname <- sprintf(".task_%s", name)
-    if (!exists(taskname, mode="list", envir=envir, inherits=FALSE)) {
-      msg <- sprintf("Task (%s) not found in %s: %s", sQuote(taskname), sQuote(class(envir)[1]), sQuote(target$code))
+    future_name <- sprintf(".future_%s", name)
+    if (!exists(future_name, mode="list", envir=envir, inherits=FALSE)) {
+      msg <- sprintf("Future (%s) not found in %s: %s", sQuote(future_name), sQuote(class(envir)[1]), sQuote(target$code))
       if (mustExist) stop(msg, call.=FALSE)
       attr(res, "reason") <- msg
       return(res)
     }
 
-    get(taskname, mode="list", envir=envir, inherits=FALSE)
-  } # get_task()
+    get(future_name, mode="list", envir=envir, inherits=FALSE)
+  } # get_future()
 
   expr <- substitute(var)
 
@@ -44,12 +44,12 @@ inspect <- function(var=NULL, envir=parent.frame(), mustExist=FALSE) {
   if (is.null(expr)) {
     res <- lapply(seq_along(envir), FUN=function(idx) {
       target <- parse_env_subset(idx, envir=envir, substitute=FALSE)
-      get_task(target)
+      get_future(target)
     })
     names(res) <- names(envir)
     return(res)
   }
 
   target <- parse_env_subset(expr, envir=envir, substitute=FALSE)
-  get_task(target)
+  get_future(target)
 }

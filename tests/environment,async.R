@@ -17,7 +17,7 @@ stopifnot(inherits(res, "try-error"))
 message("*** %<=% on environment: Assign by name (new)")
 z$B %<=% TRUE
 stopifnot(length(z) == 2) # sic!
-stopifnot(identical(names(z)[1], "B"))
+stopifnot("B" %in% ls(z))
 
 y <- as.list(z)
 str(y)
@@ -29,13 +29,13 @@ message("*** %<=% on environment: Potential task name clashes")
 u <- new.env()
 u$a %<=% 1
 stopifnot(length(u) == 2)
-stopifnot(identical(names(u)[1], "a"))
+stopifnot("a" %in% names(u))
 tu <- inspect(u$a)
 
 v <- new.env()
 v$a %<=% 2
 stopifnot(length(v) == 2)
-stopifnot(identical(names(v)[1], "a"))
+stopifnot("a" %in% names(v))
 tv <- inspect(v$a)
 stopifnot(!identical(tu, tv))
 

@@ -7,7 +7,7 @@
 #'
 #' @seealso
 #' To evaluate an expression using "lazy future", see function
-#' \code{\link{lazyfuture}()}, or alternatively, use the
+#' \code{\link{lazy}()}, or alternatively, use the
 #' infix assignment operator \code{\link{\%<-\%}}.
 #'
 #' @export
@@ -50,7 +50,7 @@ isResolved.LazyFuture <- function(future, ...) {
 #'
 #' @return A \link{LazyFuture}.
 #'
-#' @example incl/lazyfuture.R
+#' @example incl/lazy.R
 #'
 #' @details
 #' Note that the "lazy future" strategy also applies to any global variables
@@ -63,19 +63,19 @@ isResolved.LazyFuture <- function(future, ...) {
 #' the future is created.  See example for an illustration of this.
 #'
 #' This function can be registered as the default \link{future} evaluator,
-#' i.e. \code{options(future=lazyfuture)}.
+#' i.e. \code{options(future=lazy)}.
 #'
 #' @seealso Internally, \code{\link[base]{delayedAssign}()} is utilized to
 #' create a "\emph{\link[base]{promise}}", which hold the future's value.
 #'
 #' @export
-#' @name lazyfuture
-lazyfuture <- function(expr, envir=parent.frame(), substitute=TRUE, local=TRUE, ...) {
+#' @name lazy
+lazy <- function(expr, envir=parent.frame(), substitute=TRUE, local=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
 
   ## Evaluate in local() environment?
   if (local) {
-    a <- NULL; rm(list="a"); # To please R CMD check
+    a <- NULL; rm(list="a")  ## To please R CMD check
     expr <- substitute(local(a), list(a=expr))
   }
 

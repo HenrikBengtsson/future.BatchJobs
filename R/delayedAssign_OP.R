@@ -18,7 +18,7 @@ delayedAssignInternal <- function(target, expr, envir=parent.frame(), substitute
     }
   }
 
-  a <- NULL; rm(list="a"); # To please R CMD check
+  a <- NULL; rm(list="a")  # To please R CMD check
   call <- substitute(local(a), list(a=expr))
   delayedAssign(name, eval(call, envir=envir), assign.env=assign.env)
 } # delayedAssignInternal()

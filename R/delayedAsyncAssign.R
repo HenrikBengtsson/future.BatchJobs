@@ -1,9 +1,9 @@
 #' Delayed asynchroneous evaluation
 #'
-#' Method and infix operators for delayed assignments while evaluating
-#' the statement in the background/in parallel.
+#' Method and infix operators for delayed assignments
+#' of the value of an expression which is evaluated asynchroneously.
 #'
-#' @param name the name of the variable to assign.
+#' @param name the name of the variable (and the future) to assign.
 #' @param value the R expression to be asynchroneous evaluated and
 #' whose value will be assigned to the variable.
 #' @param envir The environment from which global variables used by
@@ -13,12 +13,17 @@
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
 #'
-#' @return A delayed assignment which, when evaluated, will retrieve
-#' the value of the asynchronous evaluation.
+#' @return A \code{\link{Future}} invisibly.
 #'
 #' @example incl/delayedAsyncAssign_OP.R
 #'
-#' @seealso \code{\link{asyncEvalQ}()}
+#' @details
+#' This function creates a future and a corresponding
+#' "\emph{\link[base]{promise}}", which hold the future's value.
+#' Both the future and the promise are assigned to environment
+#' \code{assign.env}.  The name of the promise is given by \code{name}
+#' and the name of the future is \code{.future_<name>}.
+#' The future is also returned invisibly.
 #'
 #' @aliases %<=% %=>%
 #' @export
@@ -27,9 +32,11 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
   stopifnot(is.character(name), !is.na(name), nzchar(name))
   if (substitute) value <- substitute(value)
 
-  ## Name of "future" (task) to be save in parallel to the
-  ## "promise" variable
-  future_name <- sprintf(".task_%s", name)
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## (1) Create future
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## Name of "future" saved in parallel with the "promise"
+  future_name <- sprintf(".future_%s", name)
   if (exists(future_name, envir=envir)) {
     msg <- sprintf("A future with name %s already exists in environment %s: %s", sQuote(future_name), sQuote(environmentName(envir)), hpaste(ls(envir=envir, all.names=TRUE)))
 ##    warning(msg)
@@ -48,7 +55,10 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
   future_without_gc$.gcenv <- NULL
   assign(future_name, future_without_gc, envir=assign.env)
 
-  ## Create a promise for the future's value.
+
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## (2) Create promise holding the future's value
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Here value may throw an error causing the assign value to be a
   ## "delayed" error, which will be thrown each time the variable is
   ## retrieved.
@@ -63,5 +73,5 @@ delayedAsyncAssign <- function(name, value, envir=parent.frame(), assign.env=env
     value
   }, eval.env=env, assign.env=assign.env)
 
-  invisible(env)
+  invisible(future)
 }

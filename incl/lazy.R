@@ -1,6 +1,8 @@
 ## A global variable
 a <- 0
-f <- lazyfuture({
+
+## Create lazy future
+f <- lazy({
   b <- 3
   c <- 2
   a * b * c

@@ -1,5 +1,5 @@
 library("async")
-oopts <- options("future"=lazyfuture)
+oopts <- options("future"=lazy)
 
 f <- future({
   42L

@@ -1,6 +1,6 @@
 library("async")
 
-f <- lazyfuture({
+f <- lazy({
   42L
 })
 stopifnot(inherits(f, "LazyFuture"))
@@ -16,7 +16,7 @@ stopifnot(y == 42L)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## A global variable
 a <- 0
-f <- lazyfuture({
+f <- lazy({
   b <- 3
   c <- 2
   a * b * c

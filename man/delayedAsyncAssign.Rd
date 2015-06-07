@@ -10,7 +10,7 @@ delayedAsyncAssign(name, value, envir = parent.frame(), assign.env = envir,
   substitute = TRUE)
 }
 \arguments{
-\item{name}{the name of the variable to assign.}
+\item{name}{the name of the variable (and the future) to assign.}
 
 \item{value}{the R expression to be asynchroneous evaluated and
 whose value will be assigned to the variable.}
@@ -25,12 +25,19 @@ be assigned.}
 \code{substitute()}:d or not.}
 }
 \value{
-A delayed assignment which, when evaluated, will retrieve
-the value of the asynchronous evaluation.
+A \code{\link{Future}} invisibly.
 }
 \description{
-Method and infix operators for delayed assignments while evaluating
-the statement in the background/in parallel.
+Method and infix operators for delayed assignments
+of the value of an expression which is evaluated asynchroneously.
+}
+\details{
+This function creates a future and a corresponding
+"\emph{\link[base]{promise}}", which hold the future's value.
+Both the future and the promise are assigned to environment
+\code{assign.env}.  The name of the promise is given by \code{name}
+and the name of the future is \code{.future_<name>}.
+The future is also returned invisibly.
 }
 \examples{
 backend(c("multicore", "local"))
@@ -51,8 +58,5 @@ message("Value 'A': ", A)
 
 ## Sleep until 'C' is available
 message("Value 'B': ", B)
-}
-\seealso{
-\code{\link{asyncEvalQ}()}
 }
 
