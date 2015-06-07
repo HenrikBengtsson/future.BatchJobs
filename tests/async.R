@@ -5,37 +5,44 @@ ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
 obe <- backend(c("multicore=2", "local"))
 
-## Test that async() works when there are no globals
-t1 <- async({ x <- 1 })
-print(t1)
-v1 <- await(t1)
-print(v1)
-stopifnot(v1 == 1)
+message("*** async() ...")
+
+## An asynchroneous future without globals
+f <- async({ x <- 1 })
+print(f)
+v <- value(f)
+print(v)
+stopifnot(v == 1)
 
 
-## Test that async() works when there are globals
+## An asynchroneous future with globals
 a <- 2
-t2 <- async({ x <- a })
-print(t2)
-v2 <- await(t2)
-print(v2)
-stopifnot(v2 == a)
+f <- async({ x <- a })
+print(f)
+v <- value(f)
+print(v)
+stopifnot(v == a)
 
 
-## Test that async() works when there are errors
-t3 <- async({ x <- 3; stop("Woops!"); x })
-print(t3)
+## An asynchroneous future with errors
+f <- async({ x <- 3; stop("Woops!"); x })
+print(f)
+v <- value(f, onCondition="return")
+print(v)
+
 res <- tryCatch({
-  v3 <- await(t3)
-  print(v3)
-  v3
+  ## Default is onCondition="signal"
+  v <- value(f)
+  print(v)
+  v
 }, error = function(ex) {
   cat(ex$message)
-  cat("\nTEST OK!\n")
   NULL
 })
 stopifnot(is.null(res))
 
+
+message("*** async() ... OK")
 
 ## Cleanup
 options(oopts)

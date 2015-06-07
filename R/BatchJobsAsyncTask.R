@@ -111,7 +111,7 @@ value.BatchJobsAsyncTask <- function(task, onCondition=c("signal", "return"), on
     await(task, cleanup=FALSE)
   }, simpleError = function(ex) {
     if (onCondition == "signal") signalCondition(ex)
-    cond
+    ex
   })
 
   value
