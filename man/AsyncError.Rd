@@ -6,7 +6,7 @@
 \alias{AsyncTaskError}
 \title{Exception class for async-related errors}
 \format{\preformatted{function (...)  
- - attr(*, ".env")=<environment: 0x000000000e80dd60> 
+ - attr(*, ".env")=<environment: 0x000000000c885d48> 
  - attr(*, "class")= chr [1:2] "Class" "Object"
  - attr(*, "export")= logi TRUE
  - attr(*, "modifiers")= chr [1:2] "public" "class"

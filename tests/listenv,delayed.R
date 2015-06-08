@@ -4,6 +4,7 @@ library("async")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
+obe <- backend(c("multicore=2", "local"))
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Delayed assignment (infix operator)
@@ -57,6 +58,23 @@ u$a %<-% 1
 v$a %<-% 2
 stopifnot(identical(u$a, 1))
 stopifnot(identical(v$a, 2))
+
+
+message("*** %<-% on listenv: Repeatedly using name and index subsetting")
+lenv <- listenv()
+for (ii in 1:3) {
+  str(as.list(lenv))
+  
+  message("List environment (name)")
+  lenv$b %<-% 2
+  print(lenv$b)
+  stopifnot(lenv$b == 2)
+  
+  message("List environment (index)")
+  lenv[[3]] %<-% 3
+  print(lenv[[3]])
+  stopifnot(lenv[[3]] == 3)
+}
 
 
 ## Cleanup

@@ -1,6 +1,15 @@
 Package: async
 ==============
 
+Version: 0.4.0 [2015-06-08]
+o CLEANUP: Extract Future API and moved to new package 'future'.
+o Now delayedAsyncAssign() returns a Future.
+o BUG FIX: The existance of .BatchJobs.R would override
+  whatever backend was already set by backend().
+o BUG FIX: Asynchroneous evaluation of { a <<- 1 } no longer
+  identifies 'a' as a global variable that needs to be exported.
+
+
 Version: 0.3.1 [2015-05-23]
 o CLEANUP: Moved more internal code to the 'listenv' package.
 

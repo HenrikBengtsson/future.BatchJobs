@@ -13,7 +13,7 @@
 #' @return Vector of type \code{integer} with job ids.
 #'
 #' @export
-#' @importFrom globals getGlobals as.Globals packagesOf cleanup
+#' @importFrom globals globalsOf as.Globals packagesOf cleanup
 #' @importFrom R.utils hpaste mcat mstr
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 #' @keywords internal
@@ -28,7 +28,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
 
   ## Identify globals?
   if (isTRUE(globals)) {
-    globals <- getGlobals(exprs, envir=envir, tweak=tweakExpression, primitive=FALSE, base=FALSE, unlist=TRUE)
+    globals <- globalsOf(exprs, envir=envir, tweak=tweakExpression, primitive=FALSE, base=FALSE, unlist=TRUE)
     if (debug) {
       mcat("Identified (non-primitive non-\"base\") globals:\n")
       mstr(globals)
@@ -45,23 +45,22 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     ## Append packages associated with globals
     pkgs <- c(pkgs, packagesOf(globals))
 
+    ## Drop all globals which are already part of one of
+    ## the packages in 'pkgs'.  They will be available
+    ## when those packages are attached.
+    pkgsG <- sapply(globals, FUN=function(obj) {
+      environmentName(environment(obj))
+    })
+    keep <- !is.element(pkgsG, pkgs)
+    globals <- globals[keep]
+    pkgsG <- keep <- NULL ## Not needed anymore
+
     ## Now drop globals that are primitive functions or
     ## that are part of the base packages, which now are
     ## part of 'pkgs' if needed.
     globals <- cleanup(globals)
   }
 
-  ## BatchJobs::batchExport() validated names of globals using
-  ## checkmate::assertList(more.args, names="strict") which doesn't
-  ## like names such as "{", although they should be valid indeed.
-  if (length(globals) > 0L) {
-    keep <- grepl("^[.a-zA-Z]", names(globals))
-    globals <- globals[keep]
-    if (debug && !all(keep)) {
-      mcat("Filtered globals:\n")
-      mstr(globals)
-    }
-  }
 
   ## Protect against user error exporting too large objects?
   if (length(globals) > 0L && is.finite(maxSizeOfGlobals)) {
@@ -77,21 +76,46 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
   }
 
 
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## Any packages to export?
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Never attach the 'base' package, because that is always
   ## available for all R sessions / implementations.
   pkgs <- setdiff(pkgs, "base")
-
-  ## Any packages to export?
   if (length(pkgs) > 0L) {
+    ## Record which packages in 'pkgs' that are loaded and
+    ## which of them are attached (at this point in time).
+    isLoaded <- is.element(pkgs, loadedNamespaces())
+    isAttached <- is.element(pkgs, attachedPackages())
+
+    ## FIXME: Update the expression such that the new session
+    ## will have the same state of (loaded, attached) packages.
+
     addRegistryPackages(reg, packages=pkgs)
   }
+  rm(list=c("pkgs")) # Not needed anymore
 
+
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Any globals to export?
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   if (length(globals) > 0L) {
-    batchExport(reg, li=globals)
+    ## BatchJobs::batchExport() validated names of globals using
+    ## checkmate::assertList(more.args, names="strict") which doesn't
+    ## like names such as "{", although they should be valid indeed.
+    keep <- grepl("^[.a-zA-Z]", names(globals))
+    globals <- globals[keep]
+    if (debug && !all(keep)) {
+      mcat("Filtered globals:\n")
+      mstr(globals)
+    }
+    if (length(globals) > 0L) batchExport(reg, li=globals)
   }
-
   rm(list=c("globals")) # Not needed anymore
 
+
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## Batch process expressions
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   batchEvalQ(reg, exprs=exprs, local=TRUE, ...)
 } # asyncBatchEvalQ()

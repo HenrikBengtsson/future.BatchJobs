@@ -19,11 +19,12 @@
 #'
 #' @example incl/asyncEvalQ.R
 #'
-#' @seealso \code{\link{delayedAsyncAssign}()} and
+#' @seealso \code{\link[future]{futureAssign}()} and
 #' its corresponding operator \code{\link{\%<=\%}}.
 #'
 #' @export
 #' @importFrom listenv listenv get_variable
+#' @importFrom future futureAssign
 #' @keywords internal
 asyncEvalQ <- function(exprs, envir=parent.frame(), ...) {
   nexprs <- length(exprs)
@@ -33,7 +34,7 @@ asyncEvalQ <- function(exprs, envir=parent.frame(), ...) {
   for (ii in seq_len(nexprs)) {
     var <- get_variable(env, ii)
     expr <- exprs[[ii]]
-    delayedAsyncAssign(var, expr, envir=envir, assign.env=env, substitute=FALSE)
+    futureAssign(var, expr, envir=envir, assign.env=env, substitute=FALSE)
   }
 
   env

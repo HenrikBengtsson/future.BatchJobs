@@ -3,14 +3,12 @@ library("async")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
-
-tempRegistry <- async:::tempRegistry
-
 ## Important: If 'interactive' is used, the current evaluation
 ## environment is contaminated by the jobs, which will assign values,
 ## including the exported globals, to the current evaluation environment.
-backend("local")
+obe <- backend(c("multicore=2", "local"))
 
+tempRegistry <- async:::tempRegistry
 
 ## Global string, which should be found instead of base::url().
 url <- "http://www.r-project.org"

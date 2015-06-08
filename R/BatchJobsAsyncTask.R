@@ -92,22 +92,36 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 } # status()
 
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Future API
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#' @importFrom future value
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(task, ...) {
-  stat <- status(task)
-  if (isNA(stat)) return(NULL)
+value.BatchJobsAsyncTask <- function(task, onCondition=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
+  onCondition <- match.arg(onCondition)
+  onMissing <- match.arg(onMissing)
 
-  if (!"done" %in% stat) {
-    throw(AsyncTaskError(sprintf("%s did not succeed: %s", class(task)[1L], paste(sQuote(stat), collapse=", ")), task=task))
+  stat <- status(task)
+  if (isNA(stat)) {
+    if (onMissing == "default") return(default)
+    stop(sprintf("The value no longer exists (or never existed) for Future of class ", paste(sQuote(class(task)), collapse=", ")))
   }
 
-  backend <- task$backend
-  reg <- backend$reg
-  id <- backend$id
-  loadResult(reg, id=id)
+  value <- tryCatch({
+    await(task, cleanup=FALSE)
+  }, simpleError = function(ex) {
+    if (onCondition == "signal") signalCondition(ex)
+    ex
+  })
+
+  value
 } # value()
 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# AsyncTask API
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #' @export
 #' @keywords internal
 error.BatchJobsAsyncTask <- function(task, ...) {
@@ -213,9 +227,9 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
 
   res <- NULL
   if (finished) {
-    if (debug) { mprint("Results:"); mstr(res) }
+    if (debug) { mprint("Results:") }
     if ("done" %in% stat) {
-      res <- value(task)
+      res <- loadResult(reg, id=id)
     } else if ("error" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobError: %s", error(task))
@@ -228,6 +242,7 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
       throw(AsyncTaskError(msg, task=task))
     }
+    if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)

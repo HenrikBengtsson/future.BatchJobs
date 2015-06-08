@@ -1,34 +1,36 @@
-library("R.utils")
 library("async")
+library("R.utils")
 
 ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-
-backend("local")
+oopts <- options(future=async, warn=1, "async::debug"=TRUE)
+obe <- backend(c("multicore=2", "local"))
 
 message("*** AsyncListEnv: Allocation (empty)")
 x <- AsyncListEnv()
 print(x)
-stopifnot(is.na(inspect(x[[1]])))
+stopifnot(is.na(futureOf(x[[1]], mustExist=FALSE)))
+
 
 message("*** AsyncListEnv: Assignment by name")
 x$a <- 1
-stopifnot(is.na(inspect(x$a)))
-stopifnot(is.na(inspect(x[[1]])))
+stopifnot(is.na(futureOf(x$a, mustExist=FALSE)))
+stopifnot(is.na(futureOf(x[[1]], mustExist=FALSE)))
+
 
 message("*** AsyncListEnv: Assignment by index")
 x[[1]] <- 1.1
-stopifnot(is.na(inspect(x$a)))
-stopifnot(is.na(inspect(x[[1]])))
+stopifnot(is.na(futureOf(x$a, mustExist=FALSE)))
+stopifnot(is.na(futureOf(x[[1]], mustExist=FALSE)))
 
 x[[2]] <- 2
-stopifnot(is.na(inspect(x[[2]])))
+stopifnot(is.na(futureOf(x[[2]], mustExist=FALSE)))
 
 
 message("*** AsyncListEnv: Allocation (length 3)")
 x <- AsyncListEnv(length=3L)
 names(x) <- c("a", "b", "c")
 print(x)
+
 
 message("*** AsyncListEnv: Asynchroneous evaluation (by name)")
 x$a %<=% { 1 }
@@ -37,8 +39,9 @@ x$c %<=% { list(foo=3, bar=letters) }
 print(x)
 
 message("*** AsyncListEnv: Inspection")
-tasks <- inspect(envir=x)
+tasks <- futureOf(envir=x)
 print(tasks)
+
 
 message("*** AsyncListEnv: Asynchroneous evaluation (by index)")
 x[[1]] %<=% { 1 }
@@ -48,13 +51,8 @@ print(x)
 
 
 message("*** AsyncListEnv: Inspection")
-tasks <- inspect(envir=x)
+tasks <- futureOf(envir=x)
 print(tasks)
-
-
-message("*** AsyncListEnv: Wait for asynchroneous evaluation to complete")
-## Wait for all jobs to finish
-while (!all(finished(x))) { cat("."); Sys.sleep(1) }; cat("\n")
 if (any(failed(x))) print(error(x))
 
 
@@ -67,13 +65,11 @@ print(finished(x))
 print(completed(x))
 print(failed(x))
 print(expired(x))
-
-## Wait for all jobs to finish
-while (!all(finished(x))) { Sys.sleep(0.5) }
 if (any(failed(x))) print(error(x))
 print(value(x))
 
 
 ## Cleanup
+backend(obe)
 options(oopts)
 rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())

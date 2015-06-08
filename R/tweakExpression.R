@@ -9,11 +9,12 @@ tweakExpression <- function(expr) {
       exprI <- expr[[ii]]
       op <- exprI[[1]]
       if (!is.symbol(op)) next
-      if (op == "%<-%" || op == "%<=%") {
+      op <- as.character(op)
+      if (op %in% c("<<-", "%<-%", "%<=%")) {
         lhs <- exprI[[2]]
         rhs <- exprI[[3]]
         expr[[ii]] <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
-      } else if (op == "%->%" || op == "%=>%") {
+      } else if (op %in% c("->>", "%->%", "%=>%")) {
         lhs <- exprI[[3]]
         rhs <- exprI[[2]]
         expr[[ii]] <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))

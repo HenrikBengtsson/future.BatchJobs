@@ -68,7 +68,7 @@
 #' @importFrom tools file_path_as_absolute
 #' @importFrom utils file_test
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
-#' @importFrom R.utils use
+#' @importFrom R.utils use mprint mprintf mstr
 backend <- local({
   aliases = list(
     default = c(".BatchJobs.R", "multicore-1", "multicore",
@@ -77,12 +77,6 @@ backend <- local({
   last = NULL
 
   function(what=NULL, ..., quietly=TRUE) {
-    ## Attach BatchJobs here, because it will attach itself later
-    ## anyways and then it will load its own default settings and
-    ## override whatever settings we use here.
-#    oopts <- options(BatchJobs.load.config=FALSE)
-#    on.exit(options(oopts))
-
     ## Imported private functions from BatchJobs
     ns <- getNamespace("BatchJobs")
     getBatchJobsConf <- get("getBatchJobsConf", mode="function", envir=ns)
@@ -90,6 +84,7 @@ backend <- local({
     assignConf <- get("assignConf", mode="function", envir=ns)
     readConfs <- get("readConfs", mode="function", envir=ns)
 
+    debug <- getOption("async::debug", FALSE)
 
     ## Set custom aliases?
     custom <- list(...)
@@ -157,6 +152,8 @@ backend <- local({
     ## The final choice
     what <- what[1L]
 
+    if (debug) mprintf("backend(): what='%s'\n", what)
+    
     ## Inform about dropped requests?
     if (length(dropped) > 0L && explicit_what && getOption("async::on_unkown_backend", "ignore") == "warn") {
       warning(sprintf("Some of the preferred backends (%s) are either not available or not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS, sQuote(what)))
@@ -179,6 +176,8 @@ backend <- local({
       last <<- what
       return(what)
     }
+
+    if (debug) mprintf("backend(): Finding action for what='%s'\n", what)
 
     conf <- getBatchJobsConf()
     if (grepl("^multicore", what)) {
@@ -232,7 +231,12 @@ backend <- local({
     conf$max.concurrent.jobs = Inf
     conf$fs.timeout = NA_real_
 
-    ## Use it?
+    if (debug) {
+      mprintf("Setting BatchJobs configuration:\n")
+      mstr(as.list(conf))
+    }
+
+    ## Use it!
     assignConf(conf)
 
     ## Record last used

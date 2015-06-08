@@ -1,8 +1,8 @@
 library("async")
-backend("interactive")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
+obe <- backend(c("multicore=2", "local"))
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Async delayed assignment (infix operator)
@@ -17,7 +17,7 @@ stopifnot(inherits(res, "try-error"))
 message("*** %<=% on environment: Assign by name (new)")
 z$B %<=% TRUE
 stopifnot(length(z) == 2) # sic!
-stopifnot(identical(names(z)[1], "B"))
+stopifnot("B" %in% ls(z))
 
 y <- as.list(z)
 str(y)
@@ -29,18 +29,18 @@ message("*** %<=% on environment: Potential task name clashes")
 u <- new.env()
 u$a %<=% 1
 stopifnot(length(u) == 2)
-stopifnot(identical(names(u)[1], "a"))
-tu <- inspect(u$a)
+stopifnot("a" %in% names(u))
+fu <- futureOf(u$a)
 
 v <- new.env()
 v$a %<=% 2
 stopifnot(length(v) == 2)
-stopifnot(identical(names(v)[1], "a"))
-tv <- inspect(v$a)
-stopifnot(!identical(tu, tv))
+stopifnot("a" %in% names(v))
+fv <- futureOf(v$a)
+stopifnot(!identical(fu, fv))
 
-tu <- inspect(u$a)
-stopifnot(!identical(tu, tv))
+fu <- futureOf(u$a)
+stopifnot(!identical(fu, fv))
 
 stopifnot(identical(u$a, 1))
 stopifnot(identical(v$a, 2))

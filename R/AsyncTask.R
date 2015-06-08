@@ -9,6 +9,7 @@
 #' @return An AsyncTask object
 #'
 #' @export
+#' @importFrom future Future
 #' @importFrom R.utils mprint
 #' @keywords internal
 AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
@@ -20,7 +21,6 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
 
 
   debug <- getOption("async::debug", FALSE)
-  if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
   if (debug) { mcat("Expression:\n"); mprint(expr) }
 
 ##  ## Inject loading of 'async' in case of nested asynchroneous evaluation
@@ -35,9 +35,27 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
     expr=expr,
     envir=envir
   )
-  structure(task, class=c("AsyncTask", class(task)))
+  task <- structure(task, class=c("AsyncTask", class(task)))
+  Future(task)
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Future API
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+#' @importFrom future isResolved
+#' @export
+#' @keywords internal
+isResolved.AsyncTask <- function(task, ...) {
+  tryCatch({
+    completed(task)
+  }, error = function(ex) FALSE)
+}
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# AsyncTask specific
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 add_finalizer <- function(...) UseMethod("add_finalizer")
 
 add_finalizer.AsyncTask <- function(task, ...) {
@@ -98,7 +116,6 @@ print.AsyncTask <- function(x, ...) {
 #' @export completed
 #' @export failed
 #' @export expired
-#' @export value
 #' @export error
 #' @keywords internal
 status <- function(...) UseMethod("status")
@@ -106,8 +123,8 @@ finished <- function(...) UseMethod("finished")
 completed <- function(...) UseMethod("completed")
 failed <- function(...) UseMethod("failed")
 expired <- function(...) UseMethod("expired")
-value <- function(...) UseMethod("value")
 error <- function(...) UseMethod("error")
+
 
 #' Status of an AsyncTask
 #'
@@ -117,7 +134,6 @@ error <- function(...) UseMethod("error")
 #' @return A character vector.
 #'
 #' @export
-#' @importFrom BatchJobs getStatus
 #' @keywords internal
 status.AsyncTask <- function(task, ...) {
   stop("Not implemented for class ", class(task)[1])
@@ -130,6 +146,7 @@ finished.AsyncTask <- function(task, ...) {
   if (isNA(status)) return(NA)
   any(c("done", "error", "expired") %in% status)
 }
+
 
 #' @export
 #' @keywords internal
@@ -158,12 +175,6 @@ expired.AsyncTask <- function(task, ...) {
 
 #' @export
 #' @keywords internal
-value.AsyncTask <- function(task, ...) {
-  stop("Not implemented for class ", class(task)[1])
-}
-
-#' @export
-#' @keywords internal
 error.AsyncTask <- function(task, ...) {
   stop("Not implemented for class ", class(task)[1])
 }
@@ -185,7 +196,6 @@ error.AsyncTask <- function(task, ...) {
 #'
 #' @export
 #' @importFrom R.methodsS3 throw
-#' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
 await.AsyncTask <- function(task, ...) {
   stop("Not implemented for class ", class(task)[1])
@@ -195,6 +205,7 @@ await.AsyncTask <- function(task, ...) {
 #' Removes an asynchroneous task
 #'
 #' @param task The asynchronously task
+#' @param onRunning Action if task is running or appears to run.
 #' @param onFailure Action if failing to delete task.
 #' @param onMissing Action if task does not exist.
 #' @param maxTries The number of tries before giving up.
@@ -206,12 +217,11 @@ await.AsyncTask <- function(task, ...) {
 #' @return (invisibly) TRUE if deleted and FALSE otherwise.
 #'
 #' @export
-#' @export delete
-#' @aliases delete
-#' @importFrom BatchJobs removeRegistry
+#' @aliases delete.AsyncTask
 #' @keywords internal
+delete <- function(...) UseMethod("delete")
+
+#' @export
 delete.AsyncTask <- function(task, ...) {
   stop("Not implemented for class ", class(task)[1])
 }
-
-delete <- function(...) UseMethod("delete")

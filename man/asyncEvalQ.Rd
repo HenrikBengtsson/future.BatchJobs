@@ -62,7 +62,7 @@ values <- as.list(lenv)
 str(values)
 }
 \seealso{
-\code{\link{delayedAsyncAssign}()} and
+\code{\link[future]{futureAssign}()} and
 its corresponding operator \code{\link{\%<=\%}}.
 }
 \keyword{internal}
