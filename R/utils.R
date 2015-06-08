@@ -9,3 +9,10 @@ isFALSE <- function(x) {
   x <- unclass(x)
   identical(FALSE, x)
 }
+
+attachedPackages <- function() {
+  pkgs <- search()
+  pkgs <- grep("^package:", pkgs, value=TRUE)
+  pkgs <- gsub("^package:", "", pkgs)
+  pkgs
+}
