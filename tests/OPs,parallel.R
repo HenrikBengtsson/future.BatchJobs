@@ -1,10 +1,11 @@
-R.utils::use()
-use("async")
+library("async")
+library("R.utils")
+
 ## Make sure not to clash with R.utils
 `%<-%` <- async::`%<-%`
 
 ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
+oopts <- options(future=async, warn=1, "async::debug"=TRUE)
 obe <- backend(c("multicore=2", "local"))
 
 rm(list=intersect(c("x", "y"), ls()))

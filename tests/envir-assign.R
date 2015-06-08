@@ -1,5 +1,6 @@
-R.utils::use()
-use("async")
+library("async")
+library("R.utils")
+
 ## Make sure not to clash with R.utils
 `%<-%` <- async::`%<-%`
 

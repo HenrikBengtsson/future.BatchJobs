@@ -1,3 +1,4 @@
+options(future=async)
 backend(c("multicore", "local"))
 
 ## A global variable

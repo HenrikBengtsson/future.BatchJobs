@@ -1,5 +1,5 @@
-R.utils::use()
-use("async")
+library("async")
+library("R.utils")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
