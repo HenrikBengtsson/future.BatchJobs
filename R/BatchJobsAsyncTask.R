@@ -95,6 +95,7 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Future API
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#' @importFrom future value
 #' @export
 #' @keywords internal
 value.BatchJobsAsyncTask <- function(task, onCondition=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {

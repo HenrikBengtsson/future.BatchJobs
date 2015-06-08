@@ -25,7 +25,7 @@ be assigned.}
 \code{substitute()}:d or not.}
 }
 \value{
-A \code{\link{Future}} invisibly.
+A \code{\link[future]{Future}} invisibly.
 }
 \description{
 Method and infix operators for delayed assignments

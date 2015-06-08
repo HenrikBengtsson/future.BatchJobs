@@ -13,7 +13,7 @@
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
 #'
-#' @return A \code{\link{Future}} invisibly.
+#' @return A \code{\link[future]{Future}} invisibly.
 #'
 #' @example incl/delayedAsyncAssign_OP.R
 #'
@@ -25,6 +25,7 @@
 #' and the name of the future is \code{.future_<name>}.
 #' The future is also returned invisibly.
 #'
+#' @importFrom future future value
 #' @aliases %<=% %=>%
 #' @export
 #' @export %<=% %=>%

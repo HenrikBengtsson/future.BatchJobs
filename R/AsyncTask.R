@@ -9,6 +9,7 @@
 #' @return An AsyncTask object
 #'
 #' @export
+#' @importFrom future Future
 #' @importFrom R.utils mprint
 #' @keywords internal
 AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
@@ -42,6 +43,7 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
 # Future API
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+#' @importFrom future isResolved
 #' @export
 #' @keywords internal
 isResolved.AsyncTask <- function(task, ...) {
