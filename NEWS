@@ -1,7 +1,7 @@
 Package: async
 ==============
 
-Version: 0.3.9-9000 [2015-06-08]
+Version: 0.4.0 [2015-06-08]
 o CLEANUP: Extract Future API and moved to new package 'future'.
 o Now delayedAsyncAssign() returns a Future.
 o BUG FIX: The existance of .BatchJobs.R would override
