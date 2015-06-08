@@ -39,16 +39,16 @@ message("*** %<=% on listenv: Potential task name clashes")
 u <- listenv()
 u$a %<=% 1
 stopifnot(identical(names(u), "a"))
-tu <- inspect(u$a)
+fu <- futureOf(u$a)
 
 v <- listenv()
 v$a %<=% 2
 stopifnot(identical(names(v), "a"))
-tv <- inspect(v$a)
-stopifnot(!identical(tu, tv))
+fv <- futureOf(v$a)
+stopifnot(!identical(fu, fv))
 
-tu <- inspect(u$a)
-stopifnot(!identical(tu, tv))
+fu <- futureOf(u$a)
+stopifnot(!identical(fu, fv))
 
 stopifnot(identical(u$a, 1))
 stopifnot(identical(v$a, 2))

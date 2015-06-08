@@ -6,6 +6,7 @@
 #'
 #' @export
 #' @importFrom listenv listenv
+#' @importFrom future futureOf
 AsyncListEnv <- function(...) {
   x <- listenv(...)
   class(x) <- c("AsyncListEnv", class(x))
@@ -59,7 +60,7 @@ status.AsyncListEnv <- function(x, ...) {
   res <- vector("list", length=nx)
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
-    task <- inspect(x[[kk]], ..., mustExist=FALSE)
+    task <- futureOf(x[[kk]], ..., mustExist=FALSE)
     if (inherits(task, "AsyncTask"))
       res[[kk]] <- status(task)
   }
@@ -72,7 +73,7 @@ finished.AsyncListEnv <- function(x, ...) {
   res <- logical(length=nx)
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
-    task <- inspect(x[[kk]], ..., mustExist=FALSE)
+    task <- futureOf(x[[kk]], ..., mustExist=FALSE)
     if (inherits(task, "AsyncTask"))
       res[kk] <- finished(task)
   }
@@ -85,7 +86,7 @@ completed.AsyncListEnv <- function(x, ...) {
   res <- logical(length=nx)
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
-    task <- inspect(x[[kk]], ..., mustExist=FALSE)
+    task <- futureOf(x[[kk]], ..., mustExist=FALSE)
     if (inherits(task, "AsyncTask"))
       res[kk] <- completed(task)
   }
@@ -98,7 +99,7 @@ failed.AsyncListEnv <- function(x, ...) {
   res <- logical(length=nx)
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
-    task <- inspect(x[[kk]], ..., mustExist=FALSE)
+    task <- futureOf(x[[kk]], ..., mustExist=FALSE)
     if (inherits(task, "AsyncTask"))
       res[kk] <- failed(task)
   }
@@ -111,7 +112,7 @@ expired.AsyncListEnv <- function(x, ...) {
   res <- logical(length=nx)
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
-    task <- inspect(x[[kk]], ..., mustExist=FALSE)
+    task <- futureOf(x[[kk]], ..., mustExist=FALSE)
     if (inherits(task, "AsyncTask"))
       res[kk] <- expired(task)
   }
@@ -124,7 +125,7 @@ error.AsyncListEnv <- function(x, ...) {
   res <- vector("list", length=nx)
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
-    task <- inspect(x[[kk]], ..., mustExist=FALSE)
+    task <- futureOf(x[[kk]], ..., mustExist=FALSE)
     if (inherits(task, "AsyncTask"))
       res[kk] <- list(error(task))
   }
@@ -137,7 +138,7 @@ value.AsyncListEnv <- function(x, ...) {
   res <- vector("list", length=nx)
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
-    task <- inspect(x[[kk]], ..., mustExist=FALSE)
+    task <- futureOf(x[[kk]], ..., mustExist=FALSE)
     if (inherits(task, "AsyncTask"))
       res[kk] <- list(value(task))
   }

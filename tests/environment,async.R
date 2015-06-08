@@ -30,17 +30,17 @@ u <- new.env()
 u$a %<=% 1
 stopifnot(length(u) == 2)
 stopifnot("a" %in% names(u))
-tu <- inspect(u$a)
+fu <- futureOf(u$a)
 
 v <- new.env()
 v$a %<=% 2
 stopifnot(length(v) == 2)
 stopifnot("a" %in% names(v))
-tv <- inspect(v$a)
-stopifnot(!identical(tu, tv))
+fv <- futureOf(v$a)
+stopifnot(!identical(fu, fv))
 
-tu <- inspect(u$a)
-stopifnot(!identical(tu, tv))
+fu <- futureOf(u$a)
+stopifnot(!identical(fu, fv))
 
 stopifnot(identical(u$a, 1))
 stopifnot(identical(v$a, 2))

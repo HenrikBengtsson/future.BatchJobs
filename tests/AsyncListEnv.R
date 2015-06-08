@@ -8,22 +8,22 @@ obe <- backend(c("multicore=2", "local"))
 message("*** AsyncListEnv: Allocation (empty)")
 x <- AsyncListEnv()
 print(x)
-stopifnot(is.na(inspect(x[[1]])))
+stopifnot(is.na(futureOf(x[[1]], mustExist=FALSE)))
 
 
 message("*** AsyncListEnv: Assignment by name")
 x$a <- 1
-stopifnot(is.na(inspect(x$a)))
-stopifnot(is.na(inspect(x[[1]])))
+stopifnot(is.na(futureOf(x$a, mustExist=FALSE)))
+stopifnot(is.na(futureOf(x[[1]], mustExist=FALSE)))
 
 
 message("*** AsyncListEnv: Assignment by index")
 x[[1]] <- 1.1
-stopifnot(is.na(inspect(x$a)))
-stopifnot(is.na(inspect(x[[1]])))
+stopifnot(is.na(futureOf(x$a, mustExist=FALSE)))
+stopifnot(is.na(futureOf(x[[1]], mustExist=FALSE)))
 
 x[[2]] <- 2
-stopifnot(is.na(inspect(x[[2]])))
+stopifnot(is.na(futureOf(x[[2]], mustExist=FALSE)))
 
 
 message("*** AsyncListEnv: Allocation (length 3)")
@@ -39,7 +39,7 @@ x$c %<=% { list(foo=3, bar=letters) }
 print(x)
 
 message("*** AsyncListEnv: Inspection")
-tasks <- inspect(envir=x)
+tasks <- futureOf(envir=x)
 print(tasks)
 
 
@@ -51,7 +51,7 @@ print(x)
 
 
 message("*** AsyncListEnv: Inspection")
-tasks <- inspect(envir=x)
+tasks <- futureOf(envir=x)
 print(tasks)
 if (any(failed(x))) print(error(x))
 
