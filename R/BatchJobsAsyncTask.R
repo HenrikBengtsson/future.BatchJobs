@@ -129,7 +129,9 @@ error.BatchJobsAsyncTask <- function(task, ...) {
   if (isNA(stat)) return(NULL)
 
   if (!finished(task)) {
-    throw(AsyncTaskError(sprintf("%s has not finished yet", class(task)[1L]), task=task))
+    msg <- sprintf("%s has not finished yet", class(task)[1L])
+    ex <- AsyncTaskError(msg, task=task)
+    throw(ex)
   }
 
   if (!"error" %in% stat) return(NULL)
@@ -233,20 +235,24 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
     } else if ("error" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobError: %s", error(task))
-      throw(AsyncTaskError(msg, task=task))
+      ex <- AsyncTaskError(msg, task=task)
+      throw(ex)
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      throw(AsyncTaskError(msg, task=task))
+      ex <- AsyncTaskError(msg, task=task)
+      throw(ex)
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
-      throw(AsyncTaskError(msg, task=task))
+      ex <- AsyncTaskError(msg, task=task)
+      throw(ex)
     }
     if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
-    throw(AsyncTaskError(msg, task=task))
+    ex <- AsyncTaskError(msg, task=task)
+    throw(ex)
   }
 
   ## Cleanup?
@@ -292,7 +298,8 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        throw(AsyncTaskError(msg, task=task))
+        ex <- AsyncTaskError(msg, task=task)
+        throw(ex)
       }
     }
     return(invisible(TRUE))
@@ -309,7 +316,8 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
       warning(msg)
       return(invisible(TRUE))
     } else if (onRunning == "error") {
-      throw(AsyncTaskError(msg, task=task))
+      ex <- AsyncTaskError(msg, task=task)
+      throw(ex)
     }
   }
 
@@ -331,7 +339,8 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        throw(AsyncTaskError(msg, task=task))
+        ex <- AsyncTaskError(msg, task=task)
+        throw(ex)
       }
     }
     return(invisible(FALSE))
