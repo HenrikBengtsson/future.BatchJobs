@@ -4,6 +4,7 @@ library("async")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
+plan(async)
 obe <- backend(c("multicore=2", "local"))
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,12 +65,12 @@ message("*** %<-% on listenv: Repeatedly using name and index subsetting")
 lenv <- listenv()
 for (ii in 1:3) {
   str(as.list(lenv))
-  
+
   message("List environment (name)")
   lenv$b %<-% 2
   print(lenv$b)
   stopifnot(lenv$b == 2)
-  
+
   message("List environment (index)")
   lenv[[3]] %<-% 3
   print(lenv[[3]])

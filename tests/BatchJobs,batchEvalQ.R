@@ -6,6 +6,7 @@ oopts <- options(warn=1, "async::debug"=TRUE)
 ## Important: If 'interactive' is used, the current evaluation
 ## environment is contaminated by the jobs, which will assign values,
 ## including the exported globals, to the current evaluation environment.
+plan(async)
 obe <- backend(c("multicore=2", "local"))
 
 tempRegistry <- async:::tempRegistry

@@ -1,4 +1,4 @@
-options(future=async)
+plan(async)
 backend(c("multicore", "local"))
 
 ## A global variable

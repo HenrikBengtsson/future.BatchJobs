@@ -3,6 +3,7 @@ library("R.utils")
 
 ovars <- ls(envir=globalenv())
 oopts <- options(warn=1, "async::debug"=TRUE)
+plan(async)
 obe <- backend(c("multicore=2", "local"))
 
 message("*** async() ...")

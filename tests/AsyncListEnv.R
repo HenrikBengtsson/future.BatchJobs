@@ -2,7 +2,8 @@ library("async")
 library("R.utils")
 
 ovars <- ls(envir=globalenv())
-oopts <- options(future=async, warn=1, "async::debug"=TRUE)
+oopts <- options(warn=1, "async::debug"=TRUE)
+plan(async)
 obe <- backend(c("multicore=2", "local"))
 
 message("*** AsyncListEnv: Allocation (empty)")
