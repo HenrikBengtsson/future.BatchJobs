@@ -2,9 +2,12 @@ source("incl/start.R")
 
 message("*** Assert backends ...")
 
+mcat(Backends to be tested:\n")
+mprint(TEST_BACKENDS)
+
 env <- new.env()
 lenv <- listenv()
-for (be in c("interactive", "local", "multicore=2")) {
+for (be in TEST_BACKENDS) {
   message("*** Backend: ", be)
   backend(be)
 
