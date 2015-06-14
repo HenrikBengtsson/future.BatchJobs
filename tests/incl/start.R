@@ -13,8 +13,10 @@ plan(batchjobs)
 ## environment is contaminated by the jobs, which will assign values,
 ## including the exported globals, to the current evaluation environment.
 if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
+  TEST_BACKENDS <- c("interactive", "local", "multicore=2")
   backend(c("multicore=2", "local"))
 } else {
+  TEST_BACKENDS <- c("interactive", "local")
   backend("local")
 }
 
