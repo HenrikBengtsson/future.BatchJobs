@@ -1,29 +1,27 @@
-Copyright Henrik Bengtsson, 2015
-
 ## Asynchronous evaluation
 _Asynchronous evaluation_ is a method for evaluating multiple R
 expressions in, typically, a parallel or distributed fashion such that
-the "observed" total time for computing all values is less that if
-the expressions would be evaluated synchronously (sequentially).
-
+the "observed" total time for computing all values is less that if the
+expressions would be evaluated synchronously (sequentially).
 For instance, the following evaluation, which is synchronous, takes about 10 seconds to complete:
 
 ```r
 > x <- { Sys.sleep(5); 3.14 }
 > y <- { Sys.sleep(5); 2.71 }
-> z <- x + y
+> x + y
 [1] 5.85
 ```
 
 whereas the following _asynchronous_ evaluation only takes
-about 5 seconds to complete when done on a
-multi-core system:
+about 5 seconds to complete since it done in parallel on multiple cores:
 
 ```r
 > library('async')
+> plan(batchjobs, backend='multicore')
+>
 > x %<=% { Sys.sleep(5); 3.14 }
 > y %<=% { Sys.sleep(5); 2.71 }
-> z <- x + y
+> x + y
 [1] 5.85
 ```
 
@@ -63,7 +61,7 @@ d <- runif(1)
 the third asynchronous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchronous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).  This pause can be avoided using nested asynchronous evaluation (see Section below).
 
 
-_Footnotes_:  
+_Footnotes_:
 (\*) Since the asynchronous environment may be in a separate R session
 on a physically different machine, the "inheritance" of "global"
 variables is achieved by first identifying which variables in the
@@ -73,7 +71,7 @@ This has to be taken into consideration when working with large
 objects, which can take a substantial time to serialize.  Serialized
 objects may also be written to file which then a compute node reads
 back in. The global environments are identified using code inspection,
-cf. the [codetools] package.  
+cf. the [codetools] package.
 (\*\*) There is currently no lazy-evaluation mechanism for global
 variables from asynchronous evaluations.  However, theoretically, one
 could imagine that parts of an asynchronous expression can be
@@ -159,10 +157,10 @@ Error: BatchJobError: 'Error in eval(expr, envir = envir) : Whoops! '
 This error is rethrown each time `e` is retrieved, so it is not
 possible to "inspect" `e` any further using standard R functions such
 as `print()` and `str()`.
-In order to troubleshoot an error, one can use the `inspect()` function
-to retrieve the underlying asynchronous "task" object, e.g.
+In order to troubleshoot an error, one can use the `futureOf()` function
+to retrieve the underlying Future object, e.g.
 ```r
-> inspect(e)
+> futureOf(e)
 AsyncTask:
 Expression:
   {
@@ -295,8 +293,7 @@ str(as.list(files))
 This package is only available via GitHub.  Install in R as:
 
 ```s
-source('http://callr.org/install#HenrikBengtsson/listenv')
-source('http://callr.org/install#HenrikBengtsson/globals')
+source('http://callr.org/install#listenv,globals')
 source('http://callr.org/install#UCSF-CBC/future')
 source('http://callr.org/install#UCSF-CBC/async')
 ```
@@ -313,12 +310,15 @@ on remote hosts, e.g. over ssh.  If that would be possible, then one
 can imagine doing things such as:
 ```r
 # The world's computer resources at your R prompt
+library(async)
+plan(batchjobs)
+
 tasks %<=% {
   update.packages()
 } %backends% c("local", "cluster", "AmazonEC2", "GoogleCompEngine")
 
 tcga %<=% {
-  backend("cluster")
+  plan(batchjobs, backend="cluster")
 
   a %<=% {
     doCRMAv2("BreastCancer", chipType="GenomeWideSNP_6")
@@ -332,7 +332,7 @@ tcga %<=% {
 } %backend% "AmazonEC2"
 
 hapmap %<=% {
-  backend("cluster")
+  plan(batchjobs, backend="cluster")
 
   normals %<=% {
     doCRMAv2("HapMap2", chipType="GenomeWideSNP_6")
@@ -340,6 +340,7 @@ hapmap %<=% {
 
   normals
 } %backend% "GoogleCompEngine"
+
 ```
 Obviously great care needs to be taken in order to minimize the amount
 of data sent back and forth, e.g. returning really large objects.
@@ -416,3 +417,6 @@ see the [BatchJobs configuration] wiki page.
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 [codetools]: http://cran.r-project.org/package=codetools
 [BiocParallel]: http://bioconductor.org/packages/release/bioc/html/BiocParallel.html
+
+---
+Copyright Henrik Bengtsson, 2015

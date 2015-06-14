@@ -71,7 +71,8 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
       sizes <- sort(sizes, decreasing=TRUE)
       sizes <- head(sizes, n=3L)
       largest <- sprintf("%s (%g Mb)", sQuote(names(sizes)), sizes/1024^2)
-      throw(sprintf("The total size of all global objects that need to be exported for the asynchronous expression is %g Mb. This exceeds the maximum allowed size of %g Mb (option 'async::maxSizeOfGlobals'). The top largest objects are %s", totalExportSize/1024^2, maxSizeOfGlobals/1024^2, hpaste(largest, lastCollapse=" and ")))
+      msg <- sprintf("The total size of all global objects that need to be exported for the asynchronous expression is %g Mb. This exceeds the maximum allowed size of %g Mb (option 'async::maxSizeOfGlobals'). The top largest objects are %s", totalExportSize/1024^2, maxSizeOfGlobals/1024^2, hpaste(largest, lastCollapse=" and "))
+      throw(msg)
     }
   }
 
@@ -106,6 +107,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     keep <- grepl("^[.a-zA-Z]", names(globals))
     globals <- globals[keep]
     if (debug && !all(keep)) {
+      ## covr: skip=2
       mcat("Filtered globals:\n")
       mstr(globals)
     }

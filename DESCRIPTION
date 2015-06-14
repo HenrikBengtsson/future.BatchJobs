@@ -1,5 +1,5 @@
 Package: async
-Version: 0.4.0
+Version: 0.4.1
 Depends:
   R (>= 3.1.2),
   listenv,
@@ -11,10 +11,10 @@ Imports:
   R.methodsS3,
   R.oo,
   R.utils
-Title: Asynchronous Evaluation
+Title: Asynchronous Future Evaluation
 Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
                                           email = "henrikb@braju.com"))
-Description: Easy asynchronous evaluation of R expressions based on the Future API defined by the 'future' package and automatically handling of global variables the with help of the 'globals' package.
+Description: Simplified parallel and distributed processing via the 'BatchJobs' framework, e.g. 'fit %<=% { glm(y ~ x) }'.  This package extends the Future API of the 'future' package.
 License: Private for now [will become LGPL (>= 2.1) when published]
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/async

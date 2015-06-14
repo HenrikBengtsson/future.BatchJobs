@@ -47,6 +47,7 @@ print.AsyncListEnv <- function(x, ...) {
   if (length(idxs) == 0L) {
     printf("Expired tasks: [0] <none>\n")
   } else {
+    ## covr: skip=3
     labels <- names(idxs)
     if (is.null(labels)) labels <- idxs
     printf("Expired tasks: [%d] %s\n", length(idxs), hpaste(sQuote(labels)))

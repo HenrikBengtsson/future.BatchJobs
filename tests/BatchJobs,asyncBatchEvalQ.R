@@ -1,14 +1,9 @@
-library("async")
-library("R.utils")
+source("incl/start.R")
 
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-obe <- backend(c("multicore=2", "local"))
-
-message("*** asyncBatchEvalQ()")
+message("*** asyncBatchEvalQ() ...")
 
 message("Creating temporary batch registry")
-reg <- async:::tempRegistry()
+reg <- tempRegistry()
 
 message("Setting up expressions")
 a <- 1
@@ -53,16 +48,19 @@ mprintf("d=%g\n", d)
 stopifnot(d == 4)
 
 
+message("asyncBatchEvalQ() with explicit globals")
+reg2 <- tempRegistry()
+ids <- asyncBatchEvalQ(reg2, exprs=exprs["D"], globals=list(a=8))
+mprint(ids)
+
+
 message("Protect against large globals (being exported)")
-oopts2 <- options(future=async, "async::maxSizeOfGlobals"=100)
+oopts2 <- options("async::maxSizeOfGlobals"=100)
 a <- 1:100
 res <- try(b %<=% { x <- a + 1 })
 stopifnot(inherits(res, "try-error"))
 options(oopts2)
 
-message("Cleanup")
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+message("*** asyncBatchEvalQ() ... DONE")
 
-message("DONE!")
+source("incl/end.R")

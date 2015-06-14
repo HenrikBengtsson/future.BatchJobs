@@ -1,23 +1,25 @@
 #' Explicit asynchroneous evaluation
 #'
-#' \code{async()} evaluates an expression asynchroneous and
-#' \code{await()} retrieves its value.
+#' \code{async()} evaluates an expression asynchroneous.
 #'
 #' @param expr An R expression to be evaluated
 #' @param envir The environment from which global environment
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
-#' \code{substitute()}:d or not.
+#'                   \code{substitute()}:d or not.
+#' @param ... Optional arguments.
 #'
 #' @return \code{async()} returns an AsyncTask object.
 #'
 #' @rdname async
 #' @export
-async <- function(expr, envir=parent.frame(), substitute=TRUE) {
+async <- function(expr, envir=parent.frame(), substitute=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
-  BatchJobsAsyncTask(expr=expr, envir=envir, substitute=FALSE)
+  BatchJobsAsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
 }
 
+#' Awaits an asynchroneous evaluation
+#'
 #' @param task An \code{AsyncTask} object whose value to retrieve.
 #' @param ... Not used.
 #'
@@ -29,6 +31,5 @@ async <- function(expr, envir=parent.frame(), substitute=TRUE) {
 #' and no longer available for subsequent calls.  If called
 #' again, an error is thrown.
 #'
-#' @rdname async
 #' @export
 await <- function(task, ...) UseMethod("await")

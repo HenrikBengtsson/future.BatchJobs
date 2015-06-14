@@ -1,9 +1,4 @@
-library("async")
-library("R.utils")
-
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-obe <- backend(c("multicore=2", "local"))
+source("incl/start.R")
 
 message("*** async() ...")
 
@@ -27,11 +22,10 @@ stopifnot(v == a)
 ## An asynchroneous future with errors
 f <- async({ x <- 3; stop("Woops!"); x })
 print(f)
-v <- value(f, onCondition="return")
+v <- value(f, onError="return")
 print(v)
 
 res <- tryCatch({
-  ## Default is onCondition="signal"
   v <- value(f)
   print(v)
   v
@@ -44,6 +38,4 @@ stopifnot(is.null(res))
 
 message("*** async() ... OK")
 
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+source("incl/end.R")

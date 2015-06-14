@@ -1,7 +1,6 @@
-library("async")
-unlink(".async_foo", recursive=TRUE)
+source("incl/start.R")
 
-oopts <- options(future=async, warn=1, "async::debug"=TRUE)
+message("*** Assert backends ...")
 
 env <- new.env()
 lenv <- listenv()
@@ -25,15 +24,18 @@ for (be in c("interactive", "local", "multicore=2")) {
   env$b %<=% be
   print(env$b)
   stopifnot(env$b == be)
-  
+
   message(" - Async evaluation (list environment - name)")
   lenv$b %<=% be
   print(lenv$b)
   stopifnot(lenv$b == be)
-  
+
   message(" - Async evaluation (list environment - index)")
   lenv[[3]] %<=% be
   print(lenv[[3]])
   stopifnot(lenv[[3]] == be)
 }
 
+message("*** Assert backends ... DONE")
+
+source("incl/end.R")

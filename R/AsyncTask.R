@@ -43,10 +43,10 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
 # Future API
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#' @importFrom future isResolved
+#' @importFrom future resolved
 #' @export
 #' @keywords internal
-isResolved.AsyncTask <- function(task, ...) {
+resolved.AsyncTask <- function(task, ...) {
   tryCatch({
     completed(task)
   }, error = function(ex) FALSE)

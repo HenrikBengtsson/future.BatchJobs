@@ -1,4 +1,4 @@
-backend(c("multicore", "local"))
+plan(batchjobs, backend=c("multicore", "local"))
 
 ## A global variable
 a <- 1

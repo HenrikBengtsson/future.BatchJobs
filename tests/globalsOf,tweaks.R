@@ -1,7 +1,13 @@
-library("async")
+source("incl/start.R")
 library("globals")
 
-tweakExpression <- async:::tweakExpression
+message("*** tweakExpression() ...")
+
+expr <- substitute({ a <<- 1; b <- 2; 3 ->> c }, env=list())
+mprint(expr)
+exprT <- tweakExpression(expr)
+mprint(exprT)
+
 
 b <- 2
 exprs <- list(
@@ -23,10 +29,14 @@ truth <- list(
 for (kk in seq_along(exprs)) {
   name <- names(exprs)[kk]
   expr <- exprs[[kk]]
-  cat(sprintf("Expression #%d ('%s'):", kk, name))
-  print(expr)
+  mprintf("Expression #%d ('%s'):", kk, name)
+  mprint(expr)
   globals <- globalsOf(expr, tweak=tweakExpression)
   globals <- cleanup(globals)
-  str(globals)
+  mstr(globals)
   stopifnot(identical(names(globals), truth[[name]]))
 }
+
+message("*** tweakExpression() ... DONE")
+
+source("incl/end.R")

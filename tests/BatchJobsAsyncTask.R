@@ -1,8 +1,6 @@
-library("async")
+source("incl/start.R")
 
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-obe <- backend(c("multicore=2", "local"))
+message("*** BatchJobsAsyncTask() ...")
 
 task <- BatchJobsAsyncTask({ x <- 1 })
 print(task)
@@ -10,7 +8,6 @@ print(task)
 try(print(delete(task)))
 try(print(delete(task)))
 
+message("*** BatchJobsAsyncTask() ... DONE")
 
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+source("incl/end.R")

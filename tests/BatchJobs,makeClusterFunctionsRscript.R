@@ -1,5 +1,9 @@
-library("async")
-makeClusterFunctionsRscript <- async:::makeClusterFunctionsRscript
+source("incl/start.R")
+
+message("*** makeClusterFunctionsRscript() ...")
 
 print(makeClusterFunctionsRscript())
 
+message("*** makeClusterFunctionsRscript() ... DONE")
+
+source("incl/end.R")

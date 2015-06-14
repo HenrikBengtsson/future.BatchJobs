@@ -14,7 +14,7 @@
 #' @importFrom R.utils mcat mstr mprint mprintf
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, finalize=getOption("async::finalize", TRUE), launch=TRUE, ...) {
+BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), launch=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
 
   ## 1. Setup task
@@ -24,7 +24,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
   ## 2. Add backend to task
-  reg <- tempRegistry()
+  reg <- tempRegistry(backend=backend)
   if (debug) mprint(reg)
   id <- asyncBatchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
   task$backend <- list(reg=reg, id=id)
@@ -98,8 +98,8 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 #' @importFrom future value
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(task, onCondition=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
-  onCondition <- match.arg(onCondition)
+value.BatchJobsAsyncTask <- function(task, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
+  onError <- match.arg(onError)
   onMissing <- match.arg(onMissing)
 
   stat <- status(task)
@@ -111,7 +111,7 @@ value.BatchJobsAsyncTask <- function(task, onCondition=c("signal", "return"), on
   value <- tryCatch({
     await(task, cleanup=FALSE)
   }, simpleError = function(ex) {
-    if (onCondition == "signal") signalCondition(ex)
+    if (onError == "signal") throw(ex)
     ex
   })
 
@@ -129,7 +129,9 @@ error.BatchJobsAsyncTask <- function(task, ...) {
   if (isNA(stat)) return(NULL)
 
   if (!finished(task)) {
-    throw(AsyncTaskError(sprintf("%s has not finished yet", class(task)[1L]), task=task))
+    msg <- sprintf("%s has not finished yet", class(task)[1L])
+    ex <- AsyncTaskError(msg, task=task)
+    throw(ex)
   }
 
   if (!"error" %in% stat) return(NULL)
@@ -233,20 +235,24 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
     } else if ("error" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobError: %s", error(task))
-      throw(AsyncTaskError(msg, task=task))
+      ex <- AsyncTaskError(msg, task=task)
+      throw(ex)
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      throw(AsyncTaskError(msg, task=task))
+      ex <- AsyncTaskError(msg, task=task)
+      throw(ex)
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
-      throw(AsyncTaskError(msg, task=task))
+      ex <- AsyncTaskError(msg, task=task)
+      throw(ex)
     }
     if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
-    throw(AsyncTaskError(msg, task=task))
+    ex <- AsyncTaskError(msg, task=task)
+    throw(ex)
   }
 
   ## Cleanup?
@@ -292,7 +298,8 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        throw(AsyncTaskError(msg, task=task))
+        ex <- AsyncTaskError(msg, task=task)
+        throw(ex)
       }
     }
     return(invisible(TRUE))
@@ -309,7 +316,8 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
       warning(msg)
       return(invisible(TRUE))
     } else if (onRunning == "error") {
-      throw(AsyncTaskError(msg, task=task))
+      ex <- AsyncTaskError(msg, task=task)
+      throw(ex)
     }
   }
 
@@ -331,7 +339,8 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        throw(AsyncTaskError(msg, task=task))
+        ex <- AsyncTaskError(msg, task=task)
+        throw(ex)
       }
     }
     return(invisible(FALSE))

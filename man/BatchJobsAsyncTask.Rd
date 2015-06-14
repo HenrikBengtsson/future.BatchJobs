@@ -5,7 +5,8 @@
 \title{Create an asynchroneous task}
 \usage{
 BatchJobsAsyncTask(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  finalize = getOption("async::finalize", TRUE), launch = TRUE, ...)
+  backend = NULL, finalize = getOption("async::finalize", TRUE),
+  launch = TRUE, ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
