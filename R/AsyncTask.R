@@ -173,6 +173,25 @@ error.AsyncTask <- function(task, ...) {
 }
 
 
+
+#' Starts an asynchroneous task
+#'
+#' @param task The asynchronously task.
+#' @param ... Not used.
+#'
+#' @return The the started task.
+#'
+#' @export
+#' @keywords internal
+run <- function(task, ...) UseMethod("run")
+
+#' @export
+#' @keywords internal
+run.AsyncTask <- function(task, ...) {
+  stop("Not implemented for class ", class(task)[1])
+}
+
+
 #' Awaits an asynchroneous task
 #'
 #' @param task The asynchronously task

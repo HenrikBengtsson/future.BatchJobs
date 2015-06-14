@@ -5,40 +5,34 @@
 #' should be located.
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
+#' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
+#' @param ... Additional arguments pass to \code{\link{AsyncTask}()}.
 #'
-#' @return An AsyncTask object
+#' @return A BatchJobsAsyncTask object
 #'
 #' @export
-#' @importFrom R.utils mcat mstr mprint mprintf
+#' @importFrom R.utils mprint
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), launch=TRUE, ...) {
+BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
-
-  ## 1. Setup task
-  task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
 
   debug <- getOption("async::debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
-  ## 2. Add backend to task
+  ## 1. Create BatchJobs registry
   reg <- tempRegistry(backend=backend)
   if (debug) mprint(reg)
-  id <- asyncBatchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
-  task$backend <- list(reg=reg, id=id)
+
+  ## 2. Create BatchJobsAsyncTask object
+  task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
+  task$backend <- list(reg=reg, id=NA_integer_)
   task <- structure(task, class=c("BatchJobsAsyncTask", class(task)))
-  if (debug) mprintf("Created task #%d\n", id)
 
   ## Register finalizer?
   if (finalize) task <- add_finalizer(task)
-
-  ## 3. Launch task?
-  if (launch) {
-    submitJobs(reg, ids=id)
-    if (debug) mprintf("Launched task #%d\n", id)
-  }
 
   task
 }
@@ -83,6 +77,7 @@ status.BatchJobsAsyncTask <- function(task, ...) {
   if (!file_test("-d", reg$file.dir)) return(NA_character_)
 
   id <- backend$id
+  if (is.na(id)) return("not submitted")
   status <- getStatus(reg, ids=id)
   status <- (unlist(status) == 1L)
   status <- status[status]
@@ -143,6 +138,35 @@ error.BatchJobsAsyncTask <- function(task, ...) {
   msg <- paste(sQuote(msg), collapse=", ")
   msg
 } # error()
+
+
+#' Starts an asynchronously task
+#'
+#' @param task The asynchronously task.
+#' @param ... Not used.
+#'
+#' @export
+#' @keywords internal
+run.BatchJobsAsyncTask <- function(task, ...) {
+  debug <- getOption("async::debug", FALSE)
+  if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+
+  reg <- task$backend$reg
+  stopifnot(inherits(reg, "Registry"))
+
+  ## 1. Create
+  id <- asyncBatchEvalQ(reg, exprs=list(task$expr), envir=task$envir, globals=TRUE)
+
+  ## 2. Update
+  task$backend$id <- id
+  if (debug) mprintf("Created %s future #%d\n", class(task)[1], id)
+
+  ## 3. Submit
+  submitJobs(reg, ids=id)
+  if (debug) mprintf("Launched future #%d\n", id)
+
+  task
+}
 
 
 #' Retrieves the value of of the asynchronously evaluated expression

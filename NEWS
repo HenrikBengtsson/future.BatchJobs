@@ -2,6 +2,8 @@ Package: async
 ==============
 
 Version: 0.4.1-9000 [2015-06-14]
+o CLEANUP: BatchJobsAsyncTask no longer registers/submits jobs.
+o Added run() for BatchJobsAsyncTask.
 o CLEANUP: Dropped async() - now batchjobs().
 o CLEANUP: Dropped makeClusterFunctionsRscript().
 o CLEANUP: Dropped delayed assignment %<-% infix operator.
