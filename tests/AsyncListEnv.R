@@ -1,10 +1,6 @@
-library("async")
-library("R.utils")
+source("incl/start.R")
 
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-plan(async)
-obe <- backend(c("multicore=2", "local"))
+message("*** AsyncListEnv ...")
 
 message("*** AsyncListEnv: Allocation (empty)")
 x <- AsyncListEnv()
@@ -70,7 +66,6 @@ if (any(failed(x))) print(error(x))
 print(value(x))
 
 
-## Cleanup
-backend(obe)
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+message("*** AsyncListEnv ... DONE")
+
+source("incl/end.R")

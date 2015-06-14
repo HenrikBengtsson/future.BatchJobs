@@ -5,7 +5,10 @@
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
-#' @param ... Additional arguments pass to \code{\link{BatchJobsAsyncTask}()}.
+#' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
+#' @param finalize If TRUE, any underlying registries are
+#' deleted when this object is garbage collected, otherwise not.
+#' @param ... Additional arguments pass to \code{\link{AsyncTask}()}.
 #'
 #' @return Returns a BatchJobsAsyncTask object that also is
 #' a \link[future]{Future}.

@@ -1,11 +1,6 @@
-library("async")
-## Make sure not to clash with R.utils
-`%<-%` <- async::`%<-%`
+source("incl/start.R")
 
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-plan(async)
-obe <- backend(c("multicore=2", "local"))
+message("*** %<-% to environments ...")
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Delayed assignment (infix operator)
@@ -58,7 +53,6 @@ z <- new.env()
 res <- try(z[[1]] %<-% { 1 }, silent=TRUE)
 stopifnot(inherits(res, "try-error"))
 
+message("*** %<-% to environments ... DONE")
 
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+source("incl/end.R")

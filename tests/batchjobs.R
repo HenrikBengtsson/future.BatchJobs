@@ -1,8 +1,4 @@
-library("async")
-library("R.utils")
-
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
+source("incl/start.R")
 
 message("*** batchjobs() ...")
 
@@ -24,7 +20,7 @@ stopifnot(v == a)
 
 
 ## An asynchroneous future with errors
-f <- batchjobs({ x <- 3; stop("Woops!"); x })
+f <- batchjobs({ x <- 5; stop("Woops!"); x })
 print(f)
 v <- value(f, onError="return")
 print(v)
@@ -78,6 +74,4 @@ stopifnot(inherits(res, "try-error"))
 
 message("*** batchjobs() ... OK")
 
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+source("incl/end.R")

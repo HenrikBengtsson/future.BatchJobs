@@ -1,13 +1,6 @@
-library("async")
-library("R.utils")
+source("incl/start.R")
 
-## Make sure not to clash with R.utils
-`%<-%` <- async::`%<-%`
-
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-plan(async)
-obe <- backend(c("multicore=2", "local"))
+message("*** Asynchronous assignment to environments ...")
 
 message("** Non-asynchronous assignment to environment")
 env <- new.env()
@@ -17,10 +10,10 @@ env[["b"]] %<-% { 2 }
 key <- "c"
 env[[key]] %<-% { 3 }
 
-print(ls(envir=env))
-printf("env$a=%s\n", env$a)
-printf("env$b=%s\n", env$b)
-printf("env$c=%s\n", env$c)
+mprint(ls(envir=env))
+mprintf("env$a=%s\n", env$a)
+mprintf("env$b=%s\n", env$b)
+mprintf("env$c=%s\n", env$c)
 stopifnot(env$a == 1, env$b == 2, env$c == 3)
 
 
@@ -32,13 +25,12 @@ env[["b"]] %<=% { 2 }
 key <- "c"
 env[[key]] %<=% { 3 }
 
-print(ls(envir=env))
-printf("env$a=%s\n", env$a)
-printf("env$b=%s\n", env$b)
-printf("env$c=%s\n", env$c)
+mprint(ls(envir=env))
+mprintf("env$a=%s\n", env$a)
+mprintf("env$b=%s\n", env$b)
+mprintf("env$c=%s\n", env$c)
 stopifnot(env$a == 1, env$b == 2, env$c == 3)
 
+message("*** Asynchronous assignment to environments ... DONE")
 
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+source("incl/end.R")

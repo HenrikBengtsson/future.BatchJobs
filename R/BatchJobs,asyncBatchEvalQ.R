@@ -107,6 +107,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     keep <- grepl("^[.a-zA-Z]", names(globals))
     globals <- globals[keep]
     if (debug && !all(keep)) {
+      ## covr: skip=2
       mcat("Filtered globals:\n")
       mstr(globals)
     }

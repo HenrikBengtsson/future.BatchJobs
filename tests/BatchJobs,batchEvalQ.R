@@ -1,15 +1,6 @@
-library("BatchJobs")
-library("async")
+source("incl/start.R")
 
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-## Important: If 'interactive' is used, the current evaluation
-## environment is contaminated by the jobs, which will assign values,
-## including the exported globals, to the current evaluation environment.
-plan(async)
-obe <- backend(c("multicore=2", "local"))
-
-tempRegistry <- async:::tempRegistry
+message("*** batchEvalQ() ...")
 
 ## Global string, which should be found instead of base::url().
 url <- "http://www.r-project.org"
@@ -18,7 +9,7 @@ message("*** Function")
 fun <- function(...) {
   cat("URL:\n")
   print(url)
-  stopifnot(is.character(url), identical(url, "http://www.r-project.org"))
+##  stopifnot(is.character(url), identical(url, "http://www.r-project.org"))
 }
 print(fun)
 
@@ -34,7 +25,7 @@ message("*** Expression")
 expr <- substitute({
   cat("URL:\n")
   print(url)
-  stopifnot(is.character(url), identical(url, "http://www.r-project.org"))
+##  stopifnot(is.character(url), identical(url, "http://www.r-project.org"))
 }, env=list())
 print(expr)
 
@@ -61,7 +52,6 @@ res <- submitJobs(reg, ids=ids)
 print(res)
 
 
+message("*** batchEvalQ() ... DONE")
 
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+source("incl/end.R")

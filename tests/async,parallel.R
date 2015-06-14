@@ -1,10 +1,6 @@
-R.utils::use()
-use("async")
+source("incl/start.R")
 
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-plan(async)
-obe <- backend(c("multicore=2", "local"))
+message("*** async() - parallel ...")
 
 t0 <- Sys.time()
 print(t0)
@@ -22,7 +18,7 @@ print(t2)
 dt2 <- Sys.time() - t0
 print(dt2)
 
-t3 <- async({ x <- 3; Sys.sleep(5); stop("Woops!"); x })
+t3 <- async({ x <- 4; stop("Woops!"); x })
 print(t3)
 dt3 <- Sys.time() - t0
 print(dt3)
@@ -57,6 +53,6 @@ print(dt13)
 dt_all <- Sys.time() - t0
 print(dt_all)
 
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
+message("*** async() - parallel ... DONE")
+
+source("incl/end.R")

@@ -16,7 +16,12 @@ are search from.}
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
 
-\item{...}{Additional arguments pass to \code{\link{BatchJobsAsyncTask}()}.}
+\item{backend}{The BatchJobs backend to use, cf. \code{\link{backend}()}.}
+
+\item{finalize}{If TRUE, any underlying registries are
+deleted when this object is garbage collected, otherwise not.}
+
+\item{...}{Additional arguments pass to \code{\link{AsyncTask}()}.}
 }
 \value{
 Returns a BatchJobsAsyncTask object that also is

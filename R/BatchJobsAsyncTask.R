@@ -98,8 +98,8 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 #' @importFrom future value
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(task, onCondition=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
-  onCondition <- match.arg(onCondition)
+value.BatchJobsAsyncTask <- function(task, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
+  onError <- match.arg(onError)
   onMissing <- match.arg(onMissing)
 
   stat <- status(task)
@@ -111,7 +111,7 @@ value.BatchJobsAsyncTask <- function(task, onCondition=c("signal", "return"), on
   value <- tryCatch({
     await(task, cleanup=FALSE)
   }, simpleError = function(ex) {
-    if (onCondition == "signal") signalCondition(ex)
+    if (onError == "signal") throw(ex)
     ex
   })
 

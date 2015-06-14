@@ -11,10 +11,10 @@ Imports:
   R.methodsS3,
   R.oo,
   R.utils
-Title: Asynchronous Evaluation
+Title: Asynchronous Future Evaluation
 Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
                                           email = "henrikb@braju.com"))
-Description: Easy asynchronous evaluation of R expressions where global variables are taken of automatically.  This package provides an 'async future' that can be used with the Future API of the 'future' package.
+Description: Simplified parallel and distributed processing via the 'BatchJobs' framework, e.g. 'fit %<=% { glm(y ~ x) }'.  Switch type of backend is as easy as 'plan(batchjobs, backend="multicore")' and 'plan(batchjobs, backend=".BatchJobs.R")'.  This package extends the Future API of the 'future' package.
 License: Private for now [will become LGPL (>= 2.1) when published]
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/async

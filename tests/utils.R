@@ -1,7 +1,6 @@
-library("async")
+source("incl/start.R")
 
-isNA <- async:::isNA
-isFALSE <- async:::isFALSE
+message("*** Utility functions ...")
 
 stopifnot(isNA(NA), !isNA(TRUE), !isNA(FALSE), !isNA(1),
           !isNA(NULL), !isNA(1:2), !isNA(rep(NA,3)),
@@ -11,3 +10,6 @@ stopifnot(isFALSE(FALSE), !isFALSE(TRUE), !isFALSE(NA), !isFALSE(1),
           !isFALSE(NULL), !isFALSE(1:2), !isFALSE(rep(FALSE,3)),
           !isFALSE(rep(TRUE,3)), !isFALSE(letters))
 
+message("*** Utility functions ... DONE")
+
+source("incl/end.R")

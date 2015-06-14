@@ -1,13 +1,6 @@
-library("async")
-library("R.utils")
+source("incl/start.R")
 
-## Make sure not to clash with R.utils
-`%<-%` <- async::`%<-%`
-
-ovars <- ls(envir=globalenv())
-oopts <- options(warn=1, "async::debug"=TRUE)
-plan(async)
-obe <- backend(c("multicore=2", "local"))
+message("*** %<=% ...")
 
 rm(list=intersect(c("x", "y"), ls()))
 
@@ -41,8 +34,8 @@ stopifnot(!exists("x") || !identical(x, a))
 
 message("** Delayed asynchronous evaluation with errors")
 ## Test that async() works when there are errors
-v3 %<=% { x <- 3; stop("Woops!"); x }
-stopifnot(!exists("x") || !identical(x, 3))
+v3 %<=% { x <- 6; stop("Woops!"); x }
+stopifnot(!exists("x") || !identical(x, 6))
 
 message("** Delayed asynchronous evaluation with progress bar (~5s)")
 v4 %<=% {
@@ -105,8 +98,6 @@ stopifnot(a == 10)
 mprintf("b=%s\n", b)
 stopifnot(b == a + 1)
 
+message("*** %<=% ... DONE")
 
-## Cleanup
-options(oopts)
-rm(list=setdiff(ls(envir=globalenv()), ovars), envir=globalenv())
-
+source("incl/end.R")
