@@ -21,7 +21,6 @@ if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
 }
 
 tempRegistry <- async:::tempRegistry
-makeClusterFunctionsRscript <- async:::makeClusterFunctionsRscript
 tweakExpression <- async:::tweakExpression
 isNA <- async:::isNA
 isFALSE <- async:::isFALSE
