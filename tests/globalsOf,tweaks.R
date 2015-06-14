@@ -4,7 +4,7 @@ library("globals")
 message("*** tweakExpression() ...")
 
 expr <- substitute({ a <<- 1; b <- 2; 3 ->> c }, env=list())
-mprint(exprT)
+mprint(expr)
 exprT <- tweakExpression(expr)
 mprint(exprT)
 
