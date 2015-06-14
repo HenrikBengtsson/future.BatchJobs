@@ -1,9 +1,13 @@
 Package: async
 ==============
 
-Version: 0.4.0 [2015-06-14]
-o BatchJobsAsyncTask() and internal tempRegistry() gained 
+Version: 0.4.0-9000 [2015-06-14]
+o Add batchjobs() allowing for plan(batchjobs, backend="multicore").
+o BatchJobsAsyncTask() and internal tempRegistry() gained
   argument 'backend'.
+
+
+Version: 0.4.0 [2015-06-08]
 o CLEANUP: Extract Future API and moved to new package 'future'.
 o Now delayedAsyncAssign() returns a Future.
 o BUG FIX: The existance of .BatchJobs.R would override
