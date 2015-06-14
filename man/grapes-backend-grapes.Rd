@@ -4,7 +4,7 @@
 \alias{\%backend\%}
 \title{Evaluate asynchroneous expression on a specific backend}
 \usage{
-x %<-% { expr } %backend% backend
+x %<=% { expr } %backend% backend
 }
 \description{
 Evaluate asynchroneous expression on a specific backend

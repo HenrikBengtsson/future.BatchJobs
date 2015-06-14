@@ -4,25 +4,6 @@ message("*** %<=% ...")
 
 rm(list=intersect(c("x", "y"), ls()))
 
-message("** Delayed non-asynchronous evaluation")
-mprint(ls())
-v0 %<-% { print("Starting"); y <- 1; print("Finished"); y }
-mprint(ls())
-mprintf("v0=%s\n", v0)
-stopifnot(v0 == 1)
-mprint(ls())
-print(exists("y"))
-stopifnot(!exists("y") || !identical(y, 1))
-
-{ print("Starting"); y <- 1; print("Finished"); y } %->% v0
-mprint(ls())
-mprintf("v0=%s\n", v0)
-stopifnot(v0 == 1)
-mprint(ls())
-print(exists("y"))
-stopifnot(!exists("y") || !identical(y, 1))
-
-
 message("** Delayed asynchronous evaluation without globals")
 v1 %<=% { x <- 1 }
 stopifnot(!exists("x") || !identical(x, 1))
@@ -69,12 +50,6 @@ mprintf("v4=%s\n", v4)
 
 
 message("** Left-to-right assignments")
-a %<-% 1
-mprintf("a=%s\n", a)
-1 %->% b
-mprintf("b=%s\n", b)
-stopifnot(b == a)
-
 c %<=% 1
 mprintf("c=%s\n", c)
 1 %=>% d
@@ -85,9 +60,9 @@ stopifnot(d == c)
 
 message("** Nested asynchronous evaluation")
 a %<=% {
-  b %<-% 1
+  b <- 1
   c %<=% 2
-  3 %->% d
+  3 -> d
   4 %=>% e
   b + c + d + e
 }

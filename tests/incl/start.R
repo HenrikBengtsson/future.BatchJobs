@@ -20,9 +20,6 @@ if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
   backend("local")
 }
 
-## Make sure not to clash with R.utils
-`%<-%` <- async::`%<-%`
-
 tempRegistry <- async:::tempRegistry
 makeClusterFunctionsRscript <- async:::makeClusterFunctionsRscript
 tweakExpression <- async:::tweakExpression

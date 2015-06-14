@@ -1,6 +1,6 @@
 #' Evaluate asynchroneous expression on a specific backend
 #'
-#' @usage x %<-% { expr } %backend% backend
+#' @usage x %<=% { expr } %backend% backend
 #'
 #' @export
 #' @importFrom R.utils mprintf
