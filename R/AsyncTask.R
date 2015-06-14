@@ -108,7 +108,7 @@ print.AsyncTask <- function(x, ...) {
 #'
 #' @param ... Arguments passed to the S3 method
 #'
-#' @return A character vector.
+#' @return A logical or aA character vector.
 #'
 #' @aliases finished completed failed expired value error
 #' @export
@@ -126,13 +126,6 @@ expired <- function(...) UseMethod("expired")
 error <- function(...) UseMethod("error")
 
 
-#' Status of an AsyncTask
-#'
-#' @param task The asynchronously task
-#' @param ... Not used.
-#'
-#' @return A character vector.
-#'
 #' @export
 #' @keywords internal
 status.AsyncTask <- function(task, ...) {
@@ -180,7 +173,7 @@ error.AsyncTask <- function(task, ...) {
 }
 
 
-#' Retrieves the value of of the asynchronously evaluated expression
+#' Awaits an asynchroneous task
 #'
 #' @param task The asynchronously task
 #' @param cleanup If TRUE, the registry is completely removed upon
@@ -194,12 +187,23 @@ error.AsyncTask <- function(task, ...) {
 #' @return The value of the evaluated expression.
 #' If an error occurs, an informative Exception is thrown.
 #'
+#' #' @details
+#' Note that \code{await()} should only be called once, because
+#' after being called the actual asynchroneous task may be removed
+#' and will no longer available in subsequent calls.  If called
+#' again, an error may be thrown.
+#'
 #' @export
-#' @importFrom R.methodsS3 throw
+#' @keywords internal
+await <- function(task, ...) UseMethod("await")
+
+#' @export
 #' @keywords internal
 await.AsyncTask <- function(task, ...) {
   stop("Not implemented for class ", class(task)[1])
 }
+
+
 
 
 #' Removes an asynchroneous task

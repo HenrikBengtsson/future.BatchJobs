@@ -16,7 +16,7 @@ status(...)
 \item{...}{Arguments passed to the S3 method}
 }
 \value{
-A character vector.
+A logical or aA character vector.
 }
 \description{
 Status of an AsyncTask

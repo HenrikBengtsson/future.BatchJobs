@@ -14,7 +14,6 @@ v2 %<=% { x <- a }
 stopifnot(!exists("x") || !identical(x, a))
 
 message("** Delayed asynchronous evaluation with errors")
-## Test that async() works when there are errors
 v3 %<=% { x <- 6; stop("Woops!"); x }
 stopifnot(!exists("x") || !identical(x, 6))
 

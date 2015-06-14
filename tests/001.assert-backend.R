@@ -12,28 +12,28 @@ for (be in TEST_BACKENDS) {
   backend(be)
 
   message(" - Future and promise")
-  f <- async(be)
+  f <- future(be)
   print(f)
-  v <- await(f)
+  v <- value(f)
   print(v)
   stopifnot(v == be)
 
-  message(" - Async evaluation (current environment)")
+  message(" - Future evaluation (current environment)")
   a %<=% be
   print(a)
   stopifnot(a == be)
 
-  message(" - Async evaluation (environment)")
+  message(" - Future evaluation (environment)")
   env$b %<=% be
   print(env$b)
   stopifnot(env$b == be)
 
-  message(" - Async evaluation (list environment - name)")
+  message(" - Future evaluation (list environment - name)")
   lenv$b %<=% be
   print(lenv$b)
   stopifnot(lenv$b == be)
 
-  message(" - Async evaluation (list environment - index)")
+  message(" - Future evaluation (list environment - index)")
   lenv[[3]] %<=% be
   print(lenv[[3]])
   stopifnot(lenv[[3]] == be)
