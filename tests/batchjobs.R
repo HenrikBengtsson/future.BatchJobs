@@ -37,7 +37,6 @@ stopifnot(is.null(res))
 
 
 message("*** future() w/ plan(batchjobs) ... OK")
-plan(batchjobs, backend=c("multicore=2", "local"))
 
 message("- future() / value() ...")
 f <- future({
