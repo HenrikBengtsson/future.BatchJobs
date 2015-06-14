@@ -2,17 +2,26 @@
 #' @importFrom BatchJobs makeRegistry
 tempRegistry <- local({
   regs <- new.env()
-  function(prefix="async", file.dir=NULL, ...) {
+
+  function(backend=NULL, prefix="async", file.dir=NULL, ...) {
     id <- tempvar(prefix=prefix, value=NA, envir=regs)
     if (is.null(file.dir)) {
       file.dir <- file.path(getwd(), ".async", paste0(id, "-files"))
+    }
+
+    ## Use a non-default backend?
+    if (!is.null(backend)) {
+      obackend <- backend()
+      on.exit(options(obackend))
+      backend(backend)
     }
 
     ## If/when makeRegistry() attaches BatchJobs, we need
     ## to prevent it from overriding the configuration
     ## already set by backend().
     oopts <- options(BatchJobs.load.config=FALSE)
-    on.exit(options(oopts))
+    on.exit(options(oopts), add=TRUE)
+
     makeRegistry(id=id, file.dir=file.dir, ...)
   }
 })

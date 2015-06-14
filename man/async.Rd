@@ -2,12 +2,9 @@
 % Please edit documentation in R/async-await.R
 \name{async}
 \alias{async}
-\alias{await}
 \title{Explicit asynchroneous evaluation}
 \usage{
-async(expr, envir = parent.frame(), substitute = TRUE)
-
-await(task, ...)
+async(expr, envir = parent.frame(), substitute = TRUE, ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated}
@@ -18,23 +15,12 @@ are search from.}
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
 
-\item{task}{An \code{AsyncTask} object whose value to retrieve.}
-
-\item{...}{Not used.}
+\item{...}{Optional arguments.}
 }
 \value{
 \code{async()} returns an AsyncTask object.
-
-\code{await()} returns the value of the expression.
 }
 \description{
-\code{async()} evaluates an expression asynchroneous and
-\code{await()} retrieves its value.
-}
-\details{
-Note that \code{await()} should only be called once, because
-after being called the actual asynchroneous task is removed
-and no longer available for subsequent calls.  If called
-again, an error is thrown.
+\code{async()} evaluates an expression asynchroneous.
 }
 

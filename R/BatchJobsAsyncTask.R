@@ -14,7 +14,7 @@
 #' @importFrom R.utils mcat mstr mprint mprintf
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, finalize=getOption("async::finalize", TRUE), launch=TRUE, ...) {
+BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), launch=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
 
   ## 1. Setup task
@@ -24,7 +24,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
   ## 2. Add backend to task
-  reg <- tempRegistry()
+  reg <- tempRegistry(backend=backend)
   if (debug) mprint(reg)
   id <- asyncBatchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
   task$backend <- list(reg=reg, id=id)
