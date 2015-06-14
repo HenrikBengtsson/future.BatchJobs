@@ -2,7 +2,7 @@ source("incl/start.R")
 
 message("*** Assert backends ...")
 
-mcat(Backends to be tested:\n")
+mcat("Backends to be tested:\n")
 mprint(TEST_BACKENDS)
 
 env <- new.env()
