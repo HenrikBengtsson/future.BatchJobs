@@ -20,24 +20,15 @@ if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
   backend("local")
 }
 
+attachedPackages <- async:::attachedPackages
 tempRegistry <- async:::tempRegistry
 tweakExpression <- async:::tweakExpression
 isNA <- async:::isNA
 isFALSE <- async:::isFALSE
-
-
-mcat <- function(...) message(..., appendLF=FALSE)
-
-mprintf <- function(...) mcat(sprintf(...))
-
-mprint <- function(..., appendLF=FALSE) {
-  bfr <- capture.output(print(...))
-  bfr <- paste(c(bfr, ""), collapse="\n")
-  message(bfr, appendLF=appendLF)
-}
-
-mstr <- function(..., appendLF=FALSE) {
-  bfr <- capture.output(str(...))
-  bfr <- paste(c(bfr, ""), collapse="\n")
-  message(bfr, appendLF=appendLF)
-}
+trim <- async:::trim
+hpaste <- async:::hpaste
+printf <- async:::printf
+mcat <- async:::mcat
+mprintf <- async:::mprintf
+mprint <- async:::mprint
+mstr <- async:::mstr

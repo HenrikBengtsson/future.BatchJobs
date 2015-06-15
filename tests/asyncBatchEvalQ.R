@@ -49,7 +49,7 @@ stopifnot(d == 4)
 
 
 message("asyncBatchEvalQ() with explicit globals")
-reg2 <- tempRegistry()
+reg2 <- tempRegistry(backend="local")
 ids <- asyncBatchEvalQ(reg2, exprs=exprs["D"], globals=list(a=8))
 mprint(ids)
 
