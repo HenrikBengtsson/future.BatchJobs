@@ -68,7 +68,7 @@
 #' @importFrom tools file_path_as_absolute
 #' @importFrom utils file_test
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
-#' @importFrom R.utils use mprint mprintf mstr
+#' @importFrom R.utils mprint mprintf mstr
 backend <- local({
   aliases = list(
     default = c(".BatchJobs.R", "multicore-1", "multicore",
