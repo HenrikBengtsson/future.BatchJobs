@@ -13,7 +13,6 @@
 #' @return A BatchJobsAsyncTask object
 #'
 #' @export
-#' @importFrom R.utils mprint
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
 BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), ...) {
@@ -44,7 +43,6 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
 #' @param ... Not used.
 #'
 #' @export
-#' @importFrom R.utils printf
 #' @keywords internal
 print.BatchJobsAsyncTask <- function(x, ...) {
   NextMethod("print")
@@ -185,7 +183,6 @@ run.BatchJobsAsyncTask <- function(task, ...) {
 #'
 #' @export
 #' @importFrom R.methodsS3 throw
-#' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
 await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {

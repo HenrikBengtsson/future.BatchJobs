@@ -3,7 +3,6 @@
 #' @usage x %<=% { expr } %backend% backend
 #'
 #' @export
-#' @importFrom R.utils mprintf
 `%backend%` <- function(x, y) {
   lhs <- substitute(x)
   backend <- y

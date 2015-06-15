@@ -19,7 +19,6 @@ AsyncListEnv <- function(...) {
 #' @param ... Not used.
 #'
 #' @export
-#' @importFrom R.utils hpaste
 #' @keywords internal
 print.AsyncListEnv <- function(x, ...) {
   printf("%s:\n", class(x)[1])

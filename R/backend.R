@@ -68,7 +68,6 @@
 #' @importFrom tools file_path_as_absolute
 #' @importFrom utils file_test
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
-#' @importFrom R.utils mprint mprintf mstr
 backend <- local({
   aliases = list(
     default = c(".BatchJobs.R", "multicore-1", "multicore",
@@ -247,8 +246,6 @@ backend <- local({
 
 # Check whether user specifies 'cluster.functions' in one of
 # the .BatchJobs.R files that BatchJobs loads.
-#
-#' @importFrom R.utils mprint
 hasUserClusterFunctions <- function(pathnames=NULL, debug=FALSE) {
   ns <- getNamespace("BatchJobs")
   findConfigs <- get("findConfigs", mode="function", envir=ns)

@@ -14,7 +14,6 @@
 #'
 #' @export
 #' @importFrom globals globalsOf as.Globals packagesOf cleanup
-#' @importFrom R.utils hpaste mcat mstr
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 #' @keywords internal
 asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.frame(), ...) {

@@ -10,7 +10,6 @@
 #'
 #' @export
 #' @importFrom future Future
-#' @importFrom R.utils mprint
 #' @keywords internal
 AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
@@ -22,13 +21,6 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
 
   debug <- getOption("async::debug", FALSE)
   if (debug) { mcat("Expression:\n"); mprint(expr) }
-
-##  ## Inject loading of 'async' in case of nested asynchroneous evaluation
-##  expr <- substitute({
-##    R.utils::use("async")
-##    a
-##  }, list(a=expr))
-##  if (debug) { mcat("Expression (injected):\n"); mprint(expr) }
 
   ## Setup return value
   task <- list(
@@ -88,8 +80,6 @@ add_finalizer.AsyncTask <- function(task, ...) {
 #' @param ... Not used.
 #'
 #' @export
-#' @importFrom R.utils captureOutput
-#' @importFrom R.utils printf
 #' @keywords internal
 print.AsyncTask <- function(x, ...) {
   printf("%s:\n", class(x)[1L])
