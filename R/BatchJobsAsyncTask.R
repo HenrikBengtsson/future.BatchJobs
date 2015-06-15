@@ -27,7 +27,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
 
   ## 2. Create BatchJobsAsyncTask object
   task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
-  task$backend <- list(reg=reg, id=NA_integer_)
+  task$backend <- list(reg=reg, cluster.functions=NULL, id=NA_integer_)
   task <- structure(task, class=c("BatchJobsAsyncTask", class(task)))
 
   ## Register finalizer?
@@ -53,6 +53,7 @@ print.BatchJobsAsyncTask <- function(x, ...) {
     printf("%s: Not found (happens when finished and deleted)\n", class(reg))
   } else {
     print(reg)
+    printf("Cluster functions: %s\n", sQuote(backend$cluster.functions$name))
   }
 }
 
@@ -146,6 +147,13 @@ error.BatchJobsAsyncTask <- function(task, ...) {
 #' @export
 #' @keywords internal
 run.BatchJobsAsyncTask <- function(task, ...) {
+  getClusterFunctions <- function() {
+    ns <- getNamespace("BatchJobs")
+    getBatchJobsConf <- get("getBatchJobsConf", envir=ns, mode="function")
+    getClusterFunctions <- get("getClusterFunctions", envir=ns, mode="function")
+    getClusterFunctions(getBatchJobsConf())
+  }
+
   debug <- getOption("async::debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
@@ -158,6 +166,9 @@ run.BatchJobsAsyncTask <- function(task, ...) {
   ## 2. Update
   task$backend$id <- id
   if (debug) mprintf("Created %s future #%d\n", class(task)[1], id)
+
+  ## 3. Record
+  task$backend$cluster.functions <- getClusterFunctions()
 
   ## 3. Submit
   submitJobs(reg, ids=id)
