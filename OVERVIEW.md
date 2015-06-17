@@ -294,7 +294,7 @@ This package is only available via GitHub.  Install in R as:
 
 ```s
 source('http://callr.org/install#listenv,globals')
-source('http://callr.org/install#UCSF-CBC/future')
+source('http://callr.org/install#HenrikBengtsson/future')
 source('http://callr.org/install#UCSF-CBC/async')
 ```
 
