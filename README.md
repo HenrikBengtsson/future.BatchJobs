@@ -295,8 +295,7 @@ str(as.list(files))
 This package is only available via GitHub.  Install in R as:
 
 ```s
-source('http://callr.org/install#listenv,globals')
-source('http://callr.org/install#UCSF-CBC/future')
+install.packages('future')
 source('http://callr.org/install#UCSF-CBC/async')
 ```
 
