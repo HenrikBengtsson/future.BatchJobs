@@ -13,22 +13,8 @@
 #' @keywords internal
 AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
-
-  # Argument 'envir':
-  if (!is.environment(envir))
-    stop("Argument 'envir' is not an environment: ", class(envir)[1L])
-
-
-  debug <- getOption("async::debug", FALSE)
-  if (debug) { mcat("Expression:\n"); mprint(expr) }
-
-  ## Setup return value
-  task <- list(
-    expr=expr,
-    envir=envir
-  )
-  task <- structure(task, class=c("AsyncTask", class(task)))
-  Future(task)
+  f <- Future(expr=expr, envir=envir)
+  structure(f, class=c("AsyncTask", class(f)))
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

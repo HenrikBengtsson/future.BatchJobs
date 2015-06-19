@@ -27,8 +27,9 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
 
   ## 2. Create BatchJobsAsyncTask object
   task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
-  task$backend <- list(reg=reg, cluster.functions=NULL, id=NA_integer_)
   task <- structure(task, class=c("BatchJobsAsyncTask", class(task)))
+
+  task$backend <- list(reg=reg, cluster.functions=NULL, id=NA_integer_)
 
   ## Register finalizer?
   if (finalize) task <- add_finalizer(task)
@@ -96,20 +97,30 @@ value.BatchJobsAsyncTask <- function(task, onError=c("signal", "return"), onMiss
   onError <- match.arg(onError)
   onMissing <- match.arg(onMissing)
 
+  value <- task$value
+  if (task$state == 'finished') {
+    return(value)
+  } else if (task$state == 'failed') {
+    if (onError == "signal") stop(value)
+    return(value)
+  }
+
   stat <- status(task)
   if (isNA(stat)) {
     if (onMissing == "default") return(default)
     stop(sprintf("The value no longer exists (or never existed) for Future of class ", paste(sQuote(class(task)), collapse=", ")))
   }
 
-  value <- tryCatch({
-    await(task, cleanup=FALSE)
+  tryCatch({
+    task$value <- await(task, cleanup=FALSE)
+    task$state <- 'finished'
   }, simpleError = function(ex) {
+    task$state <- 'failed'
     if (onError == "signal") throw(ex)
-    ex
+    task$value <- ex
   })
 
-  value
+  task$value
 } # value()
 
 
@@ -170,7 +181,8 @@ run.BatchJobsAsyncTask <- function(task, ...) {
   ## 3. Record
   task$backend$cluster.functions <- getClusterFunctions()
 
-  ## 3. Submit
+  ## 4. Submit
+  task$state <- 'running'
   submitJobs(reg, ids=id)
   if (debug) mprintf("Launched future #%d\n", id)
 

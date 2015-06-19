@@ -1,4 +1,5 @@
 source("incl/start.R")
+options("async::debug"=FALSE)
 
 message("*** batchjobs() ...")
 
@@ -25,15 +26,14 @@ print(f)
 v <- value(f, onError="return")
 print(v)
 
-res <- tryCatch({
-  v <- value(f)
-  print(v)
-  v
-}, error = function(ex) {
-  cat(ex$message)
-  NULL
-})
-stopifnot(is.null(res))
+res <- try(value(f), silent=TRUE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+## Error is repeated
+res <- try(value(f), silent=TRUE)
+print(res)
+stopifnot(inherits(res, "try-error"))
 
 
 message("*** future() w/ plan(batchjobs) ... OK")
@@ -66,6 +66,12 @@ v %<=% {
   stop("Woops!")
   x
 }
+
+res <- try(print(v), silent=TRUE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+## Error is repeated
 res <- try(print(v), silent=TRUE)
 print(res)
 stopifnot(inherits(res, "try-error"))
@@ -73,4 +79,4 @@ stopifnot(inherits(res, "try-error"))
 
 message("*** batchjobs() ... OK")
 
-source("incl/end.R")
+#source("incl/end.R")
