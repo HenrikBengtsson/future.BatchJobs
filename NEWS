@@ -1,7 +1,11 @@
 Package: async
 ==============
 
-Version: 0.4.1-9000 [2015-06-14]
+Version: 0.4.2-9000 [2015-06-14]
+o Adjusted to future (>= 0.5.1)
+
+
+Version: 0.4.2 [2015-06-14]
 o Added demo("mandelbrot", package="async").
 o Added run() for BatchJobsAsyncTask.
 o CLEANUP: BatchJobsAsyncTask no longer registers/submits jobs.

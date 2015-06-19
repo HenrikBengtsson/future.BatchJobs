@@ -1,5 +1,4 @@
 source("incl/start.R")
-options("async::debug"=FALSE)
 
 message("*** batchjobs() ...")
 

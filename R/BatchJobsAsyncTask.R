@@ -93,34 +93,28 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 #' @importFrom future value
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(task, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
-  onError <- match.arg(onError)
-  onMissing <- match.arg(onMissing)
-
-  value <- task$value
-  if (task$state == 'finished') {
-    return(value)
-  } else if (task$state == 'failed') {
-    if (onError == "signal") stop(value)
-    return(value)
+value.BatchJobsAsyncTask <- function(future, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
+  ## Has the value already been collected?
+  if (future$state %in% c('finished', 'failed', 'interrupted')) {
+    return(NextMethod("value"))
   }
 
-  stat <- status(task)
+  stat <- status(future)
   if (isNA(stat)) {
+    onMissing <- match.arg(onMissing)
     if (onMissing == "default") return(default)
-    stop(sprintf("The value no longer exists (or never existed) for Future of class ", paste(sQuote(class(task)), collapse=", ")))
+    stop(sprintf("The value no longer exists (or never existed) for Future of class ", paste(sQuote(class(future)), collapse=", ")))
   }
 
   tryCatch({
-    task$value <- await(task, cleanup=FALSE)
-    task$state <- 'finished'
+    future$value <- await(future, cleanup=FALSE)
+    future$state <- 'finished'
   }, simpleError = function(ex) {
-    task$state <- 'failed'
-    if (onError == "signal") throw(ex)
-    task$value <- ex
+    future$state <- 'failed'
+    future$value <- ex
   })
 
-  task$value
+  NextMethod("value")
 } # value()
 
 
@@ -351,8 +345,7 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
 
 
   ## Does the task still run?  If so, then...
-  isRunning <- FALSE ## FIX ME: Code here!
-  if (isRunning) {
+  if (task$state == 'running') {
     if (onRunning == "skip") return(invisible(TRUE))
 
     msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running task: %s", sQuote(path))

@@ -17,19 +17,6 @@ AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
   structure(f, class=c("AsyncTask", class(f)))
 }
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Future API
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-#' @importFrom future resolved
-#' @export
-#' @keywords internal
-resolved.AsyncTask <- function(task, ...) {
-  tryCatch({
-    completed(task)
-  }, error = function(ex) FALSE)
-}
-
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # AsyncTask specific
@@ -39,22 +26,13 @@ add_finalizer <- function(...) UseMethod("add_finalizer")
 add_finalizer.AsyncTask <- function(task, ...) {
   ## Register finalizer (will clean up registries etc.)
 
-  ## Use a "dummy" environment for GC finalization
-  gcenv <- new.env()
-  gcenv$task <- task
-
-  reg.finalizer(gcenv, f=function(gcenv) {
-    task <- gcenv$task
-    gcenv$task <- NULL
+  reg.finalizer(task, f=function(gcenv) {
     if (inherits(task, "AsyncTask") && "async" %in% loadedNamespaces()) {
       try({
         delete(task, onRunning="skip", onMissing="ignore", onFailure="warning")
       })
     }
   }, onexit=TRUE)
-
-  task$.gcenv <- gcenv
-  gcenv <- NULL
 
   invisible(task)
 }
