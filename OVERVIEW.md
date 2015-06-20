@@ -1,5 +1,5 @@
 **UPDATE 2015-06-20**: This package has been updated to work with the
-  Future API provided by the [future] (>=0.6.0).  However, the
+  Future API provided by the [future] (>=0.6.0) package.  However, the
   internal code as well as the documentation (including the one below)
   could need some more cleanup in order to better match this new
   Future API.  Also, lots of the text below repeats what is now
