@@ -28,7 +28,6 @@ setConstructorS3("AsyncTaskError", function(..., task=NULL) {
 
 #' @export
 #' @importFrom R.oo getMessage
-#' @importFrom R.oo trim
 getMessage.AsyncTaskError <- function(x, ...) {
   msg <- R.oo::getMessage.Exception(x, ...)
   task <- x$task

@@ -13,10 +13,12 @@ tweakExpression <- function(expr) {
       if (op %in% c("<<-", "%<-%", "%<=%")) {
         lhs <- exprI[[2]]
         rhs <- exprI[[3]]
+        ## covr: skip=1
         expr[[ii]] <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
       } else if (op %in% c("->>", "%->%", "%=>%")) {
         lhs <- exprI[[3]]
         rhs <- exprI[[2]]
+        ## covr: skip=1
         expr[[ii]] <- substitute({a <- b; e}, list(a=lhs, b=rhs, e=exprI))
       }
     }, error=function(ex) {})

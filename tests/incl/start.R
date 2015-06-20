@@ -13,33 +13,23 @@ plan(batchjobs)
 ## environment is contaminated by the jobs, which will assign values,
 ## including the exported globals, to the current evaluation environment.
 if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
+  TEST_BACKENDS <- c("interactive", "local", "multicore=2")
   backend(c("multicore=2", "local"))
 } else {
+  TEST_BACKENDS <- c("interactive", "local")
   backend("local")
 }
 
-## Make sure not to clash with R.utils
-`%<-%` <- async::`%<-%`
-
+attachedPackages <- async:::attachedPackages
 tempRegistry <- async:::tempRegistry
-makeClusterFunctionsRscript <- async:::makeClusterFunctionsRscript
 tweakExpression <- async:::tweakExpression
 isNA <- async:::isNA
 isFALSE <- async:::isFALSE
+trim <- async:::trim
+hpaste <- async:::hpaste
+printf <- async:::printf
+mcat <- async:::mcat
+mprintf <- async:::mprintf
+mprint <- async:::mprint
+mstr <- async:::mstr
 
-
-mcat <- function(...) message(..., appendLF=FALSE)
-
-mprintf <- function(...) mcat(sprintf(...))
-
-mprint <- function(..., appendLF=FALSE) {
-  bfr <- capture.output(print(...))
-  bfr <- paste(c(bfr, ""), collapse="\n")
-  message(bfr, appendLF=appendLF)
-}
-
-mstr <- function(..., appendLF=FALSE) {
-  bfr <- capture.output(str(...))
-  bfr <- paste(c(bfr, ""), collapse="\n")
-  message(bfr, appendLF=appendLF)
-}

@@ -5,40 +5,34 @@
 #' should be located.
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
+#' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
+#' @param ... Additional arguments pass to \code{\link{AsyncTask}()}.
 #'
-#' @return An AsyncTask object
+#' @return A BatchJobsAsyncTask object
 #'
 #' @export
-#' @importFrom R.utils mcat mstr mprint mprintf
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), launch=TRUE, ...) {
+BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
-
-  ## 1. Setup task
-  task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
 
   debug <- getOption("async::debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
-  ## 2. Add backend to task
+  ## 1. Create BatchJobs registry
   reg <- tempRegistry(backend=backend)
   if (debug) mprint(reg)
-  id <- asyncBatchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
-  task$backend <- list(reg=reg, id=id)
+
+  ## 2. Create BatchJobsAsyncTask object
+  task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
   task <- structure(task, class=c("BatchJobsAsyncTask", class(task)))
-  if (debug) mprintf("Created task #%d\n", id)
+
+  task$backend <- list(reg=reg, cluster.functions=NULL, id=NA_integer_)
 
   ## Register finalizer?
   if (finalize) task <- add_finalizer(task)
-
-  ## 3. Launch task?
-  if (launch) {
-    submitJobs(reg, ids=id)
-    if (debug) mprintf("Launched task #%d\n", id)
-  }
 
   task
 }
@@ -50,7 +44,6 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
 #' @param ... Not used.
 #'
 #' @export
-#' @importFrom R.utils printf
 #' @keywords internal
 print.BatchJobsAsyncTask <- function(x, ...) {
   NextMethod("print")
@@ -61,6 +54,7 @@ print.BatchJobsAsyncTask <- function(x, ...) {
     printf("%s: Not found (happens when finished and deleted)\n", class(reg))
   } else {
     print(reg)
+    printf("Cluster functions: %s\n", sQuote(backend$cluster.functions$name))
   }
 }
 
@@ -83,6 +77,7 @@ status.BatchJobsAsyncTask <- function(task, ...) {
   if (!file_test("-d", reg$file.dir)) return(NA_character_)
 
   id <- backend$id
+  if (is.na(id)) return("not submitted")
   status <- getStatus(reg, ids=id)
   status <- (unlist(status) == 1L)
   status <- status[status]
@@ -98,24 +93,28 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 #' @importFrom future value
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(task, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
-  onError <- match.arg(onError)
-  onMissing <- match.arg(onMissing)
-
-  stat <- status(task)
-  if (isNA(stat)) {
-    if (onMissing == "default") return(default)
-    stop(sprintf("The value no longer exists (or never existed) for Future of class ", paste(sQuote(class(task)), collapse=", ")))
+value.BatchJobsAsyncTask <- function(future, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
+  ## Has the value already been collected?
+  if (future$state %in% c('finished', 'failed', 'interrupted')) {
+    return(NextMethod("value"))
   }
 
-  value <- tryCatch({
-    await(task, cleanup=FALSE)
+  stat <- status(future)
+  if (isNA(stat)) {
+    onMissing <- match.arg(onMissing)
+    if (onMissing == "default") return(default)
+    stop(sprintf("The value no longer exists (or never existed) for Future of class ", paste(sQuote(class(future)), collapse=", ")))
+  }
+
+  tryCatch({
+    future$value <- await(future, cleanup=FALSE)
+    future$state <- 'finished'
   }, simpleError = function(ex) {
-    if (onError == "signal") throw(ex)
-    ex
+    future$state <- 'failed'
+    future$value <- ex
   })
 
-  value
+  NextMethod("value")
 } # value()
 
 
@@ -145,6 +144,46 @@ error.BatchJobsAsyncTask <- function(task, ...) {
 } # error()
 
 
+#' Starts an asynchronously task
+#'
+#' @param task The asynchronously task.
+#' @param ... Not used.
+#'
+#' @export
+#' @keywords internal
+run.BatchJobsAsyncTask <- function(task, ...) {
+  getClusterFunctions <- function() {
+    ns <- getNamespace("BatchJobs")
+    getBatchJobsConf <- get("getBatchJobsConf", envir=ns, mode="function")
+    getClusterFunctions <- get("getClusterFunctions", envir=ns, mode="function")
+    getClusterFunctions(getBatchJobsConf())
+  }
+
+  debug <- getOption("async::debug", FALSE)
+  if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+
+  reg <- task$backend$reg
+  stopifnot(inherits(reg, "Registry"))
+
+  ## 1. Create
+  id <- asyncBatchEvalQ(reg, exprs=list(task$expr), envir=task$envir, globals=TRUE)
+
+  ## 2. Update
+  task$backend$id <- id
+  if (debug) mprintf("Created %s future #%d\n", class(task)[1], id)
+
+  ## 3. Record
+  task$backend$cluster.functions <- getClusterFunctions()
+
+  ## 4. Submit
+  task$state <- 'running'
+  submitJobs(reg, ids=id)
+  if (debug) mprintf("Launched future #%d\n", id)
+
+  task
+}
+
+
 #' Retrieves the value of of the asynchronously evaluated expression
 #'
 #' @param task The asynchronously task
@@ -161,7 +200,6 @@ error.BatchJobsAsyncTask <- function(task, ...) {
 #'
 #' @export
 #' @importFrom R.methodsS3 throw
-#' @importFrom R.utils mprint mprintf mstr
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
 await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
@@ -307,8 +345,7 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
 
 
   ## Does the task still run?  If so, then...
-  isRunning <- FALSE ## FIX ME: Code here!
-  if (isRunning) {
+  if (task$state == 'running') {
     if (onRunning == "skip") return(invisible(TRUE))
 
     msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running task: %s", sQuote(path))

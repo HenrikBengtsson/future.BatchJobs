@@ -14,7 +14,6 @@
 #'
 #' @export
 #' @importFrom globals globalsOf as.Globals packagesOf cleanup
-#' @importFrom R.utils hpaste mcat mstr
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 #' @keywords internal
 asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.frame(), ...) {
@@ -119,5 +118,8 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Batch process expressions
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  batchEvalQ(reg, exprs=exprs, local=TRUE, ...)
+  fun <- function(expr, ..., envir=globalenv()) {
+    eval(substitute(local(expr)), envir=envir)
+  }
+  batchMap(reg, fun=fun, exprs, ...)
 } # asyncBatchEvalQ()

@@ -17,28 +17,12 @@
 batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
-  debug <- getOption("async::debug", FALSE)
-  if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+  ## 1. Create
+  future <- BatchJobsAsyncTask(expr=expr, envir=envir, substitute=FALSE,
+                               backend=backend, finalize=finalize, ...)
 
-  ## 1. Create BatchJobs registry
-  reg <- tempRegistry(backend=backend)
-  if (debug) mprint(reg)
-
-  ## 2. Setup future
-  future <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
-
-  ## 3. Register/submit future
-  id <- asyncBatchEvalQ(reg, exprs=list(expr), globals=TRUE, envir=envir)
-  future$backend <- list(reg=reg, id=id)
-  future <- structure(future, class=c("BatchJobsAsyncTask", class(future)))
-  if (debug) mprintf("Created %s future #%d\n", class(future)[1], id)
-
-  ## 4. Register finalizer?
-  if (finalize) future <- add_finalizer(future)
-
-  ## 5. Launch processing
-  submitJobs(reg, ids=id)
-  if (debug) mprintf("Launched future #%d\n", id)
+  ## 2. Launch
+  future <- run(future)
 
   future
 }

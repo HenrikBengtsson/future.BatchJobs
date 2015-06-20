@@ -10,46 +10,11 @@
 #'
 #' @export
 #' @importFrom future Future
-#' @importFrom R.utils mprint
 #' @keywords internal
 AsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
-
-  # Argument 'envir':
-  if (!is.environment(envir))
-    stop("Argument 'envir' is not an environment: ", class(envir)[1L])
-
-
-  debug <- getOption("async::debug", FALSE)
-  if (debug) { mcat("Expression:\n"); mprint(expr) }
-
-##  ## Inject loading of 'async' in case of nested asynchroneous evaluation
-##  expr <- substitute({
-##    R.utils::use("async")
-##    a
-##  }, list(a=expr))
-##  if (debug) { mcat("Expression (injected):\n"); mprint(expr) }
-
-  ## Setup return value
-  task <- list(
-    expr=expr,
-    envir=envir
-  )
-  task <- structure(task, class=c("AsyncTask", class(task)))
-  Future(task)
-}
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Future API
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-#' @importFrom future resolved
-#' @export
-#' @keywords internal
-resolved.AsyncTask <- function(task, ...) {
-  tryCatch({
-    completed(task)
-  }, error = function(ex) FALSE)
+  f <- Future(expr=expr, envir=envir)
+  structure(f, class=c("AsyncTask", class(f)))
 }
 
 
@@ -61,22 +26,13 @@ add_finalizer <- function(...) UseMethod("add_finalizer")
 add_finalizer.AsyncTask <- function(task, ...) {
   ## Register finalizer (will clean up registries etc.)
 
-  ## Use a "dummy" environment for GC finalization
-  gcenv <- new.env()
-  gcenv$task <- task
-
-  reg.finalizer(gcenv, f=function(gcenv) {
-    task <- gcenv$task
-    gcenv$task <- NULL
+  reg.finalizer(task, f=function(gcenv) {
     if (inherits(task, "AsyncTask") && "async" %in% loadedNamespaces()) {
       try({
         delete(task, onRunning="skip", onMissing="ignore", onFailure="warning")
       })
     }
   }, onexit=TRUE)
-
-  task$.gcenv <- gcenv
-  gcenv <- NULL
 
   invisible(task)
 }
@@ -88,8 +44,6 @@ add_finalizer.AsyncTask <- function(task, ...) {
 #' @param ... Not used.
 #'
 #' @export
-#' @importFrom R.utils captureOutput
-#' @importFrom R.utils printf
 #' @keywords internal
 print.AsyncTask <- function(x, ...) {
   printf("%s:\n", class(x)[1L])
@@ -108,7 +62,7 @@ print.AsyncTask <- function(x, ...) {
 #'
 #' @param ... Arguments passed to the S3 method
 #'
-#' @return A character vector.
+#' @return A logical or aA character vector.
 #'
 #' @aliases finished completed failed expired value error
 #' @export
@@ -126,13 +80,6 @@ expired <- function(...) UseMethod("expired")
 error <- function(...) UseMethod("error")
 
 
-#' Status of an AsyncTask
-#'
-#' @param task The asynchronously task
-#' @param ... Not used.
-#'
-#' @return A character vector.
-#'
 #' @export
 #' @keywords internal
 status.AsyncTask <- function(task, ...) {
@@ -180,7 +127,26 @@ error.AsyncTask <- function(task, ...) {
 }
 
 
-#' Retrieves the value of of the asynchronously evaluated expression
+
+#' Starts an asynchroneous task
+#'
+#' @param task The asynchronously task.
+#' @param ... Not used.
+#'
+#' @return The the started task.
+#'
+#' @export
+#' @keywords internal
+run <- function(task, ...) UseMethod("run")
+
+#' @export
+#' @keywords internal
+run.AsyncTask <- function(task, ...) {
+  stop("Not implemented for class ", class(task)[1])
+}
+
+
+#' Awaits an asynchroneous task
 #'
 #' @param task The asynchronously task
 #' @param cleanup If TRUE, the registry is completely removed upon
@@ -194,12 +160,23 @@ error.AsyncTask <- function(task, ...) {
 #' @return The value of the evaluated expression.
 #' If an error occurs, an informative Exception is thrown.
 #'
+#' #' @details
+#' Note that \code{await()} should only be called once, because
+#' after being called the actual asynchroneous task may be removed
+#' and will no longer available in subsequent calls.  If called
+#' again, an error may be thrown.
+#'
 #' @export
-#' @importFrom R.methodsS3 throw
+#' @keywords internal
+await <- function(task, ...) UseMethod("await")
+
+#' @export
 #' @keywords internal
 await.AsyncTask <- function(task, ...) {
   stop("Not implemented for class ", class(task)[1])
 }
+
+
 
 
 #' Removes an asynchroneous task
