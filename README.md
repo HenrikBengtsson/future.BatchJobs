@@ -1,5 +1,14 @@
 # async: Asynchronous Future Evaluation
 
+**UPDATE 2015-06-20**: This package has been updated to work with the
+  Future API provided by the [future] (>=0.6.0).  However, the
+  internal code as well as the documentation (including the one below)
+  could need some more cleanup in order to better match this new
+  Future API.  Also, lots of the text below repeats what is now
+  already explained in the [future] documentation.
+  However, the instructions/examples below are still correct.
+
+
 ## Asynchronous evaluation
 _Asynchronous evaluation_ is a method for evaluating multiple R
 expressions in, typically, a parallel or distributed fashion such that
@@ -411,13 +420,15 @@ For further details and examples on how to configure BatchJobs,
 see the [BatchJobs configuration] wiki page.
 
 
-[listenv]: https://github.com/HenrikBengtsson/listenv/
-[async]: https://github.com/UCSF-CBC/async/
-[brew]: http://cran.r-project.org/package=brew
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
-[BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
-[codetools]: http://cran.r-project.org/package=codetools
 [BiocParallel]: http://bioconductor.org/packages/release/bioc/html/BiocParallel.html
+[brew]: http://cran.r-project.org/package=brew
+[codetools]: http://cran.r-project.org/package=codetools
+[globals]: http://cran.r-project.org/package=globals
+[future]: http://cran.r-project.org/package=future
+[listenv]: http://cran.r-project.org/package=listenv
+[async]: https://github.com/UCSF-CBC/async/
+[BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 
 ---
 Copyright Henrik Bengtsson, 2015
