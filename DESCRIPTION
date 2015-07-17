@@ -7,7 +7,6 @@ Depends:
 Imports:
   BatchJobs (>= 1.6.0),
   globals,
-  parallel,
   R.methodsS3,
   R.oo,
   R.utils

@@ -49,7 +49,7 @@ Switch backend to be used for asynchronous processing
  \item \code{"multicore"} -
    parallel processing using all available cores on the local machine.
    The number of available cores is inferred using
-   \code{\link{availableCores}()}.
+   \code{\link[future]{availableCores}()}.
    Note: Multicore processing is not supported on Windows.
    If explicitly specified, then an informative warning will be given,
    and it will be ignored.

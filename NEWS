@@ -1,6 +1,10 @@
 Package: async
 ==============
 
+Version: 0.5.0-9000 [2015-07-17]
+o Adjusted to future (>= 0.7.0).
+
+
 Version: 0.5.0 [2015-06-19]
 o Adjusted to future (>= 0.5.1).
 
