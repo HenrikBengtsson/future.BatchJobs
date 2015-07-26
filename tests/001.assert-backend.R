@@ -9,7 +9,7 @@ env <- new.env()
 lenv <- listenv()
 for (be in TEST_BACKENDS) {
   message("*** Backend: ", be)
-  backend(be)
+  plan(batchjobs, backend=be)
 
   message(" - Future and promise")
   f <- future(be)
