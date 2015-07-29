@@ -27,6 +27,8 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
 
   ## Identify globals?
   if (isTRUE(globals)) {
+    ns <- getNamespace("future")
+    tweakExpression <- get("tweakExpression", envir=ns, mode="function")
     globals <- globalsOf(exprs, envir=envir, tweak=tweakExpression, primitive=FALSE, base=FALSE, unlist=TRUE)
     if (debug) {
       mcat("Identified (non-primitive non-\"base\") globals:\n")

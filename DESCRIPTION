@@ -1,5 +1,5 @@
 Package: async
-Version: 0.5.0
+Version: 0.5.1
 Depends:
   R (>= 3.1.2),
   listenv,
@@ -7,7 +7,6 @@ Depends:
 Imports:
   BatchJobs (>= 1.6.0),
   globals,
-  parallel,
   R.methodsS3,
   R.oo,
   R.utils

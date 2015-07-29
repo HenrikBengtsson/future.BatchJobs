@@ -22,7 +22,6 @@ if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
 
 attachedPackages <- async:::attachedPackages
 tempRegistry <- async:::tempRegistry
-tweakExpression <- async:::tweakExpression
 isNA <- async:::isNA
 isFALSE <- async:::isFALSE
 trim <- async:::trim
@@ -32,4 +31,3 @@ mcat <- async:::mcat
 mprintf <- async:::mprintf
 mprint <- async:::mprint
 mstr <- async:::mstr
-

@@ -6,14 +6,15 @@ message("Creating temporary batch registry")
 reg <- tempRegistry()
 
 message("Setting up expressions")
-a <- 1
+g <- 1
 square <- function(x) x^2
 
 exprs <- list(
-  A = substitute({ Sys.sleep(5); x <- 0.1 }, env=list()),
-  B = substitute({ Sys.sleep(5); y <- 0.2 }, env=list()),
-  C = substitute({ Sys.sleep(5); z <- a+0.3 }, env=list()),
-  D = substitute({ x <- 1; w <- square(a+x) }, env=list())
+  A = substitute({ Sys.sleep(1); x <- 0.1 }, env=list()),
+  B = substitute({ Sys.sleep(1); y <- 0.2 }, env=list()),
+  C = substitute({ Sys.sleep(1); z <- g+0.3 }, env=list()),
+  D = substitute({ x <- 1; w <- square(g+x) }, env=list()),
+  E = substitute({ x <- listenv(); x$g <- g; x[[1]] }, env=list())
 )
 
 message("Adding expressions to batch registry")
@@ -46,6 +47,10 @@ stopifnot(c == 1.3)
 d <- loadResult(reg, id=ids[4])
 mprintf("d=%g\n", d)
 stopifnot(d == 4)
+
+e <- loadResult(reg, id=ids[5])
+mprintf("e=%g\n", e)
+stopifnot(e == 1)
 
 
 message("asyncBatchEvalQ() with explicit globals")
