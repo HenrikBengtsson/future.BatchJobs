@@ -32,7 +32,7 @@ getMessage.AsyncTaskError <- function(x, ...) {
   msg <- R.oo::getMessage.Exception(x, ...)
   task <- x$task
   if (!is.null(task)) {
-    info <- capture.output(print(task))
+    info <- captureOutput(print(task))
     info <- trim(info)
     info <- paste(info, collapse="; ")
     msg <- sprintf("%s [DEBUG INFORMATION: %s]", msg, info)

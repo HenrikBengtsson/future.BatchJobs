@@ -24,13 +24,14 @@ mcat <- function(...) message(..., appendLF=FALSE)
 mprintf <- function(...) message(sprintf(...), appendLF=FALSE)
 
 mprint <- function(...) {
-  bfr <- capture.output(print(...))
+  bfr <- captureOutput(print(...))
   bfr <- paste(c(bfr, ""), collapse="\n")
   message(bfr, appendLF=FALSE)
 }
 
+#' @importFrom utils str
 mstr <- function(...) {
-  bfr <- capture.output(str(...))
+  bfr <- captureOutput(str(...))
   bfr <- paste(c(bfr, ""), collapse="\n")
   message(bfr, appendLF=FALSE)
 }
@@ -68,6 +69,7 @@ hpaste <- function(..., sep="", collapse=", ", lastCollapse=NULL, maxHead=if (mi
 } # hpaste()
 
 ## Adopted R.utils 2.1.0 (2015-06-15)
+#' @importFrom utils capture.output
 captureOutput <- function(expr, envir=parent.frame(), ...) {
   res <- eval({
     file <- rawConnection(raw(0L), open="w")
