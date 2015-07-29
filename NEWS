@@ -1,6 +1,10 @@
 Package: async
 ==============
 
+Version: 0.5.1-9000 [2015-07-29]
+o ...
+
+
 Version: 0.5.1 [2015-07-29]
 o Adjusted to future (>= 0.7.0).
 o CLEANUP: Dropped functions and tests that are now in the
