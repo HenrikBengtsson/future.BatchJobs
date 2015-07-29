@@ -147,10 +147,10 @@ plan(batchjobs, backend="cluster")
 
 
 ### Evaluate asynchronous expression on specific backend
-Asynchronous expressions are processed by the default backend as given by `backend()`.  If another backend should be used to evaluate for a particular expression, operator `%backend%` can be used.  For example,
+Asynchronous expressions are processed by the default backend as given by `backend()`.  If another backend should be used to evaluate for a particular expression, operator `%plan%` can be used.  For example,
 ```r
-a %<=% { Sys.sleep(7); runif(1) } %backend% "multicore-2"
-b %<=% { Sys.sleep(2); rnorm(1) } %backend% "cluster"
+a %<=% { Sys.sleep(7); runif(1) } %plan% batchjobs(backend="multicore-2")
+b %<=% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="cluster-2")
 c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
@@ -161,7 +161,7 @@ Backend specifications can also be used in nested asynchronous evaluations:
 plan(batchjobs, backend="cluster")
 a %<=% { Sys.sleep(7); runif(1) }
 c %<=% {
-  b %<=% { Sys.sleep(2); rnorm(1) } %backend% "multicore=2"
+  b %<=% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="multicore=2")
   x <- a*b; Sys.sleep(2); abs(x)
 }
 d <- runif(1)
@@ -223,7 +223,7 @@ tcga %<=% {
   }
 
   list(a=a, b=b)
-} %backend% "AmazonEC2"
+} %plan% batchjobs(backend="AmazonEC2")
 
 hapmap %<=% {
   plan(batchjobs, backend="cluster")
@@ -233,7 +233,7 @@ hapmap %<=% {
   }
 
   normals
-} %backend% "GoogleCompEngine"
+} %plan% batchjobs(backend="GoogleCompEngine")
 
 ```
 Obviously great care needs to be taken in order to minimize the amount
