@@ -13,6 +13,7 @@
 #' @return Vector of type \code{integer} with job ids.
 #'
 #' @export
+#' @importFrom utils object.size head
 #' @importFrom globals globalsOf as.Globals packagesOf cleanup
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 #' @keywords internal

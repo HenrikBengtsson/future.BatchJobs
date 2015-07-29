@@ -39,9 +39,9 @@ stopifnot(z == x)
 backend("spare"=c("multicore-2", "local"))
 mprintf("Current backend: %s\n", backend(NULL))
 
-x %<=% { y / 2 } %backend% "interactive"
-y %<=% { 2*a } %backend% "local"
-z %<=% { y / 2 } %backend% "spare"
+x %<=% { y / 2 } %plan% batchjobs(backend="interactive")
+y %<=% { 2*a } %plan% batchjobs(backend="local")
+z %<=% { y / 2 } %plan% batchjobs(backend="spare")
 mprintf("x=%g\n", x)
 mprintf("y=%g\n", y)
 mprintf("z=%g\n", z)

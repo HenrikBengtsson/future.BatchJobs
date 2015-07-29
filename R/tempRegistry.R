@@ -12,7 +12,7 @@ tempRegistry <- local({
     ## Use a non-default backend?
     if (!is.null(backend)) {
       obackend <- backend()
-      on.exit(options(obackend))
+      on.exit(backend(obackend))
       backend(backend)
     }
 

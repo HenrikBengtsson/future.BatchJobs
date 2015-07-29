@@ -23,6 +23,12 @@ cluster.functions <- local({
     tmpl <- tmpl[1L]
     message(".BatchJobs.R: Package 'async' using torque template file'", tmpl, "'")
     makeClusterFunctionsTorque(tmpl)
+  } else if (backend == "ssh") {
+    makeClusterFunctionsSSH(
+      makeSSHWorker(nodename="n6", max.jobs=2),
+      makeSSHWorker(nodename="n8"),
+      makeSSHWorker(nodename="n12")
+    )
   } else {
     stop("Unknown backend: ", backend)
   }

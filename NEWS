@@ -1,6 +1,12 @@
 Package: async
 ==============
 
+Version: 0.5.2 [2015-07-30]
+o CLEANUP: Dropped %backend% - use %plan% backend(...) instead.
+o BUG FIX: batchjobs(..., backend="interactive") changed
+  also the default backend.
+
+
 Version: 0.5.1 [2015-07-29]
 o Adjusted to future (>= 0.7.0).
 o CLEANUP: Dropped functions and tests that are now in the
