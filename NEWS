@@ -1,6 +1,10 @@
 Package: async
 ==============
 
+Version: 0.5.2-9000 [2015-09-12]
+o batchjobs(sum(x, ...), globals=TRUE) now handles `...` properly.
+
+
 Version: 0.5.2 [2015-07-30]
 o CLEANUP: Dropped %backend% - use %plan% backend(...) instead.
 o BUG FIX: batchjobs(..., backend="interactive") changed

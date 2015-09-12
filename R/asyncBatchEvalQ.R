@@ -30,10 +30,35 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
   if (isTRUE(globals)) {
     ns <- getNamespace("future")
     tweakExpression <- get("tweakExpression", envir=ns, mode="function")
-    globals <- globalsOf(exprs, envir=envir, tweak=tweakExpression, primitive=FALSE, base=FALSE, unlist=TRUE)
+    globals <- globalsOf(exprs, envir=envir, tweak=tweakExpression, dotdotdot="return", primitive=FALSE, base=FALSE, unlist=TRUE)
     if (debug) {
       mcat("Identified (non-primitive non-\"base\") globals:\n")
       mstr(globals)
+    }
+
+    ## Tweak expression to be called with global ... arguments?
+    if (inherits(globals$`...`, "DotDotDotList")) {
+      ## Missing global '...'?
+      if (!is.list(globals$`...`)) {
+        stop("Did you mean to create the future within a function?  Invalid future expression tries to use global '...' variables that do not exist: ", paste(deparse(exprs), collapse="; "))
+      }
+
+      ## BatchJobs do not handle `<future-call-arguments>`, cf.
+      ## https://github.com/tudo-r/BatchJobs/issues/93
+      globals$`future.call.arguments` <- globals$`...`
+      globals$`...` <- NULL
+
+      ## To please R CMD check
+      a <- `future.call.arguments` <- NULL
+      rm(list=c("a", "future.call.arguments"))
+
+      for (kk in seq_along(exprs)) {
+        expr <- exprs[[kk]]
+        expr <- substitute({
+          do.call(function(...) a, args=`future.call.arguments`)
+        }, list(a=expr))
+        exprs[[kk]] <- expr
+      }
     }
   } else if (is.list(globals)) {
     globals <- as.Globals(globals)
