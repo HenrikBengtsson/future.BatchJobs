@@ -131,13 +131,25 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     ## BatchJobs::batchExport() validated names of globals using
     ## checkmate::assertList(more.args, names="strict") which doesn't
     ## like names such as "{", although they should be valid indeed.
+    ## Details: https://github.com/tudo-r/BatchJobs/issues/93
     keep <- grepl("^[.a-zA-Z]", names(globals))
-    globals <- globals[keep]
-    if (debug && !all(keep)) {
-      ## covr: skip=2
-      mcat("Filtered globals:\n")
-      mstr(globals)
+    if (!all(keep)) {
+      names <- names(globals)[!keep]
+      globals <- globals[keep]
+      msg <- sprintf("BatchJobs does not support exporting of variables with names that does not match pattern '[a-zA-Z0-9._-]+' (see https://github.com/tudo-r/BatchJobs/issues/93). The following objects were not exported: ", hpaste(sQuote(names)))
+      warning(msg)
+      if (debug) mcat(msg)
     }
+
+    ## BatchJobs::loadExports() ignores exported variables that
+    ## start with a period.
+    ## Details: https://github.com/tudo-r/BatchJobs/issues/103
+    bad <- grepl("^[.]", names(globals))
+    if (any(bad)) {
+      names <- names(globals)[bad]
+      stop("BatchJobs does not support exported variables that start with a period (see https://github.com/tudo-r/BatchJobs/issues/103): ", hpaste(sQuote(names)))
+    }
+
     if (length(globals) > 0L) batchExport(reg, li=globals)
   }
   rm(list=c("globals")) # Not needed anymore
