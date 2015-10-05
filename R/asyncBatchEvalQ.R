@@ -125,9 +125,13 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
 
 
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  ## Any globals to export?
+  ## Any globals to encode/decore to workaround various
+  ## BatchJobs limitations.
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  encodeGlobals <- FALSE
   if (length(globals) > 0L) {
+    globalsToEncode <- NULL
+
     ## BatchJobs::batchExport() validated names of globals using
     ## checkmate::assertList(more.args, names="strict") which doesn't
     ## like names such as "{", although they should be valid indeed.
@@ -135,9 +139,8 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     keep <- grepl("^[.a-zA-Z]", names(globals))
     if (!all(keep)) {
       names <- names(globals)[!keep]
-      globals <- globals[keep]
-      msg <- sprintf("BatchJobs does not support exporting of variables with names that does not match pattern '[a-zA-Z0-9._-]+' (see https://github.com/tudo-r/BatchJobs/issues/93). The following objects were not exported: %s", hpaste(sQuote(names)))
-      warning(msg)
+      globalsToEncode <- c(globalsToEncode, names)
+      msg <- sprintf("WORKAROUND: BatchJobs does not support exporting of variables with names that does not match pattern '[a-zA-Z0-9._-]+' (see https://github.com/tudo-r/BatchJobs/issues/93). Encoding/decoding the following global variables: %s", hpaste(sQuote(names)))
       if (debug) mcat(msg)
     }
 
@@ -147,19 +150,64 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     bad <- grepl("^[.]", names(globals))
     if (any(bad)) {
       names <- names(globals)[bad]
-      stop("BatchJobs does not support exported variables that start with a period (see https://github.com/tudo-r/BatchJobs/issues/103): ", hpaste(sQuote(names)))
+      globalsToEncode <- c(globalsToEncode, names)
+      msg <- sprintf("WORKAROUND: BatchJobs does not support exported variables that start with a period (see https://github.com/tudo-r/BatchJobs/issues/103). Encoding/decoding the following global variables: %s", hpaste(sQuote(names)))
+      if (debug) mcat(msg)
     }
 
-    if (length(globals) > 0L) batchExport(reg, li=globals)
+    ## Does any globals need to be encoded/decoded to workaround
+    ## the limitations of BatchJobs?
+    encodeGlobals <- (length(globalsToEncode) > 0L)
+    if (encodeGlobals) {
+      ## (a) URL encode global variable names
+      globalsToDecode <- sapply(globalsToEncode, FUN=utils::URLencode, reserved=TRUE)
+      ## (b) Append with 'R_ASYNC_RENAME_'
+      globalsToDecode <- paste("R_ASYNC_RENAME_", globalsToDecode, sep="")
+
+      ## (c) Rename corresponding globals
+      names <- names(globals)
+      idxs <- match(globalsToEncode, names)
+      names[idxs] <- globalsToDecode
+      names(globals) <- names
+
+      ## (d) Record variables which to be rename by the future
+      globals <- append(globals, list(R_ASYNC_GLOBALS_TO_RENAME=globalsToDecode))
+    }
   }
+
+
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  ## Any globals to export?
+  ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  if (length(globals) > 0L) batchExport(reg, li=globals)
   rm(list=c("globals")) # Not needed anymore
 
 
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   ## Batch process expressions
   ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  fun <- function(expr, ..., envir=globalenv()) {
-    eval(substitute(local(expr)), envir=envir)
+  ## Does some globals need to be encoded?
+  if (encodeGlobals) {
+    fun <- function(expr, ..., envir=globalenv()) {
+      eval(substitute({
+        print(R_ASYNC_GLOBALS_TO_RENAME)
+        print(ls(all.names=TRUE))
+        ## Decode exported globals (workaround for BatchJobs)
+        for (..key.. in R_ASYNC_GLOBALS_TO_RENAME) {
+          ..key2.. <- utils::URLdecode(sub("^R_ASYNC_RENAME_", "", ..key..))
+          str(list(..key..=..key.., ..key2..=..key2..))
+          assign(..key2.., get(..key.., inherits=FALSE), inherits=FALSE)
+        }
+        rm(list=c("..key..", "..key2..", "R_ASYNC_GLOBALS_TO_RENAME"))
+
+        local(expr)
+      }), envir=envir)
+    }
+  } else {
+    fun <- function(expr, ..., envir=globalenv()) {
+      eval(substitute(local(expr)), envir=envir)
+    }
   }
+
   batchMap(reg, fun=fun, exprs, ...)
 } # asyncBatchEvalQ()

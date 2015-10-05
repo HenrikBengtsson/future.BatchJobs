@@ -1,5 +1,5 @@
 Package: async
-Version: 0.5.2-9000
+Version: 0.5.9-9000
 Depends:
   R (>= 3.1.2),
   listenv,
