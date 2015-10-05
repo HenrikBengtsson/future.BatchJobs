@@ -1,12 +1,11 @@
 # async: Asynchronous Future Evaluation
 
-**UPDATE 2015-06-20**: This package has been updated to work with the
-  Future API provided by the [future] \(>= 0.6.0\) package.  However, the
-  internal code as well as the documentation (including the one below)
-  could need some more cleanup in order to better match this new
-  Future API.  Also, lots of the text below repeats what is now
-  already explained in the [future] documentation.
-  However, the instructions/examples below are still correct.
+## Introduction
+This package provides a Future API for the [BatchJobs] package by
+enhancing the [future] package.  For an introduction how to use
+futures in R, please consult the vignettes of the [future] package.
+A large fraction of the below text is just an adopted iteration
+of what is already documented in [future].
 
 
 ## Asynchronous evaluation
@@ -14,7 +13,8 @@ _Asynchronous evaluation_ is a method for evaluating multiple R
 expressions in, typically, a parallel or distributed fashion such that
 the "observed" total time for computing all values is less that if the
 expressions would be evaluated synchronously (sequentially).
-For instance, the following evaluation, which is synchronous, takes about 10 seconds to complete:
+For instance, the following evaluation, which is synchronous, takes
+about 10 seconds to complete:
 
 ```r
 > x <- { Sys.sleep(5); 3.14 }
@@ -23,8 +23,9 @@ For instance, the following evaluation, which is synchronous, takes about 10 sec
 [1] 5.85
 ```
 
-whereas the following _asynchronous_ evaluation only takes
-about 5 seconds to complete since it done in parallel on multiple cores:
+whereas the following _asynchronous_ evaluation using BatchJobs
+futures only takes about 5 seconds to complete since it done in
+parallel on multiple cores:
 
 ```r
 > library('async')
@@ -36,24 +37,35 @@ about 5 seconds to complete since it done in parallel on multiple cores:
 [1] 5.85
 ```
 
-
 ### Global variables
 
-Although the following expression is evaluated in an asynchronous environment - separated from the calling one - the asynchronous environment "inherits"(*) any "global" variables in the calling environment and its parents.  For example,
+Although the following expression is evaluated in an asynchronous
+environment - separated from the calling one - the asynchronous
+environment "inherits"(*) any "global" variables in the calling
+environment and its parents.  For example,
 ```r
 a <- 2
 y %<=% { b <- a*3.14; b }
 ```
 results in `y` being assigned `6.28`.
 
-If a global variable is one that is assigned by another asynchronous expression, then dependent asynchronous expressions will wait for the former to complete in order to resolve the global variables.  For example, in
+If a global variable is one that is assigned by another asynchronous
+expression, then dependent asynchronous expressions will wait for the
+former to complete in order to resolve the global variables.  For
+example, in
 ```r
 a %<=% { Sys.sleep(7); runif(1) }
 b %<=% { Sys.sleep(2); rnorm(1) }
 c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
-the third asynchronous expression will not be evaluated until `a` and `b` have taken their values.  As a matter of fact, even if `c` is also an asynchronous assignment, R will pause (**) until global variables `a` and `b` are resolved.  In other words, the assignment of `d` will not take place until `a` and `b` are resolved (but there is no need to wait for `c`).  This pause can be avoided using nested asynchronous evaluation (see Section below).
+the third asynchronous expression will not be evaluated until `a` and
+`b` have taken their values.  As a matter of fact, even if `c` is also
+an asynchronous assignment, R will pause (**) until global variables
+`a` and `b` are resolved.  In other words, the assignment of `d` will
+not take place until `a` and `b` are resolved (but there is no need to
+wait for `c`).  This pause can be avoided using nested asynchronous
+evaluation (see Section below).
 
 
 _Footnotes_:
@@ -87,19 +99,24 @@ the long-running evaluation to complete.
 
 
 ## Choosing backend
-The asynchronous evaluation done by the [async] package uses the [BatchJobs] package as a backend for effectuating the computations.  This can be configured using `plan(batchjobs, backend=...)`.  Examples:
+The asynchronous evaluation done by the [async] package uses the
+[BatchJobs] package as a backend for effectuating the computations.
+This can be configured using `plan(batchjobs, backend=...)`.
+Examples:
 
-* `plan(batchjobs, backend="default")` - use `.BatchJobs.R` configuration file,
-   if available. If not, use `"multicore-1"` if supported,
-   otherwise use `"local"`
-* `plan(batchjobs, backend="multicore")` - parallel processing using all available
-   cores on the local machine.
-* `plan(batchjobs, backend="multicore-1")` - parallel processing using all but one
-   of the available cores on the local machine.
-* `plan(batchjobs, backend="local")` - non-parallel processing in a separate R process.
-* `plan(batchjobs, backend="interactive")` - non-parallel processing in the
-   current R session.
-* `plan(batchjobs, backend=".BatchJobs.R")` - use `.BatchJobs.R` configuration file.
+* `plan(batchjobs, backend="default")` - use `.BatchJobs.R`
+   configuration file, if available. If not, use `"multicore-1"` if
+   supported, otherwise use `"local"`
+* `plan(batchjobs, backend="multicore")` - parallel processing using
+  all available cores on the local machine.
+* `plan(batchjobs, backend="multicore-1")` - parallel processing using
+  all but one of the available cores on the local machine.
+* `plan(batchjobs, backend="local")` - non-parallel processing in a
+  separate R process.
+* `plan(batchjobs, backend="interactive")` - non-parallel processing
+  in the current R session.
+* `plan(batchjobs, backend=".BatchJobs.R")` - use `.BatchJobs.R`
+  configuration file.
 
 It is possible to specify a set of possible backends,
 e.g. `plan(batchjobs, backend=c("multicore", "local"))`.  The first
@@ -115,16 +132,17 @@ To reset, use `backend("reset")`
 
 
 ### Multi-core processing
-Multi-core processing is when multiple R processes are used (instead of the
-default single-thread single-process R session we are all used to).
-Note that multi-core processing is not available on Windows (this is a
-limitation of the R core package `parallel`).
-When specifying `plan(batchjobs, backend="multicore")`, all available cores are used on the
-machine.  For heavy computations, this might render the machine very slow and
-useless for other things.  To avoid this, one can specify how many cores to
-"spare", e.g. `plan(batchjobs, backend="multicore-2")` will use all but two cores.
-Note how the default (see above) is `plan(batchjobs, backend="multicore-1")`.
-As an alternative, it is also possible to specify the exact number of cores
+Multi-core processing is when multiple R processes are used (instead
+of the default single-thread single-process R session we are all used
+to).  Note that multi-core processing is not available on Windows
+(this is a limitation of the R core package `parallel`).
+When specifying `plan(batchjobs, backend="multicore")`, all available
+cores are used on the machine.  For heavy computations, this might
+render the machine very slow and useless for other things.  To avoid
+this, one can specify how many cores to "spare", e.g. `plan(batchjobs,
+backend="multicore-2")` will use all but two cores. Note how the
+default (see above) is `plan(batchjobs, backend="multicore-1")`. As an
+alternative, it is also possible to specify the exact number of cores
 to be used, e.g. `plan(batchjobs, backend="multicore=3")`.
 
 
@@ -132,11 +150,13 @@ to be used, e.g. `plan(batchjobs, backend="multicore=3")`.
 For more complicated backends (e.g. clusters), one has to use
 BatchJobs-specific configuration files as explained in the Appendix.
 The default is to use such configuration files, if available.  To
-explicitly use such backend configurations, use `plan(batchjobs, backend=".BatchJobs.R")`.
+explicitly use such backend configurations, use
+`plan(batchjobs, backend=".BatchJobs.R")`. 
 
 
 ### Backend aliases
-It is possible to create aliases for favorite sets of backends.  For instance,
+It is possible to create aliases for favorite sets of backends.  For
+instance,
 ```r
 backend(cluster=c(".BatchJobs.R", "multicore", "local"))
 ```
@@ -149,16 +169,21 @@ plan(batchjobs, backend="cluster")
 
 
 ### Evaluate asynchronous expression on specific backend
-Asynchronous expressions are processed by the default backend as given by `backend()`.  If another backend should be used to evaluate for a particular expression, operator `%plan%` can be used.  For example,
+Asynchronous expressions are processed by the default backend as given
+by `backend()`.  If another backend should be used to evaluate for a
+particular expression, operator `%plan%` can be used.  For example,
 ```r
 a %<=% { Sys.sleep(7); runif(1) } %plan% batchjobs(backend="multicore-2")
 b %<=% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="cluster-2")
 c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
-In this case expression `a` will be processed by the `multicore-2` backend, expression `c` by the `cluster` backend, and expression `c` by the default backend.
+In this case expression `a` will be processed by the `multicore-2`
+backend, expression `c` by the `cluster` backend, and expression `c`
+by the default backend.
 
-Backend specifications can also be used in nested asynchronous evaluations:
+Backend specifications can also be used in nested asynchronous
+evaluations:
 ```r
 plan(batchjobs, backend="cluster")
 a %<=% { Sys.sleep(7); runif(1) }
@@ -169,7 +194,23 @@ c %<=% {
 d <- runif(1)
 ```
 
-## Examples
+## Demos and Examples
+
+### Mandelbrot demo
+The [future] package provdides a demo of how futures can be used to
+calculate a set of Mandelbrot planes.  The demo script is the same
+regardless of how the futures are resolved, i.e. in addition to
+running that demo using eager, lazy and multicore evaluation
+strategies, you can also run it using one of the many BatchJobs
+futures.  For instance, the following evaluates the BatchJobs futures
+using a "local" backend, i.e. each of them are processed in a seperate
+R session:
+```r
+library(async)
+plan(batchjobs, batchjobs="local")
+demo("mandelbrot", package="future", ask=FALSE)
+```
+
 
 ### Download files in parallel
 ```r
@@ -293,7 +334,8 @@ cluster.functions <- makeClusterFunctionsSSH(
 )
 ```
 
-To use a more formal cluster system with a Torque/PBS job queue mechanism, use:
+To use a more formal cluster system with a Torque/PBS job queue
+mechanism, use:
 ```r
 cluster.functions <- local({
   tmpl <- system.file(package="async", "config", "pbs.tmpl")
@@ -324,6 +366,14 @@ R package async is only available via [GitHub](https://github.com/UCSF-CBC/async
 ```r
 source('http://callr.org/install#UCSF-CBC/async')
 ```
+
+### Pre-release version
+To install the pre-release version that is available in branch `develop`, use:
+```r
+source('http://callr.org/install#UCSF-CBC/async@develop')
+```
+This will install the package from source.  
+
 
 
 ## Software status
