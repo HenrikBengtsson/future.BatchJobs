@@ -11,6 +11,7 @@ o WORKAROUND: Global variables with names starting with a period
   ort that does not match pattern '[a-zA-Z0-9._-]+' could not be
   exported due to BatchJobs limitation.  Until resolved by BatchJobs,
   this package encode and decode such variable names automatically.
+o ROBUSTNESS: Package test coverage is 88%.
 
 
 Version: 0.5.2 [2015-07-30]
