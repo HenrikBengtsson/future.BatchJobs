@@ -57,6 +57,14 @@ print.AsyncTask <- function(x, ...) {
   if ("error" %in% status) printf("Error: %s\n", error(x))
 }
 
+#' @importFrom future resolved
+#' @export
+#' @keywords internal
+resolved.AsyncTask <- function(future, ...) {
+  resolved <- finished(future)
+  if (is.na(resolved)) return(FALSE)
+  resolved
+}
 
 #' Status of an AsyncTask
 #'

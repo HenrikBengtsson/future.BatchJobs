@@ -12,6 +12,8 @@ o WORKAROUND: Global variables with names starting with a period
   exported due to BatchJobs limitation.  Until resolved by BatchJobs,
   this package encode and decode such variable names automatically.
 o ROBUSTNESS: Package test coverage is 88%.
+o BUG FIX: resolved() for AsyncFuture:s would always give FALSE
+  unless value() of the future has been called first.
 
 
 Version: 0.5.2 [2015-07-30]
