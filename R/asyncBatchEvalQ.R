@@ -136,7 +136,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     if (!all(keep)) {
       names <- names(globals)[!keep]
       globals <- globals[keep]
-      msg <- sprintf("BatchJobs does not support exporting of variables with names that does not match pattern '[a-zA-Z0-9._-]+' (see https://github.com/tudo-r/BatchJobs/issues/93). The following objects were not exported: ", hpaste(sQuote(names)))
+      msg <- sprintf("BatchJobs does not support exporting of variables with names that does not match pattern '[a-zA-Z0-9._-]+' (see https://github.com/tudo-r/BatchJobs/issues/93). The following objects were not exported: %s", hpaste(sQuote(names)))
       warning(msg)
       if (debug) mcat(msg)
     }
