@@ -1,6 +1,19 @@
 Package: async
 ==============
 
+Version: 0.6.0 [2015-10-05]
+o batchjobs(sum(x, ...), globals=TRUE) now handles `...` properly.
+o ROBUSTNESS: asyncBatchEvalQ() gives an informative error when
+  a global variables starting with a period needs to be exported;
+  these are currently not supported due to limitations in the
+  BatchJobs package.
+o WORKAROUND: Global variables with names starting with a period
+  ort that does not match pattern '[a-zA-Z0-9._-]+' could not be
+  exported due to BatchJobs limitation.  Until resolved by BatchJobs,
+  this package encode and decode such variable names automatically.
+o ROBUSTNESS: Package test coverage is 88%.
+
+
 Version: 0.5.2 [2015-07-30]
 o CLEANUP: Dropped %backend% - use %plan% backend(...) instead.
 o BUG FIX: batchjobs(..., backend="interactive") changed
