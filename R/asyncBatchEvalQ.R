@@ -161,10 +161,13 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     if (encodeGlobals) {
       ## (a) URL encode global variable names
       globalsToDecode <- sapply(globalsToEncode, FUN=utils::URLencode, reserved=TRUE)
-      ## (b) Append with 'R_ASYNC_RENAME_'
+      ## (b) Substitute '%' with '_.PERCENT._'
+      globalsToDecode <- gsub("%", "_.PERCENT._", globalsToDecode, fixed=TRUE)
+
+      ## (c) Append with 'R_ASYNC_RENAME_'
       globalsToDecode <- paste("R_ASYNC_RENAME_", globalsToDecode, sep="")
 
-      ## (c) Rename corresponding globals
+      ## (d) Rename corresponding globals
       names <- names(globals)
       idxs <- match(globalsToEncode, names)
       names[idxs] <- globalsToDecode
@@ -190,12 +193,11 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
   if (encodeGlobals) {
     fun <- function(expr, ..., envir=globalenv()) {
       eval(substitute({
-        print(R_ASYNC_GLOBALS_TO_RENAME)
-        print(ls(all.names=TRUE))
         ## Decode exported globals (workaround for BatchJobs)
         for (..key.. in R_ASYNC_GLOBALS_TO_RENAME) {
-          ..key2.. <- utils::URLdecode(sub("^R_ASYNC_RENAME_", "", ..key..))
-          str(list(..key..=..key.., ..key2..=..key2..))
+          ..key2.. <- sub("^R_ASYNC_RENAME_", "", ..key..)
+          ..key2.. <- gsub("_.PERCENT._", "%", ..key2.., fixed=TRUE)
+          ..key2.. <- utils::URLdecode(..key2..)
           assign(..key2.., get(..key.., inherits=FALSE), inherits=FALSE)
         }
         rm(list=c("..key..", "..key2..", "R_ASYNC_GLOBALS_TO_RENAME"))
