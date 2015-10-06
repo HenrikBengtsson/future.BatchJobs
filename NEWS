@@ -1,6 +1,10 @@
 Package: async
 ==============
 
+Version: 0.6.0-9000 [2015-10-06]
+o CLEANUP: Package no longer attaches listenv.
+
+
 Version: 0.6.0 [2015-10-05]
 o batchjobs(sum(x, ...), globals=TRUE) now handles `...` properly.
 o ROBUSTNESS: asyncBatchEvalQ() gives an informative error when

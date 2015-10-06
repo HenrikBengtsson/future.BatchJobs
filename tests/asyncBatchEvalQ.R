@@ -1,4 +1,5 @@
 source("incl/start.R")
+library("listenv")
 
 message("*** asyncBatchEvalQ() ...")
 

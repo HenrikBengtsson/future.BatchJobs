@@ -1,9 +1,5 @@
-library("async")
-library("future")
+source("incl/start.R")
 library("listenv")
-
-ovars <- ls()
-oopts <- options(warn=1L)
 
 message("*** Global argument '...' in futures ...")
 
@@ -57,6 +53,4 @@ for (strategy in c("eager", "lazy", "multicore", "batchjobs")) {
 
 message("*** Global argument '...' in futures ... DONE")
 
-plan(eager)
-options(oopts)
-rm(list=setdiff(ls(), ovars))
+source("incl/end.R")
