@@ -111,7 +111,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
       pkgObj <- get(name, mode=mode, envir=envir, inherits=FALSE)
       if (!identical(pkgObj, obj)) next
 
-      ## Drop - should really not happen with globals (> 0.8.1)
+      ## Drop - should really not happen with globals (> 0.4.1)
       keep[kk] <- FALSE
     }
 
