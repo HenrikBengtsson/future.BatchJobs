@@ -9,8 +9,6 @@ await(task, ...)
 \arguments{
 \item{task}{The asynchronously task}
 
-\item{...}{Not used.}
-
 \item{cleanup}{If TRUE, the registry is completely removed upon
 success, otherwise not.}
 
@@ -20,6 +18,8 @@ success, otherwise not.}
 
 \item{alpha}{A factor to scale up the waiting time in each iteration
 such that the waiting time in the k:th iteration is \code{alpha^k*delta}.}
+
+\item{\ldots}{Not used.}
 }
 \value{
 The value of the evaluated expression.

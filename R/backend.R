@@ -8,7 +8,7 @@
 #'   If \code{"default"}, the default backend according to alias
 #'      \code{"default"} is used (see Details).
 #'   If \code{"aliases"}, all registered aliases are returned.
-#' @param ... Named character arguments specifying custom aliases
+#' @param \ldots Named character arguments specifying custom aliases
 #'            for character sets of backends.
 #' @param quietly If TRUE, messages are suppressed.
 #'

@@ -1,10 +1,10 @@
 Package: async
-Version: 0.6.0
+Version: 0.6.1
 Depends:
   R (>= 3.1.2),
-  listenv,
   future
 Imports:
+  listenv,
   BatchJobs (>= 1.6),
   globals,
   R.methodsS3,

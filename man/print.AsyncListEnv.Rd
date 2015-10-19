@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{An AsyncListEnv object}
 
-\item{...}{Not used.}
+\item{\ldots}{Not used.}
 }
 \description{
 Print an AsyncListEnv

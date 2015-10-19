@@ -9,7 +9,7 @@
 \arguments{
 \item{x}{An AsyncTask object}
 
-\item{...}{Not used.}
+\item{\ldots}{Not used.}
 }
 \description{
 Print an AsyncTask

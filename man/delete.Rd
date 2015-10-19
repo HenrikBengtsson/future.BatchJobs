@@ -8,8 +8,6 @@
 delete(...)
 }
 \arguments{
-\item{...}{Not used.}
-
 \item{task}{The asynchronously task}
 
 \item{onRunning}{Action if task is running or appears to run.}
@@ -24,6 +22,8 @@ delete(...)
 
 \item{alpha}{A multiplicative penalty increasing the delay
 for each failed try.}
+
+\item{\ldots}{Not used.}
 }
 \value{
 (invisibly) TRUE if deleted and FALSE otherwise.

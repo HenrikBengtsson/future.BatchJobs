@@ -9,7 +9,7 @@
 \arguments{
 \item{task}{The asynchronously task}
 
-\item{...}{Not used.}
+\item{\ldots}{Not used.}
 }
 \value{
 A character vector.

@@ -41,7 +41,7 @@ add_finalizer.AsyncTask <- function(task, ...) {
 #' Print an AsyncTask
 #'
 #' @param x An AsyncTask object
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @export
 #' @keywords internal
@@ -68,7 +68,7 @@ resolved.AsyncTask <- function(future, ...) {
 
 #' Status of an AsyncTask
 #'
-#' @param ... Arguments passed to the S3 method
+#' @param \ldots Arguments passed to the S3 method
 #'
 #' @return A logical or aA character vector.
 #'
@@ -139,7 +139,7 @@ error.AsyncTask <- function(task, ...) {
 #' Starts an asynchroneous task
 #'
 #' @param task The asynchronously task.
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @return The the started task.
 #'
@@ -163,7 +163,7 @@ run.AsyncTask <- function(task, ...) {
 #' @param delta The number of seconds to wait the first time.
 #' @param alpha A factor to scale up the waiting time in each iteration
 #' such that the waiting time in the k:th iteration is \code{alpha^k*delta}.
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @return The value of the evaluated expression.
 #' If an error occurs, an informative Exception is thrown.
@@ -197,7 +197,7 @@ await.AsyncTask <- function(task, ...) {
 #' @param delta The delay interval (in seconds) between retries.
 #' @param alpha A multiplicative penalty increasing the delay
 #' for each failed try.
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @return (invisibly) TRUE if deleted and FALSE otherwise.
 #'

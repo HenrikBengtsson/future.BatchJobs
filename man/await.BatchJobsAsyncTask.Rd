@@ -21,7 +21,7 @@ success, otherwise not.}
 \item{alpha}{A factor to scale up the waiting time in each iteration
 such that the waiting time in the k:th iteration is \code{alpha^k*delta}.}
 
-\item{...}{Not used.}
+\item{\ldots}{Not used.}
 }
 \value{
 The value of the evaluated expression.
