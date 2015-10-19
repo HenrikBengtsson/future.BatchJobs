@@ -15,10 +15,10 @@ If \code{"default"}, the default backend according to alias
    \code{"default"} is used (see Details).
 If \code{"aliases"}, all registered aliases are returned.}
 
-\item{...}{Named character arguments specifying custom aliases
-for character sets of backends.}
-
 \item{quietly}{If TRUE, messages are suppressed.}
+
+\item{\ldots}{Named character arguments specifying custom aliases
+for character sets of backends.}
 }
 \value{
 Returns the name of the backend used, or a list of named aliases.

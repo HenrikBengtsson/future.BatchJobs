@@ -8,7 +8,7 @@
 #'        This set will be extended with packages inferred from
 #'        the list of globals.
 #' @param envir The environment where to search for globals.
-#' @param ... Additional arguments passed to \code{batchEvalQ)}.
+#' @param \ldots Additional arguments passed to \code{batchEvalQ)}.
 #'
 #' @return Vector of type \code{integer} with job ids.
 #'

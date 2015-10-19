@@ -21,7 +21,7 @@ are search from.}
 \item{finalize}{If TRUE, any underlying registries are
 deleted when this object is garbage collected, otherwise not.}
 
-\item{...}{Additional arguments pass to \code{\link{AsyncTask}()}.}
+\item{\ldots}{Additional arguments pass to \code{\link{AsyncTask}()}.}
 }
 \value{
 Returns a BatchJobsAsyncTask object that also is

@@ -7,7 +7,7 @@
 AsyncListEnv(...)
 }
 \arguments{
-\item{...}{Passed to \code{listenv()}.}
+\item{\ldots}{Passed to \code{listenv()}.}
 }
 \value{
 An environment of class `AsyncListEnv` extending `listenv`.

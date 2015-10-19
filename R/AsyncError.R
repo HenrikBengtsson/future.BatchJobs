@@ -1,7 +1,7 @@
 #' Exception class for async-related errors
 #'
 #' @usage AsyncError(...)
-#' @param ... Passed to \code{\link[R.oo]{Exception}}
+#' @param \ldots Passed to \code{\link[R.oo]{Exception}}
 #'
 #' @aliases AsyncTaskError
 #' @export

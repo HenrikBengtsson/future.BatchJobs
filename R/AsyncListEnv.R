@@ -1,6 +1,6 @@
 #' Create an async list environment
 #'
-#' @param ... Passed to \code{listenv()}.
+#' @param \ldots Passed to \code{listenv()}.
 #'
 #' @return An environment of class `AsyncListEnv` extending `listenv`.
 #'
@@ -16,7 +16,7 @@ AsyncListEnv <- function(...) {
 #' Print an AsyncListEnv
 #'
 #' @param x An AsyncListEnv object
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @export
 #' @keywords internal

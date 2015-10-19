@@ -13,7 +13,7 @@
 status(...)
 }
 \arguments{
-\item{...}{Arguments passed to the S3 method}
+\item{\ldots}{Arguments passed to the S3 method}
 }
 \value{
 A logical or aA character vector.

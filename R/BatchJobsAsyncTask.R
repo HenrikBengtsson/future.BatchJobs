@@ -8,7 +8,7 @@
 #' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
-#' @param ... Additional arguments pass to \code{\link{AsyncTask}()}.
+#' @param \ldots Additional arguments pass to \code{\link{AsyncTask}()}.
 #'
 #' @return A BatchJobsAsyncTask object
 #'
@@ -41,7 +41,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
 #' Print an AsyncTask
 #'
 #' @param x An AsyncTask object
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @export
 #' @keywords internal
@@ -62,7 +62,7 @@ print.BatchJobsAsyncTask <- function(x, ...) {
 #' Status of an AsyncTask
 #'
 #' @param task The asynchronously task
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @return A character vector.
 #'
@@ -147,7 +147,7 @@ error.BatchJobsAsyncTask <- function(task, ...) {
 #' Starts an asynchronously task
 #'
 #' @param task The asynchronously task.
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @export
 #' @keywords internal
@@ -193,7 +193,7 @@ run.BatchJobsAsyncTask <- function(task, ...) {
 #' @param delta The number of seconds to wait the first time.
 #' @param alpha A factor to scale up the waiting time in each iteration
 #' such that the waiting time in the k:th iteration is \code{alpha^k*delta}.
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @return The value of the evaluated expression.
 #' If an error occurs, an informative Exception is thrown.
@@ -312,7 +312,7 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
 #' @param delta The delay interval (in seconds) between retries.
 #' @param alpha A multiplicative penalty increasing the delay
 #' for each failed try.
-#' @param ... Not used.
+#' @param \ldots Not used.
 #'
 #' @return (invisibly) TRUE if deleted and FALSE otherwise.
 #'
