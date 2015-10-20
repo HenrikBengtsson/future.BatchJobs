@@ -183,6 +183,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     ## BatchJobs::loadExports() ignores exported variables that
     ## start with a period.
     ## Details: https://github.com/tudo-r/BatchJobs/issues/103
+    ## FIXME: Can this be removed with fail (>= 1.3)? /HB 2015-10-20
     bad <- grepl("^[.]", names(globals))
     if (any(bad)) {
       names <- names(globals)[bad]
