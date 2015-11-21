@@ -18,6 +18,13 @@
 #' @importFrom BatchJobs batchExport batchMap addRegistryPackages
 #' @keywords internal
 asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.frame(), ...) {
+  ## Local functions
+  asPkgEnvironment <- function(pkg) {
+    name <- sprintf("package:%s", pkg)
+    if (!name %in% search()) return(emptyenv())
+    as.environment(name)
+  } ## asPkgEnvironment()
+
   debug <- getOption("async::debug", FALSE)
 
   ## Default maximum export size is 100 MB for now. /HB 2015-04-25
@@ -83,7 +90,11 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     names(keep) <- names
     for (name in names) {
       pkg <- environmentName(where[[name]])
-      if (pkg %in% pkgs) keep[name] <- FALSE
+      if (pkg %in% pkgs) {
+        ## Only drop exported objects
+        if (exists(name, envir=asPkgEnvironment(pkg)))
+          keep[name] <- FALSE
+      }
     }
     if (!all(keep)) globals <- globals[keep]
 
@@ -101,14 +112,16 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
 
       ## Not part of a loaded package / namespace?
       if (is.null(envir)) next
-      if (!environmentName(envir) %in% loadedNamespaces()) next
+      pkg <- environmentName(envir)
+      if (!pkg %in% loadedNamespaces()) next
 
-      ## Before deciding to drop, make sure the object with the
-      ## the same name truly exist in the environment that it
-      ## claims to according to environment().  This will prevent
-      ## copies such as FUN <- base::sample from being dropped.
-      if (!exists(name, mode=mode, envir=envir, inherits=FALSE)) next
-      pkgObj <- get(name, mode=mode, envir=envir, inherits=FALSE)
+      ## Before deciding to drop, make sure the object is exported
+      ## from the package that environment() claims it belongs to.
+      ## This will prevent (a) non-exported objects and (b) copies
+      ## such as FUN <- base::sample from being dropped.
+      pkgEnv <- asPkgEnvironment(pkg)
+      if (!exists(name, mode=mode, envir=pkgEnv, inherits=FALSE)) next
+      pkgObj <- get(name, mode=mode, envir=pkgEnv, inherits=FALSE)
       if (!identical(pkgObj, obj)) next
 
       ## Drop - should really not happen with globals (> 0.4.1)
