@@ -28,7 +28,8 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
   debug <- getOption("async::debug", FALSE)
 
   ## Default maximum export size is 100 MB for now. /HB 2015-04-25
-  maxSizeOfGlobals <- getOption("async::maxSizeOfGlobals", 100*1024^2)
+  maxSizeOfGlobals <- Sys.getenv("ASYNC_MAXSIZE_GLOBALS", "104857600")
+  maxSizeOfGlobals <- getOption("async::maxSizeOfGlobals", maxSizeOfGlobals)
   maxSizeOfGlobals <- as.numeric(maxSizeOfGlobals)
   stopifnot(!is.na(maxSizeOfGlobals), maxSizeOfGlobals > 0)
 
