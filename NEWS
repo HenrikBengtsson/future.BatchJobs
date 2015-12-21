@@ -2,8 +2,8 @@ Package: async
 ==============
 
 Version: 0.6.2 [2015-11-21]
-o BUG FIX: asyncBatchEvalQ() would not export globals that are
-  belongs to a package but are not exported.
+o BUG FIX: asyncBatchEvalQ() would not export globals that belongs
+  to a package but are not exported.
 
 
 Version: 0.6.1 [2015-10-20]
