@@ -5,6 +5,8 @@ Version: 0.6.2-9000 [2015-12-22]
 o Now value() for BatchJobsAsyncTask removes associated BatchJobs 
   files and directories upon success.  Previously such cleanup
   was only happening when the object was garbage collected.
+o BatchJobs directories are now session-specific to make them
+  easier to identify and cleanup, e.g. .async/async-async_IVBRy1/.
 
 
 Version: 0.6.2 [2015-11-21]
