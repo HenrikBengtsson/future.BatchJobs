@@ -230,7 +230,7 @@ This package is only available via GitHub.  Install in R as:
 
 ```s
 install.packages('future')
-source('http://callr.org/install#UCSF-CBC/async')
+source('http://callr.org/install#HenrikBengtsson/async')
 ```
 
 
@@ -353,7 +353,7 @@ see the [BatchJobs configuration] wiki page.
 [globals]: http://cran.r-project.org/package=globals
 [future]: http://cran.r-project.org/package=future
 [listenv]: http://cran.r-project.org/package=listenv
-[async]: https://github.com/UCSF-CBC/async/
+[async]: https://github.com/HenrikBengtsson/async/
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 
 ---
