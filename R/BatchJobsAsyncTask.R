@@ -93,7 +93,7 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 #' @importFrom future value
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(future, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, ...) {
+value.BatchJobsAsyncTask <- function(future, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, cleanup=TRUE, ...) {
   ## Has the value already been collected?
   if (future$state %in% c('finished', 'failed', 'interrupted')) {
     return(NextMethod("value"))
@@ -109,6 +109,7 @@ value.BatchJobsAsyncTask <- function(future, onError=c("signal", "return"), onMi
   tryCatch({
     future$value <- await(future, cleanup=FALSE)
     future$state <- 'finished'
+    if (cleanup) delete(future, ...)
   }, simpleError = function(ex) {
     future$state <- 'failed'
     future$value <- ex

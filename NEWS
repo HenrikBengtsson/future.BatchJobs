@@ -1,9 +1,24 @@
 Package: async
 ==============
 
+Version: 0.7.0 [2016-01-02]
+o Now value() for BatchJobsAsyncTask removes associated BatchJobs
+  subdirectories upon success.  Previously, such cleanup was only
+  happening when the object was garbage collected.
+o Each R session that load the async package now uses a unique
+  subdirectory under .async/, e.g. .async/20160102_154202-IVBRy1/.
+  It is in turn under that session-specific subdirectory that the
+  individual BatchJobs subdirectories corresponding to a specific
+  future lives.  Note that, although, the each of latter is removed
+  when calling value() for its future, the session-specific async
+  directory is not removed.  In order to remove the latter, make
+  sure to resolve all futures.  Then call unloadNamespace("async"),
+  which will try to remove the directory.
+
+
 Version: 0.6.2 [2015-11-21]
-o BUG FIX: asyncBatchEvalQ() would not export globals that are
-  belongs to a package but are not exported.
+o BUG FIX: asyncBatchEvalQ() would not export globals that belongs
+  to a package but are not exported.
 
 
 Version: 0.6.1 [2015-10-20]

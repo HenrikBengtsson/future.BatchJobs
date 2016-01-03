@@ -1,4 +1,4 @@
-# async: Asynchronous Future Evaluation
+# async: A Future for BatchJobs
 
 ## Introduction
 This package provides a Future API for the [BatchJobs] package by
@@ -232,7 +232,7 @@ This package is only available via GitHub.  Install in R as:
 
 ```s
 install.packages('future')
-source('http://callr.org/install#UCSF-CBC/async')
+source('http://callr.org/install#HenrikBengtsson/async')
 ```
 
 
@@ -355,22 +355,22 @@ see the [BatchJobs configuration] wiki page.
 [globals]: http://cran.r-project.org/package=globals
 [future]: http://cran.r-project.org/package=future
 [listenv]: http://cran.r-project.org/package=listenv
-[async]: https://github.com/UCSF-CBC/async/
+[async]: https://github.com/HenrikBengtsson/async/
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 
 ---
 Copyright Henrik Bengtsson, 2015
 
 ## Installation
-R package async is only available via [GitHub](https://github.com/UCSF-CBC/async) and can be installed in R as:
+R package async is only available via [GitHub](https://github.com/HenrikBengtsson/async) and can be installed in R as:
 ```r
-source('http://callr.org/install#UCSF-CBC/async')
+source('http://callr.org/install#HenrikBengtsson/async')
 ```
 
 ### Pre-release version
 To install the pre-release version that is available in branch `develop`, use:
 ```r
-source('http://callr.org/install#UCSF-CBC/async@develop')
+source('http://callr.org/install#HenrikBengtsson/async@develop')
 ```
 This will install the package from source.  
 
@@ -381,5 +381,5 @@ This will install the package from source.
 | Resource:     | GitHub        | Travis CI     | Appveyor         |
 | ------------- | ------------------- | ------------- | ---------------- |
 | _Platforms:_  | _Multiple_          | _Linux_       | _Windows_        |
-| R CMD check   |  | <a href="https://travis-ci.org/UCSF-CBC/async"><img src="https://travis-ci.org/UCSF-CBC/async.svg" alt="Build status"></a> | <a href="https://ci.appveyor.com/project/UCSF-CBC/async"><img src="https://ci.appveyor.com/api/projects/status/github/UCSF-CBC/async?svg=true" alt="Build status"></a> |
-| Test coverage |                     | <a href="https://coveralls.io/r/UCSF-CBC/async"><img src="https://coveralls.io/repos/UCSF-CBC/async/badge.svg?branch=develop" alt="Coverage Status"/></a>   |                  |
+| R CMD check   |  | <a href="https://travis-ci.org/HenrikBengtsson/async"><img src="https://travis-ci.org/HenrikBengtsson/async.svg" alt="Build status"></a> | <a href="https://ci.appveyor.com/project/HenrikBengtsson/async"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/async?svg=true" alt="Build status"></a> |
+| Test coverage |                     | <a href="https://coveralls.io/r/HenrikBengtsson/async"><img src="https://coveralls.io/repos/HenrikBengtsson/async/badge.svg?branch=develop" alt="Coverage Status"/></a>   |                  |

@@ -60,8 +60,8 @@ print.AsyncTask <- function(x, ...) {
 #' @importFrom future resolved
 #' @export
 #' @keywords internal
-resolved.AsyncTask <- function(future, ...) {
-  resolved <- finished(future)
+resolved.AsyncTask <- function(x, ...) {
+  resolved <- finished(x)
   if (is.na(resolved)) return(FALSE)
   resolved
 }
