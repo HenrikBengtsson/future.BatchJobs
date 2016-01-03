@@ -1,11 +1,20 @@
+#' @importFrom R.utils isDirectory mkdirs captureOutput
+#' @importFrom utils sessionInfo
 asyncPath <- local({
   path <- NULL
-  function(absolute=TRUE) {
+  function(absolute=TRUE, create=TRUE) {
     if (is.null(path)) {
       id <- basename(tempdir())
       id <- gsub("Rtmp", "", id, fixed=TRUE)
-      dir <- sprintf("async_%s", id)
-      path <<- file.path(".async", dir)
+      timestamp <- format(Sys.time(), format="%Y%m%d_%k%M%S")
+      dir <- sprintf("%s-%s", timestamp, id)
+      pathT <- file.path(".async", dir)
+      if (create && !isDirectory(pathT)) {
+        mkdirs(pathT)
+        pathnameT <- file.path(pathT, "sessioninfo.txt")
+        writeLines(captureOutput(print(sessionInfo())), con=pathnameT)
+      }
+      path <<- pathT
     }
     if (absolute) path <- file.path(getwd(), path)
     path
