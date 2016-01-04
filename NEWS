@@ -1,6 +1,12 @@
 Package: async
 ==============
 
+Version: 0.7.0-9000 [2016-01-04]
+o BUG FIX: New BatchJobs work directories would encode 08:03 as
+  ' 803' instead of '0803' resulting in a BatchJobs assertion
+  error on invalid pathnames.
+
+
 Version: 0.7.0 [2016-01-02]
 o Now value() for BatchJobsAsyncTask removes associated BatchJobs
   subdirectories upon success.  Previously, such cleanup was only
