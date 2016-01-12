@@ -6,7 +6,7 @@ asyncPath <- local({
     if (is.null(path)) {
       id <- basename(tempdir())
       id <- gsub("Rtmp", "", id, fixed=TRUE)
-      timestamp <- format(Sys.time(), format="%Y%m%d_%k%M%S")
+      timestamp <- format(Sys.time(), format="%Y%m%d_%H%M%S")
       dir <- sprintf("%s-%s", timestamp, id)
       pathT <- file.path(".async", dir)
       if (create && !isDirectory(pathT)) {
