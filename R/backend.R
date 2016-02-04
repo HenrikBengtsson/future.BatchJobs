@@ -141,7 +141,7 @@ backend <- local({
     }
 
     ## Multicore processing is not supported on Windows :(
-    if (.Platform$OS == "windows") {
+    if (.Platform$OS.type == "windows") {
       dropped <- c(dropped, grep("^multicore", what, value=TRUE))
       what <- setdiff(what, dropped)
     }
