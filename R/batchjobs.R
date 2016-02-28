@@ -26,3 +26,4 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
 
   future
 }
+class(batchjobs) <- c("batchjobs", "future", "function")
