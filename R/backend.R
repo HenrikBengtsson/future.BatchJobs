@@ -161,12 +161,18 @@ backend <- local({
 
     ## Load specific or global BatchJobs config file?
     if (file_test("-f", what)) {
+      if (debug) mprintf("backend(): file='%s'\n", what)
       conf <- sourceConfFiles(what)
+      if (debug) {
+        mprintf("Setting BatchJobs configuration:\n")
+        mstr(as.list(conf))
+      }
       assignConf(conf)
       ## Record last used
       last <<- what
       return(what)
     } else if (what == ".BatchJobs.R") {
+      if (debug) mprintf("backend(): First available '.BatchJobs.R'\n")
       if (quietly) {
         suppressPackageStartupMessages(readConfs())
       } else {
@@ -208,8 +214,10 @@ backend <- local({
           }
         }
       }
+      if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d)\n", ncpus)
       conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus)
     } else if (what == "local") {
+      if (debug) mprintf("backend(): makeClusterFunctionsLocal()\n")
       conf$cluster.functions = makeClusterFunctionsLocal()
     } else if (what == "interactive") {
       conf$cluster.functions = makeClusterFunctionsInteractive()
