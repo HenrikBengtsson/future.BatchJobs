@@ -84,7 +84,7 @@ backend <- local({
     assignConf <- get("assignConf", mode="function", envir=ns)
     readConfs <- get("readConfs", mode="function", envir=ns)
 
-    debug <- getOption("async::debug", FALSE)
+    debug <- getOption("future.debug", FALSE)
 
     ## Set custom aliases?
     custom <- list(...)

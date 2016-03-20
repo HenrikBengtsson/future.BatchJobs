@@ -5,7 +5,7 @@
 \title{A BatchJobs future represents a future that is resolved by one of the many BatchJobs backends}
 \usage{
 batchjobs(expr, envir = parent.frame(), substitute = TRUE, backend = NULL,
-  finalize = getOption("async::finalize", TRUE), ...)
+  resources = list(), finalize = getOption("async::finalize", TRUE), ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -17,6 +17,8 @@ are search from.}
 \code{substitute()}:d or not.}
 
 \item{backend}{The BatchJobs backend to use, cf. \code{\link{backend}()}.}
+
+\item{resources}{A named list of resources needed by this future.}
 
 \item{finalize}{If TRUE, any underlying registries are
 deleted when this object is garbage collected, otherwise not.}
