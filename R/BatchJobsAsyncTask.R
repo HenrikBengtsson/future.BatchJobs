@@ -6,6 +6,7 @@
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
 #' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
+#' @param resources A named list of resources needed by this future.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
 #' @param \ldots Additional arguments pass to \code{\link{AsyncTask}()}.
@@ -15,8 +16,10 @@
 #' @export
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), ...) {
+BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("async::finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
+  stopifnot(is.list(resources),
+            length(resources) == 0 || !is.null(names(resources)))
 
   debug <- getOption("async::debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
@@ -30,6 +33,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
   task <- structure(task, class=c("BatchJobsAsyncTask", class(task)))
 
   task$backend <- list(reg=reg, cluster.functions=NULL, id=NA_integer_)
+  task$resources <- resources
 
   ## Register finalizer?
   if (finalize) task <- add_finalizer(task)
@@ -166,7 +170,9 @@ run.BatchJobsAsyncTask <- function(task, ...) {
   reg <- task$backend$reg
   stopifnot(inherits(reg, "Registry"))
 
-  ## 1. Create
+  resources <- task$resources
+
+  ## 1. Create (uses batchMap() internally)
   id <- asyncBatchEvalQ(reg, exprs=list(task$expr), envir=task$envir, globals=TRUE)
 
   ## 2. Update
@@ -178,7 +184,7 @@ run.BatchJobsAsyncTask <- function(task, ...) {
 
   ## 4. Submit
   task$state <- 'running'
-  submitJobs(reg, ids=id)
+  submitJobs(reg, ids=id, resources=resources)
   if (debug) mprintf("Launched future #%d\n", id)
 
   task

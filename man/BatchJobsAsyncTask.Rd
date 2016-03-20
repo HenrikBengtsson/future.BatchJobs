@@ -5,7 +5,8 @@
 \title{Create an asynchroneous task}
 \usage{
 BatchJobsAsyncTask(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  backend = NULL, finalize = getOption("async::finalize", TRUE), ...)
+  backend = NULL, resources = list(),
+  finalize = getOption("async::finalize", TRUE), ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
@@ -17,6 +18,8 @@ should be located.}
 \code{substitute()}:d or not.}
 
 \item{backend}{The BatchJobs backend to use, cf. \code{\link{backend}()}.}
+
+\item{resources}{A named list of resources needed by this future.}
 
 \item{finalize}{If TRUE, any underlying registries are
 deleted when this object is garbage collected, otherwise not.}
