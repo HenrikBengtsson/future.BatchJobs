@@ -6,6 +6,7 @@
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
 #' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
+#' @param resources A named list of resources needed by this future.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
 #' @param \ldots Additional arguments pass to \code{\link{AsyncTask}()}.
@@ -14,12 +15,13 @@
 #' a \link[future]{Future}.
 #'
 #' @export
-batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), ...) {
+batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("async::finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   ## 1. Create
   future <- BatchJobsAsyncTask(expr=expr, envir=envir, substitute=FALSE,
-                               backend=backend, finalize=finalize, ...)
+                               backend=backend, resources=resources,
+			       finalize=finalize, ...)
 
   ## 2. Launch
   future <- run(future)

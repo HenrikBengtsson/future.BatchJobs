@@ -21,7 +21,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
   stopifnot(is.list(resources),
             length(resources) == 0 || !is.null(names(resources)))
 
-  debug <- getOption("async::debug", FALSE)
+  debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
   ## 1. Create BatchJobs registry
@@ -164,7 +164,7 @@ run.BatchJobsAsyncTask <- function(task, ...) {
     getClusterFunctions(getBatchJobsConf())
   }
 
-  debug <- getOption("async::debug", FALSE)
+  debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
   reg <- task$backend$reg
@@ -214,7 +214,7 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
 
   maxTries <- as.integer(maxTries)
 
-  debug <- getOption("async::debug", FALSE)
+  debug <- getOption("future.debug", FALSE)
   if (debug) mprintf("Polling...\n")
 
   expr <- task$expr

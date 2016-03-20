@@ -25,7 +25,7 @@ asyncBatchEvalQ <- function(reg, exprs, globals=TRUE, pkgs=NULL, envir=parent.fr
     as.environment(name)
   } ## asPkgEnvironment()
 
-  debug <- getOption("async::debug", FALSE)
+  debug <- getOption("future.debug", FALSE)
 
   ## Default maximum export size is 100 MiB for now. /HB 2015-04-25
   maxSizeOfGlobals <- Sys.getenv("ASYNC_MAXSIZE_GLOBALS", "104857600")
