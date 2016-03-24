@@ -179,10 +179,26 @@ run.BatchJobsAsyncTask <- function(task, ...) {
   task$backend$id <- id
   if (debug) mprintf("Created %s future #%d\n", class(task)[1], id)
 
-  ## 3. Record
+  ## 3. Set backend here
+  ## Use a non-default backend?
+  backend <- NULL ### FIXME: /HB 2016-03-20 Issue #49
+  if (!is.null(backend)) {
+    obackend <- backend()
+    on.exit(backend(obackend))
+    backend(backend)
+
+    ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
+    ## If/when makeRegistry() attaches BatchJobs, we need
+    ## to prevent it from overriding the configuration
+    ## already set by backend().
+    oopts <- options(BatchJobs.load.config=FALSE)
+    on.exit(options(oopts), add=TRUE)
+  }
+
+  ## 4. Record
   task$backend$cluster.functions <- getClusterFunctions()
 
-  ## 4. Submit
+  ## 5. Submit
   task$state <- 'running'
   submitJobs(reg, ids=id, resources=resources)
   if (debug) mprintf("Launched future #%d\n", id)
