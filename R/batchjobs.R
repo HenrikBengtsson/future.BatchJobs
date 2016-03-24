@@ -11,7 +11,7 @@
 #' deleted when this object is garbage collected, otherwise not.
 #' @param \ldots Additional arguments pass to \code{\link{AsyncTask}()}.
 #'
-#' @return Returns a BatchJobsAsyncTask object that also is
+#' @return Returns a BatchJobsFuture object that also is
 #' a \link[future]{Future}.
 #'
 #' @export
@@ -19,9 +19,9 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
   if (substitute) expr <- substitute(expr)
 
   ## 1. Create
-  future <- BatchJobsAsyncTask(expr=expr, envir=envir, substitute=FALSE,
-                               backend=backend, resources=resources,
-			       finalize=finalize, ...)
+  future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
+                            backend=backend, resources=resources,
+			    finalize=finalize, ...)
 
   ## 2. Launch
   future <- run(future)

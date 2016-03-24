@@ -26,7 +26,7 @@ deleted when this object is garbage collected, otherwise not.}
 \item{\ldots}{Additional arguments pass to \code{\link{AsyncTask}()}.}
 }
 \value{
-Returns a BatchJobsAsyncTask object that also is
+Returns a BatchJobsFuture object that also is
 a \link[future]{Future}.
 }
 \description{

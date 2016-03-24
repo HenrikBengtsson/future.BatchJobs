@@ -11,12 +11,12 @@
 #' deleted when this object is garbage collected, otherwise not.
 #' @param \ldots Additional arguments pass to \code{\link{AsyncTask}()}.
 #'
-#' @return A BatchJobsAsyncTask object
+#' @return A BatchJobsFuture object
 #'
 #' @export
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("async::finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("async::finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
   stopifnot(is.list(resources),
             length(resources) == 0 || !is.null(names(resources)))
@@ -28,9 +28,9 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
   reg <- tempRegistry()
   if (debug) mprint(reg)
 
-  ## 2. Create BatchJobsAsyncTask object
+  ## 2. Create BatchJobsFuture object
   task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
-  task <- structure(task, class=c("BatchJobsAsyncTask", class(task)))
+  task <- structure(task, class=c("BatchJobsFuture", class(task)))
 
   task$config <- list(reg=reg, id=NA_integer_, cluster.functions=NULL, backend=backend)
   task$resources <- resources
@@ -49,7 +49,7 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
 #'
 #' @export
 #' @keywords internal
-print.BatchJobsAsyncTask <- function(x, ...) {
+print.BatchJobsFuture <- function(x, ...) {
   NextMethod("print")
   printf("BatchJobs configuration:\n")
   config <- x$config
@@ -73,7 +73,7 @@ print.BatchJobsAsyncTask <- function(x, ...) {
 #' @export
 #' @importFrom BatchJobs getStatus
 #' @keywords internal
-status.BatchJobsAsyncTask <- function(task, ...) {
+status.BatchJobsFuture <- function(task, ...) {
   config <- task$config
   reg <- config$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
@@ -97,7 +97,7 @@ status.BatchJobsAsyncTask <- function(task, ...) {
 #' @importFrom future value
 #' @export
 #' @keywords internal
-value.BatchJobsAsyncTask <- function(future, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, cleanup=TRUE, ...) {
+value.BatchJobsFuture <- function(future, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, cleanup=TRUE, ...) {
   ## Has the value already been collected?
   if (future$state %in% c('finished', 'failed', 'interrupted')) {
     return(NextMethod("value"))
@@ -128,7 +128,7 @@ value.BatchJobsAsyncTask <- function(future, onError=c("signal", "return"), onMi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 #' @export
 #' @keywords internal
-error.BatchJobsAsyncTask <- function(task, ...) {
+error.BatchJobsFuture <- function(task, ...) {
   stat <- status(task)
   if (isNA(stat)) return(NULL)
 
@@ -156,7 +156,7 @@ error.BatchJobsAsyncTask <- function(task, ...) {
 #'
 #' @export
 #' @keywords internal
-run.BatchJobsAsyncTask <- function(task, ...) {
+run.BatchJobsFuture <- function(task, ...) {
   getClusterFunctions <- function() {
     ns <- getNamespace("BatchJobs")
     getBatchJobsConf <- get("getBatchJobsConf", envir=ns, mode="function")
@@ -225,7 +225,7 @@ run.BatchJobsAsyncTask <- function(task, ...) {
 #' @importFrom R.methodsS3 throw
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+await.BatchJobsFuture <- function(task, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   throw <- R.methodsS3::throw
 
   maxTries <- as.integer(maxTries)
@@ -342,7 +342,7 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
 #' @export
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+delete.BatchJobsFuture <- function(task, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   onRunning <- match.arg(onRunning)
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
