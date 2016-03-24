@@ -84,3 +84,12 @@ captureOutput <- function(expr, envir=parent.frame(), ...) {
 trim <- function(x, ...) {
   sub("[\t\n\f\r ]*$", "", sub("^[\t\n\f\r ]*", "", x))
 }
+
+
+## We are currently importing the following non-exported functions:
+## * future:::getGlobalsAndPackages()
+importFuture <- function(name=NULL) {
+  ns <- getNamespace("future")
+  get(name, mode="function", envir=ns, inherits=FALSE)
+}
+

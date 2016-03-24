@@ -24,16 +24,26 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ba
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
+  ## Record globals
+  getGlobalsAndPackages <- importFuture("getGlobalsAndPackages")
+  gp <- getGlobalsAndPackages(expr, envir=envir)
+
   ## 1. Create BatchJobs registry
   reg <- tempRegistry()
   if (debug) mprint(reg)
 
   ## 2. Create BatchJobsFuture object
   task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
+
+  task$globals <- gp$globals
+  task$packages <- gp$packages
+  task$config <- list(reg=reg, id=NA_integer_,
+                      cluster.functions=NULL,
+                      resources=resources,
+                      backend=backend)
+
   task <- structure(task, class=c("BatchJobsFuture", class(task)))
 
-  task$config <- list(reg=reg, id=NA_integer_, cluster.functions=NULL, backend=backend)
-  task$resources <- resources
 
   ## Register finalizer?
   if (finalize) task <- add_finalizer(task)
@@ -170,7 +180,7 @@ run.BatchJobsFuture <- function(task, ...) {
   reg <- task$config$reg
   stopifnot(inherits(reg, "Registry"))
 
-  resources <- task$resources
+  resources <- task$config$resources
 
   ## 1. Create (uses batchMap() internally)
   id <- asyncBatchEvalQ(reg, exprs=list(task$expr), envir=task$envir, globals=TRUE)
