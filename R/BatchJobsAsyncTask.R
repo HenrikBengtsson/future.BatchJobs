@@ -25,14 +25,14 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
   ## 1. Create BatchJobs registry
-  reg <- tempRegistry(backend=backend)
+  reg <- tempRegistry()
   if (debug) mprint(reg)
 
   ## 2. Create BatchJobsAsyncTask object
   task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
   task <- structure(task, class=c("BatchJobsAsyncTask", class(task)))
 
-  task$backend <- list(reg=reg, cluster.functions=NULL, id=NA_integer_)
+  task$config <- list(reg=reg, id=NA_integer_, cluster.functions=NULL, backend=backend)
   task$resources <- resources
 
   ## Register finalizer?
@@ -51,14 +51,14 @@ BatchJobsAsyncTask <- function(expr=NULL, envir=parent.frame(), substitute=TRUE,
 #' @keywords internal
 print.BatchJobsAsyncTask <- function(x, ...) {
   NextMethod("print")
-  printf("Backend:\n")
-  backend <- x$backend
-  reg <- backend$reg
+  printf("BatchJobs configuration:\n")
+  config <- x$config
+  reg <- config$reg
   if (isNA(status(x))) {
     printf("%s: Not found (happens when finished and deleted)\n", class(reg))
   } else {
     print(reg)
-    printf("Cluster functions: %s\n", sQuote(backend$cluster.functions$name))
+    printf("Cluster functions: %s\n", sQuote(config$cluster.functions$name))
   }
 }
 
@@ -74,13 +74,13 @@ print.BatchJobsAsyncTask <- function(x, ...) {
 #' @importFrom BatchJobs getStatus
 #' @keywords internal
 status.BatchJobsAsyncTask <- function(task, ...) {
-  backend <- task$backend
-  reg <- backend$reg
+  config <- task$config
+  reg <- config$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
   ## Closed and deleted?
   if (!file_test("-d", reg$file.dir)) return(NA_character_)
 
-  id <- backend$id
+  id <- config$id
   if (is.na(id)) return("not submitted")
   status <- getStatus(reg, ids=id)
   status <- (unlist(status) == 1L)
@@ -140,9 +140,9 @@ error.BatchJobsAsyncTask <- function(task, ...) {
 
   if (!"error" %in% stat) return(NULL)
 
-  backend <- task$backend
-  reg <- backend$reg
-  id <- backend$id
+  config <- task$config
+  reg <- config$reg
+  id <- config$id
   msg <- getErrorMessages(reg, ids=id)
   msg <- paste(sQuote(msg), collapse=", ")
   msg
@@ -167,7 +167,7 @@ run.BatchJobsAsyncTask <- function(task, ...) {
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
-  reg <- task$backend$reg
+  reg <- task$config$reg
   stopifnot(inherits(reg, "Registry"))
 
   resources <- task$resources
@@ -176,12 +176,12 @@ run.BatchJobsAsyncTask <- function(task, ...) {
   id <- asyncBatchEvalQ(reg, exprs=list(task$expr), envir=task$envir, globals=TRUE)
 
   ## 2. Update
-  task$backend$id <- id
+  task$config$id <- id
   if (debug) mprintf("Created %s future #%d\n", class(task)[1], id)
 
   ## 3. Set backend here
   ## Use a non-default backend?
-  backend <- NULL ### FIXME: /HB 2016-03-20 Issue #49
+  backend <- task$config$backend ### FIXME: /HB 2016-03-20 Issue #49
   if (!is.null(backend)) {
     obackend <- backend()
     on.exit(backend(obackend))
@@ -196,7 +196,7 @@ run.BatchJobsAsyncTask <- function(task, ...) {
   }
 
   ## 4. Record
-  task$backend$cluster.functions <- getClusterFunctions()
+  task$config$cluster.functions <- getClusterFunctions()
 
   ## 5. Submit
   task$state <- 'running'
@@ -234,9 +234,9 @@ await.BatchJobsAsyncTask <- function(task, cleanup=TRUE, maxTries=getOption("asy
   if (debug) mprintf("Polling...\n")
 
   expr <- task$expr
-  backend <- task$backend
-  reg <- backend$reg
-  id <- backend$id
+  config <- task$config
+  reg <- config$reg
+  id <- config$id
 
   ## It appears that occassionally a job can shown as 'expired'
   ## just before becoming 'done'.  It's odd and should be reported
@@ -348,8 +348,8 @@ delete.BatchJobsAsyncTask <- function(task, onRunning=c("warning", "error", "ski
   onFailure <- match.arg(onFailure)
 
   ## Identify registry
-  backend <- task$backend
-  reg <- backend$reg
+  config <- task$config
+  reg <- config$reg
   path <- reg$file.dir
 
   ## Already deleted?
