@@ -88,8 +88,14 @@ trim <- function(x, ...) {
 
 ## We are currently importing the following non-exported functions:
 ## * future:::getGlobalsAndPackages()
-importFuture <- function(name=NULL) {
+importFuture <- function(name, default=NULL) {
   ns <- getNamespace("future")
-  get(name, mode="function", envir=ns, inherits=FALSE)
+  if (exists(name, mode="function", envir=ns, inherits=FALSE)) {
+    get(name, mode="function", envir=ns, inherits=FALSE)
+  } else if (!is.null(default)) {
+    default
+  } else {
+    stop(sprintf("No such 'future' function: %s()", name))
+  }
 }
 

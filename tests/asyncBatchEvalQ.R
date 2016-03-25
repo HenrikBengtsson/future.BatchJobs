@@ -75,7 +75,7 @@ ids <- asyncBatchEvalQ(reg2, exprs=exprs["D"], globals=list(a=8))
 mprint(ids)
 
 message("Protect against large globals (being exported)")
-oopts2 <- options("async::maxSizeOfGlobals"=100)
+oopts2 <- options("future.maxSizeOfGlobals"=100)
 a <- 1:100
 res <- try(b %<=% { x <- a + 1 })
 stopifnot(inherits(res, "try-error"))

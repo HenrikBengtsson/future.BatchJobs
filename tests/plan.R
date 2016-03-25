@@ -16,7 +16,9 @@ for (backend in c("interactive", "local")) {
   message(sprintf("*** plan(batchjobs, backend='%s') ...", backend))
 
   plan(batchjobs, backend=backend)
-  stopifnot(inherits(plan(), "batchjobs"))
+  if (exists("tweak", envir=asNamespace("future"))) {
+    stopifnot(inherits(plan(), "batchjobs"))
+  }
 
   a <- 0
   f <- future({

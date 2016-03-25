@@ -33,7 +33,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ba
   if (debug) mprint(reg)
 
   ## 2. Create BatchJobsFuture object
-  task <- AsyncTask(expr=expr, envir=envir, substitute=FALSE, ...)
+  task <- AsyncTask(expr=gp$expr, envir=envir, substitute=FALSE, ...)
 
   task$globals <- gp$globals
   task$packages <- gp$packages
@@ -165,8 +165,13 @@ error.BatchJobsFuture <- function(task, ...) {
 #' @param \ldots Not used.
 #'
 #' @export
+## @importFrom future getExpression
+#' @importFrom BatchJobs addRegistryPackages batchExport batchMap
+#'
 #' @keywords internal
 run.BatchJobsFuture <- function(task, ...) {
+  mdebug <- importFuture("mdebug")
+
   getClusterFunctions <- function() {
     ns <- getNamespace("BatchJobs")
     getBatchJobsConf <- get("getBatchJobsConf", envir=ns, mode="function")
@@ -174,16 +179,131 @@ run.BatchJobsFuture <- function(task, ...) {
     getClusterFunctions(getBatchJobsConf())
   }
 
+  ## Assert that the process that created the future is
+  ## also the one that evaluates/resolves/queries it.
+  assertOwner <- importFuture("assertOwner")
+  assertOwner(task)
+
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+
+  getExpression <- importFuture("getExpression", default=function(future) future$expr)
+  expr <- getExpression(task)
+
+  ## Always evaluate in local environment
+  expr <- substitute(local(expr), list(expr=expr))
 
   reg <- task$config$reg
   stopifnot(inherits(reg, "Registry"))
 
   resources <- task$config$resources
 
-  ## 1. Create (uses batchMap() internally)
-  id <- asyncBatchEvalQ(reg, exprs=list(task$expr), envir=task$envir, globals=TRUE)
+  ## (ii) Attach packages that needs to be attached
+  packages <- task$packages
+  if (length(packages) > 0) {
+    mdebug("Attaching %d packages (%s) ...",
+                    length(packages), hpaste(sQuote(packages)))
+
+    ## Record which packages in 'pkgs' that are loaded and
+    ## which of them are attached (at this point in time).
+    isLoaded <- is.element(packages, loadedNamespaces())
+    isAttached <- is.element(packages, attachedPackages())
+
+    ## FIXME: Update the expression such that the new session
+    ## will have the same state of (loaded, attached) packages.
+
+    addRegistryPackages(reg, packages=packages)
+
+    mdebug("Attaching %d packages (%s) ... DONE",
+                    length(packages), hpaste(sQuote(packages)))
+  }
+  ## Not needed anymore
+  packages <- NULL
+
+  ## (iii) Export globals
+  globals <- task$globals
+  if (length(globals) > 0) {
+    ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    ## Any globals to encode/decore to workaround various
+    ## BatchJobs limitations.
+    ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    globalsToEncode <- NULL
+
+    ## BatchJobs::batchExport() validated names of globals using
+    ## checkmate::assertList(more.args, names="strict") which doesn't
+    ## like names such as "{", although they should be valid indeed.
+    ## Details: https://github.com/tudo-r/BatchJobs/issues/93
+    keep <- grepl("^[.a-zA-Z]", names(globals))
+    if (!all(keep)) {
+      names <- names(globals)[!keep]
+      globalsToEncode <- c(globalsToEncode, names)
+      msg <- sprintf("WORKAROUND: BatchJobs does not support exporting of variables with names that does not match pattern '[a-zA-Z0-9._-]+' (see https://github.com/tudo-r/BatchJobs/issues/93). Encoding/decoding the following global variables: %s", hpaste(sQuote(names)))
+      if (debug) mcat(msg)
+    }
+
+    ## FIXME: The below can be removed with
+    ##        fail (>= 1.3) and BatchJobs (>= 1.7)
+    ##        /HB 2015-10-20
+    ## BatchJobs::loadExports() ignores exported variables that
+    ## start with a period.
+    ## Details: https://github.com/tudo-r/BatchJobs/issues/103
+    bad <- grepl("^[.]", names(globals))
+    if (any(bad)) {
+      names <- names(globals)[bad]
+      globalsToEncode <- c(globalsToEncode, names)
+      msg <- sprintf("WORKAROUND: BatchJobs does not support exported variables that start with a period (see https://github.com/tudo-r/BatchJobs/issues/103). Encoding/decoding the following global variables: %s", hpaste(sQuote(names)))
+      if (debug) mcat(msg)
+    }
+
+    ## Does any globals need to be encoded/decoded to workaround
+    ## the limitations of BatchJobs?
+    if (length(globalsToEncode) > 0L) {
+      ## (a) URL encode global variable names
+      globalsToDecode <- sapply(globalsToEncode, FUN=utils::URLencode, reserved=TRUE)
+      ## (b) Substitute '%' with '_.PERCENT._'
+      globalsToDecode <- gsub("%", "_.PERCENT._", globalsToDecode, fixed=TRUE)
+
+      ## (c) Append with 'R_ASYNC_RENAME_'
+      globalsToDecode <- paste("R_ASYNC_RENAME_", globalsToDecode, sep="")
+
+      ## (d) Rename corresponding globals
+      names <- names(globals)
+      idxs <- match(globalsToEncode, names)
+      names[idxs] <- globalsToDecode
+      names(globals) <- names
+
+      ## (d) Record variables which to be rename by the future
+      globals <- append(globals, list(R_ASYNC_GLOBALS_TO_RENAME=globalsToDecode))
+
+      ## (e) Tweak future expression to decode encoded globals
+      expr <- substitute({
+        ## Decode exported globals (workaround for BatchJobs)
+        for (..key.. in R_ASYNC_GLOBALS_TO_RENAME) {
+          ..key2.. <- sub("^R_ASYNC_RENAME_", "", ..key..)
+          ..key2.. <- gsub("_.PERCENT._", "%", ..key2.., fixed=TRUE)
+          ..key2.. <- utils::URLdecode(..key2..)
+          assign(..key2.., get(..key.., inherits=FALSE), inherits=FALSE)
+        }
+        rm(list=c("..key..", "..key2..", "R_ASYNC_GLOBALS_TO_RENAME"))
+
+        expr
+      }, list(expr=expr))
+    }
+    ## Not needed anymore
+    globalsToDecode <- NULL
+
+    ## Export via BatchJobs
+    batchExport(reg, li=globals)
+  }
+  ## Not needed anymore
+  globals <- NULL
+
+  ## 1. Add to BatchJobs for evaluation
+  id <- batchMap(reg, fun=function(expr, ..., envir=globalenv()) {
+    eval(expr, envir=envir)
+  }, list(expr), ...)
+
+  ## id <- asyncBatchEvalQ(reg, exprs=list(task$expr), envir=task$envir, globals=TRUE)
 
   ## 2. Update
   task$config$id <- id
