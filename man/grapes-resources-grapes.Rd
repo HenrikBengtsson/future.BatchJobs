@@ -10,7 +10,7 @@ fassignment \%resources\% tweaks
 \item{fassignment}{The future assignment, e.g.
 \code{x \%<=\% \{ expr \}}.}
 
-\item{resources}{A named list (or vector) of resource
+\item{tweaks}{A named list (or vector) of resource
 BatchJobs parameters that should be changed relative to
 the current strategy.}
 }

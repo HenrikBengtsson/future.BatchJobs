@@ -4,7 +4,7 @@
 #'
 #' @param fassignment The future assignment, e.g.
 #'        \code{x \%<=\% \{ expr \}}.
-#' @param resources A named list (or vector) of resource
+#' @param tweaks A named list (or vector) of resource
 #' BatchJobs parameters that should be changed relative to
 #' the current strategy.
 #'
