@@ -14,6 +14,7 @@
 #' @return A BatchJobsFuture object
 #'
 #' @export
+#' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
 BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("async::finalize", TRUE), ...) {
@@ -364,8 +365,6 @@ run.BatchJobsFuture <- function(future, ...) {
   id <- batchMap(reg, fun=function(expr, ..., envir=globalenv()) {
     eval(expr, envir=envir)
   }, list(expr), ...)
-
-  ## id <- asyncBatchEvalQ(reg, exprs=list(future$expr), envir=future$envir, globals=TRUE)
 
   ## 2. Update
   future$config$id <- id
