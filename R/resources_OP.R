@@ -9,6 +9,7 @@
 #' the current strategy.
 #'
 #' @export
+#' @importFrom future plan tweak
 `%resources%` <- function(fassignment, tweaks) {
   fassignment <- substitute(fassignment)
   envir <- parent.frame(1)
