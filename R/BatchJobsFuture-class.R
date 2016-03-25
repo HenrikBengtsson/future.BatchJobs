@@ -9,7 +9,7 @@
 #' @param resources A named list of resources needed by this future.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
-#' @param \ldots Additional arguments pass to \code{\link{AsyncTask}()}.
+#' @param \ldots Additional arguments pass to \code{\link[future]{Future}()}.
 #'
 #' @return A BatchJobsFuture object
 #'
@@ -33,7 +33,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ba
   if (debug) mprint(reg)
 
   ## 2. Create BatchJobsFuture object
-  future <- AsyncTask(expr=gp$expr, envir=envir, substitute=FALSE, ...)
+  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, ...)
 
   future$globals <- gp$globals
   future$packages <- gp$packages
@@ -54,13 +54,24 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ba
 
 #' Prints a BatchJobs future
 #'
-#' @param x An AsyncTask object
+#' @param x An BatchJobsFuture object
 #' @param \ldots Not used.
 #'
 #' @export
 #' @keywords internal
 print.BatchJobsFuture <- function(x, ...) {
-  NextMethod("print")
+  printf("%s:\n", class(x)[1L])
+
+  printf("Expression:\n")
+  code <- captureOutput(print(x$expr))
+  code <- paste(sprintf("  %s", code), collapse="\n")
+  printf("%s\n", code)
+
+  ## Ask for status once
+  status <- status(x)
+  printf("Status: %s\n", paste(sQuote(status), collapse=", "))
+  if ("error" %in% status) printf("Error: %s\n", error(x))
+
   printf("BatchJobs configuration:\n")
   config <- x$config
   reg <- config$reg
@@ -73,16 +84,32 @@ print.BatchJobsFuture <- function(x, ...) {
 }
 
 
+status <- function(...) UseMethod("status")
+finished <- function(...) UseMethod("finished")
+completed <- function(...) UseMethod("completed")
+failed <- function(...) UseMethod("failed")
+expired <- function(...) UseMethod("expired")
+error <- function(...) UseMethod("error")
+
 #' Status of BatchJobs future
 #'
 #' @param future The future.
 #' @param \ldots Not used.
 #'
-#' @return A character vector.
+#' @return A character vector or a logical scalar.
+#'
+#' @aliases status finished completed failed expired value error
+#' @keywords internal
 #'
 #' @export
+#' @export status
+#' @export finished
+#' @export completed
+#' @export failed
+#' @export expired
+#' @export value
+#' @export error
 #' @importFrom BatchJobs getStatus
-#' @keywords internal
 status.BatchJobsFuture <- function(future, ...) {
   config <- future$config
   reg <- config$reg
@@ -101,9 +128,75 @@ status.BatchJobsFuture <- function(future, ...) {
 } # status()
 
 
+
+#' @export
+#' @keywords internal
+finished.BatchJobsFuture <- function(task, ...) {
+  status <- status(task)
+  if (isNA(status)) return(NA)
+  any(c("done", "error", "expired") %in% status)
+}
+
+
+#' @export
+#' @keywords internal
+completed.BatchJobsFuture <- function(task, ...) {
+  status <- status(task)
+  if (isNA(status)) return(NA)
+  ("done" %in% status) && !any(c("error", "expired") %in% status)
+}
+
+#' @export
+#' @keywords internal
+failed.BatchJobsFuture <- function(task, ...) {
+  status <- status(task)
+  if (isNA(status)) return(NA)
+  any("error" %in% status)
+}
+
+#' @export
+#' @keywords internal
+expired.BatchJobsFuture <- function(task, ...) {
+  status <- status(task)
+  if (isNA(status)) return(NA)
+  any("expired" %in% status)
+}
+
+#' @export
+#' @keywords internal
+error.BatchJobsFuture <- function(future, ...) {
+  stat <- status(future)
+  if (isNA(stat)) return(NULL)
+
+  if (!finished(future)) {
+    msg <- sprintf("%s has not finished yet", class(future)[1L])
+    ex <- AsyncTaskError(msg, task=future)
+    throw(ex)
+  }
+
+  if (!"error" %in% stat) return(NULL)
+
+  config <- future$config
+  reg <- config$reg
+  id <- config$id
+  msg <- getErrorMessages(reg, ids=id)
+  msg <- paste(sQuote(msg), collapse=", ")
+  msg
+} # error()
+
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Future API
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#' @importFrom future resolved
+#' @export
+#' @keywords internal
+resolved.BatchJobsFuture <- function(x, ...) {
+  resolved <- finished(x)
+  if (is.na(resolved)) return(FALSE)
+  resolved
+}
+
 #' @importFrom future value
 #' @export
 #' @keywords internal
@@ -134,18 +227,10 @@ value.BatchJobsFuture <- function(future, onError=c("signal", "return"), onMissi
 
 
 
-#' Runs a BatchJobs future
-#'
-#' @param future The future.
-#' @param \ldots Not used.
-#'
-#' @return (invisibly) the future.
-#'
-#' @export
+run <- function(...) UseMethod("run")
+
 ## @importFrom future getExpression
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
-#'
-#' @keywords internal
 run.BatchJobsFuture <- function(future, ...) {
   mdebug <- importFuture("mdebug")
 
@@ -314,7 +399,9 @@ run.BatchJobsFuture <- function(future, ...) {
 }
 
 
-#' Retrieves the value of of the asynchronously evaluated expression
+await <- function(...) UseMethod("await")
+
+#' Awaits the value of a BatchJobs future
 #'
 #' @param future The future.
 #' @param cleanup If TRUE, the registry is completely removed upon
@@ -327,6 +414,12 @@ run.BatchJobsFuture <- function(future, ...) {
 #'
 #' @return The value of the evaluated expression.
 #' If an error occurs, an informative Exception is thrown.
+#'
+#' @details
+#' Note that \code{await()} should only be called once, because
+#' after being called the actual asynchroneous task may be removed
+#' and will no longer available in subsequent calls.  If called
+#' again, an error may be thrown.
 #'
 #' @export
 #' @importFrom R.methodsS3 throw
@@ -432,7 +525,9 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("asyn
 } # await()
 
 
-#' Removes an asynchroneous future
+delete <- function(...) UseMethod("delete")
+
+#' Removes a BatchJobs future
 #'
 #' @param future The future.
 #' @param onRunning Action if future is running or appears to run.
@@ -517,27 +612,18 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
 } # delete()
 
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# AsyncTask API
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#' @export
-#' @keywords internal
-error.BatchJobsFuture <- function(future, ...) {
-  stat <- status(future)
-  if (isNA(stat)) return(NULL)
+add_finalizer <- function(...) UseMethod("add_finalizer")
 
-  if (!finished(future)) {
-    msg <- sprintf("%s has not finished yet", class(future)[1L])
-    ex <- AsyncTaskError(msg, task=future)
-    throw(ex)
-  }
+add_finalizer.BatchJobsFuture <- function(future, ...) {
+  ## Register finalizer (will clean up registries etc.)
 
-  if (!"error" %in% stat) return(NULL)
+  reg.finalizer(future, f=function(gcenv) {
+    if (inherits(future, "BatchJobsFuture") && "async" %in% loadedNamespaces()) {
+      try({
+        delete(future, onRunning="skip", onMissing="ignore", onFailure="warning")
+      })
+    }
+  }, onexit=TRUE)
 
-  config <- future$config
-  reg <- config$reg
-  id <- config$id
-  msg <- getErrorMessages(reg, ids=id)
-  msg <- paste(sQuote(msg), collapse=", ")
-  msg
-} # error()
+  invisible(future)
+}

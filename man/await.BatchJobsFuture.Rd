@@ -2,7 +2,7 @@
 % Please edit documentation in R/BatchJobsFuture-class.R
 \name{await.BatchJobsFuture}
 \alias{await.BatchJobsFuture}
-\title{Retrieves the value of of the asynchronously evaluated expression}
+\title{Awaits the value of a BatchJobs future}
 \usage{
 \method{await}{BatchJobsFuture}(future, cleanup = TRUE,
   maxTries = getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES",
@@ -28,7 +28,13 @@ The value of the evaluated expression.
 If an error occurs, an informative Exception is thrown.
 }
 \description{
-Retrieves the value of of the asynchronously evaluated expression
+Awaits the value of a BatchJobs future
+}
+\details{
+Note that \code{await()} should only be called once, because
+after being called the actual asynchroneous task may be removed
+and will no longer available in subsequent calls.  If called
+again, an error may be thrown.
 }
 \keyword{internal}
 

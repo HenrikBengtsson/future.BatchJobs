@@ -2,7 +2,7 @@
 % Please edit documentation in R/BatchJobsFuture-class.R
 \name{delete.BatchJobsFuture}
 \alias{delete.BatchJobsFuture}
-\title{Removes an asynchroneous future}
+\title{Removes a BatchJobs future}
 \usage{
 \method{delete}{BatchJobsFuture}(future, onRunning = c("warning", "error",
   "skip"), onFailure = c("error", "warning", "ignore"),
@@ -31,7 +31,7 @@ for each failed try.}
 (invisibly) TRUE if deleted and FALSE otherwise.
 }
 \description{
-Removes an asynchroneous future
+Removes a BatchJobs future
 }
 \keyword{internal}
 

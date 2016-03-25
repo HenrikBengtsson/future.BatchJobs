@@ -61,7 +61,7 @@ status.AsyncListEnv <- function(x, ...) {
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
     task <- futureOf(x[[kk]], ..., mustExist=FALSE)
-    if (inherits(task, "AsyncTask"))
+    if (inherits(task, "BatchJobsFuture"))
       res[[kk]] <- status(task)
   }
   res
@@ -74,7 +74,7 @@ finished.AsyncListEnv <- function(x, ...) {
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
     task <- futureOf(x[[kk]], ..., mustExist=FALSE)
-    if (inherits(task, "AsyncTask"))
+    if (inherits(task, "BatchJobsFuture"))
       res[kk] <- finished(task)
   }
   res
@@ -87,7 +87,7 @@ completed.AsyncListEnv <- function(x, ...) {
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
     task <- futureOf(x[[kk]], ..., mustExist=FALSE)
-    if (inherits(task, "AsyncTask"))
+    if (inherits(task, "BatchJobsFuture"))
       res[kk] <- completed(task)
   }
   res
@@ -100,7 +100,7 @@ failed.AsyncListEnv <- function(x, ...) {
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
     task <- futureOf(x[[kk]], ..., mustExist=FALSE)
-    if (inherits(task, "AsyncTask"))
+    if (inherits(task, "BatchJobsFuture"))
       res[kk] <- failed(task)
   }
   res
@@ -113,7 +113,7 @@ expired.AsyncListEnv <- function(x, ...) {
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
     task <- futureOf(x[[kk]], ..., mustExist=FALSE)
-    if (inherits(task, "AsyncTask"))
+    if (inherits(task, "BatchJobsFuture"))
       res[kk] <- expired(task)
   }
   res
@@ -126,7 +126,7 @@ error.AsyncListEnv <- function(x, ...) {
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
     task <- futureOf(x[[kk]], ..., mustExist=FALSE)
-    if (inherits(task, "AsyncTask"))
+    if (inherits(task, "BatchJobsFuture"))
       res[kk] <- list(error(task))
   }
   res
@@ -139,7 +139,7 @@ value.AsyncListEnv <- function(x, ...) {
   names(res) <- names(x)
   for (kk in seq_len(nx)) {
     task <- futureOf(x[[kk]], ..., mustExist=FALSE)
-    if (inherits(task, "AsyncTask"))
+    if (inherits(task, "BatchJobsFuture"))
       res[kk] <- list(value(task))
   }
   res

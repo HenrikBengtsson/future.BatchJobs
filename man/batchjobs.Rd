@@ -5,7 +5,7 @@
 \title{A BatchJobs future represents a future that is resolved by one of the many BatchJobs backends}
 \usage{
 batchjobs(expr, envir = parent.frame(), substitute = TRUE, backend = NULL,
-  resources = list(), finalize = getOption("async::finalize", TRUE), ...)
+  resources = list(), ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -20,14 +20,10 @@ are search from.}
 
 \item{resources}{A named list of resources needed by this future.}
 
-\item{finalize}{If TRUE, any underlying registries are
-deleted when this object is garbage collected, otherwise not.}
-
-\item{\ldots}{Additional arguments pass to \code{\link{AsyncTask}()}.}
+\item{\ldots}{Additional arguments pass to \code{\link{BatchJobsFuture}()}.}
 }
 \value{
-Returns a BatchJobsFuture object that also is
-a \link[future]{Future}.
+An object of class \code{BatchJobsFuture}.
 }
 \description{
 A BatchJobs future represents a future that is resolved by one of the many BatchJobs backends

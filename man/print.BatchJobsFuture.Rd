@@ -7,7 +7,7 @@
 \method{print}{BatchJobsFuture}(x, ...)
 }
 \arguments{
-\item{x}{An AsyncTask object}
+\item{x}{An BatchJobsFuture object}
 
 \item{\ldots}{Not used.}
 }
