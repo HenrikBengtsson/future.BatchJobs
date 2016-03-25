@@ -2,7 +2,7 @@
 % Please edit documentation in R/BatchJobsFuture-class.R
 \name{print.BatchJobsFuture}
 \alias{print.BatchJobsFuture}
-\title{Print an AsyncTask}
+\title{Prints a BatchJobs future}
 \usage{
 \method{print}{BatchJobsFuture}(x, ...)
 }
@@ -12,7 +12,7 @@
 \item{\ldots}{Not used.}
 }
 \description{
-Print an AsyncTask
+Prints a BatchJobs future
 }
 \keyword{internal}
 

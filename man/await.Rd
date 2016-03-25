@@ -4,7 +4,7 @@
 \alias{await}
 \title{Awaits an asynchroneous task}
 \usage{
-await(task, ...)
+await(...)
 }
 \arguments{
 \item{task}{The asynchronously task}

@@ -2,12 +2,12 @@
 % Please edit documentation in R/BatchJobsFuture-class.R
 \name{status.BatchJobsFuture}
 \alias{status.BatchJobsFuture}
-\title{Status of an AsyncTask}
+\title{Status of BatchJobs future}
 \usage{
-\method{status}{BatchJobsFuture}(task, ...)
+\method{status}{BatchJobsFuture}(future, ...)
 }
 \arguments{
-\item{task}{The asynchronously task}
+\item{future}{The future.}
 
 \item{\ldots}{Not used.}
 }
@@ -15,7 +15,7 @@
 A character vector.
 }
 \description{
-Status of an AsyncTask
+Status of BatchJobs future
 }
 \keyword{internal}
 

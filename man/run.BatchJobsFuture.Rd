@@ -2,17 +2,20 @@
 % Please edit documentation in R/BatchJobsFuture-class.R
 \name{run.BatchJobsFuture}
 \alias{run.BatchJobsFuture}
-\title{Starts an asynchronously task}
+\title{Runs a BatchJobs future}
 \usage{
-\method{run}{BatchJobsFuture}(task, ...)
+\method{run}{BatchJobsFuture}(future, ...)
 }
 \arguments{
-\item{task}{The asynchronously task.}
+\item{future}{The future.}
 
 \item{\ldots}{Not used.}
 }
+\value{
+(invisibly) the future.
+}
 \description{
-Starts an asynchronously task
+Runs a BatchJobs future
 }
 \keyword{internal}
 

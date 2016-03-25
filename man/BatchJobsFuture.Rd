@@ -2,7 +2,7 @@
 % Please edit documentation in R/BatchJobsFuture-class.R
 \name{BatchJobsFuture}
 \alias{BatchJobsFuture}
-\title{Create an asynchroneous task}
+\title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
   backend = NULL, resources = list(),
@@ -30,7 +30,7 @@ deleted when this object is garbage collected, otherwise not.}
 A BatchJobsFuture object
 }
 \description{
-Create an asynchroneous task
+A BatchJobs future is a future whose value will be resolved via BatchJobs
 }
 \keyword{internal}
 

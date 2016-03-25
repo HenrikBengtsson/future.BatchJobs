@@ -1,4 +1,4 @@
-#' Create an asynchroneous task
+#' A BatchJobs future is a future whose value will be resolved via BatchJobs
 #'
 #' @param expr The R expression to be evaluated
 #' @param envir The environment in which global environment
@@ -33,26 +33,26 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ba
   if (debug) mprint(reg)
 
   ## 2. Create BatchJobsFuture object
-  task <- AsyncTask(expr=gp$expr, envir=envir, substitute=FALSE, ...)
+  future <- AsyncTask(expr=gp$expr, envir=envir, substitute=FALSE, ...)
 
-  task$globals <- gp$globals
-  task$packages <- gp$packages
-  task$config <- list(reg=reg, id=NA_integer_,
+  future$globals <- gp$globals
+  future$packages <- gp$packages
+  future$config <- list(reg=reg, id=NA_integer_,
                       cluster.functions=NULL,
                       resources=resources,
                       backend=backend)
 
-  task <- structure(task, class=c("BatchJobsFuture", class(task)))
+  future <- structure(future, class=c("BatchJobsFuture", class(future)))
 
 
   ## Register finalizer?
-  if (finalize) task <- add_finalizer(task)
+  if (finalize) future <- add_finalizer(future)
 
-  task
+  future
 }
 
 
-#' Print an AsyncTask
+#' Prints a BatchJobs future
 #'
 #' @param x An AsyncTask object
 #' @param \ldots Not used.
@@ -73,9 +73,9 @@ print.BatchJobsFuture <- function(x, ...) {
 }
 
 
-#' Status of an AsyncTask
+#' Status of BatchJobs future
 #'
-#' @param task The asynchronously task
+#' @param future The future.
 #' @param \ldots Not used.
 #'
 #' @return A character vector.
@@ -83,8 +83,8 @@ print.BatchJobsFuture <- function(x, ...) {
 #' @export
 #' @importFrom BatchJobs getStatus
 #' @keywords internal
-status.BatchJobsFuture <- function(task, ...) {
-  config <- task$config
+status.BatchJobsFuture <- function(future, ...) {
+  config <- future$config
   reg <- config$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
   ## Closed and deleted?
@@ -133,43 +133,20 @@ value.BatchJobsFuture <- function(future, onError=c("signal", "return"), onMissi
 } # value()
 
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# AsyncTask API
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#' @export
-#' @keywords internal
-error.BatchJobsFuture <- function(task, ...) {
-  stat <- status(task)
-  if (isNA(stat)) return(NULL)
 
-  if (!finished(task)) {
-    msg <- sprintf("%s has not finished yet", class(task)[1L])
-    ex <- AsyncTaskError(msg, task=task)
-    throw(ex)
-  }
-
-  if (!"error" %in% stat) return(NULL)
-
-  config <- task$config
-  reg <- config$reg
-  id <- config$id
-  msg <- getErrorMessages(reg, ids=id)
-  msg <- paste(sQuote(msg), collapse=", ")
-  msg
-} # error()
-
-
-#' Starts an asynchronously task
+#' Runs a BatchJobs future
 #'
-#' @param task The asynchronously task.
+#' @param future The future.
 #' @param \ldots Not used.
+#'
+#' @return (invisibly) the future.
 #'
 #' @export
 ## @importFrom future getExpression
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
 #'
 #' @keywords internal
-run.BatchJobsFuture <- function(task, ...) {
+run.BatchJobsFuture <- function(future, ...) {
   mdebug <- importFuture("mdebug")
 
   getClusterFunctions <- function() {
@@ -182,24 +159,24 @@ run.BatchJobsFuture <- function(task, ...) {
   ## Assert that the process that created the future is
   ## also the one that evaluates/resolves/queries it.
   assertOwner <- importFuture("assertOwner")
-  assertOwner(task)
+  assertOwner(future)
 
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
   getExpression <- importFuture("getExpression", default=function(future) future$expr)
-  expr <- getExpression(task)
+  expr <- getExpression(future)
 
   ## Always evaluate in local environment
   expr <- substitute(local(expr), list(expr=expr))
 
-  reg <- task$config$reg
+  reg <- future$config$reg
   stopifnot(inherits(reg, "Registry"))
 
-  resources <- task$config$resources
+  resources <- future$config$resources
 
   ## (ii) Attach packages that needs to be attached
-  packages <- task$packages
+  packages <- future$packages
   if (length(packages) > 0) {
     mdebug("Attaching %d packages (%s) ...",
                     length(packages), hpaste(sQuote(packages)))
@@ -221,7 +198,7 @@ run.BatchJobsFuture <- function(task, ...) {
   packages <- NULL
 
   ## (iii) Export globals
-  globals <- task$globals
+  globals <- future$globals
   if (length(globals) > 0) {
     ## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     ## Any globals to encode/decore to workaround various
@@ -303,15 +280,15 @@ run.BatchJobsFuture <- function(task, ...) {
     eval(expr, envir=envir)
   }, list(expr), ...)
 
-  ## id <- asyncBatchEvalQ(reg, exprs=list(task$expr), envir=task$envir, globals=TRUE)
+  ## id <- asyncBatchEvalQ(reg, exprs=list(future$expr), envir=future$envir, globals=TRUE)
 
   ## 2. Update
-  task$config$id <- id
-  if (debug) mprintf("Created %s future #%d\n", class(task)[1], id)
+  future$config$id <- id
+  if (debug) mprintf("Created %s future #%d\n", class(future)[1], id)
 
   ## 3. Set backend here
   ## Use a non-default backend?
-  backend <- task$config$backend ### FIXME: /HB 2016-03-20 Issue #49
+  backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
   if (!is.null(backend)) {
     obackend <- backend()
     on.exit(backend(obackend))
@@ -326,20 +303,20 @@ run.BatchJobsFuture <- function(task, ...) {
   }
 
   ## 4. Record
-  task$config$cluster.functions <- getClusterFunctions()
+  future$config$cluster.functions <- getClusterFunctions()
 
   ## 5. Submit
-  task$state <- 'running'
+  future$state <- 'running'
   submitJobs(reg, ids=id, resources=resources)
   if (debug) mprintf("Launched future #%d\n", id)
 
-  task
+  invisible(future)
 }
 
 
 #' Retrieves the value of of the asynchronously evaluated expression
 #'
-#' @param task The asynchronously task
+#' @param future The future.
 #' @param cleanup If TRUE, the registry is completely removed upon
 #' success, otherwise not.
 #' @param maxTries The number of tries before giving up.
@@ -355,7 +332,7 @@ run.BatchJobsFuture <- function(task, ...) {
 #' @importFrom R.methodsS3 throw
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.BatchJobsFuture <- function(task, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   throw <- R.methodsS3::throw
 
   maxTries <- as.integer(maxTries)
@@ -363,8 +340,8 @@ await.BatchJobsFuture <- function(task, cleanup=TRUE, maxTries=getOption("async:
   debug <- getOption("future.debug", FALSE)
   if (debug) mprintf("Polling...\n")
 
-  expr <- task$expr
-  config <- task$config
+  expr <- future$expr
+  config <- future$config
   reg <- config$reg
   id <- config$id
 
@@ -382,7 +359,7 @@ await.BatchJobsFuture <- function(task, cleanup=TRUE, maxTries=getOption("async:
   interval <- delta
   finished <- FALSE
   while (tries <= maxTries) {
-    stat <- status(task)
+    stat <- status(future)
     if (debug) mprintf(" Status %d: %s\n", tries, paste(stat, collapse=", "))
     if (isNA(stat)) {
       finished <- TRUE
@@ -425,42 +402,42 @@ await.BatchJobsFuture <- function(task, cleanup=TRUE, maxTries=getOption("async:
       res <- loadResult(reg, id=id)
     } else if ("error" %in% stat) {
       cleanup <- FALSE
-      msg <- sprintf("BatchJobError: %s", error(task))
-      ex <- AsyncTaskError(msg, task=task)
+      msg <- sprintf("BatchJobError: %s", error(future))
+      ex <- AsyncTaskError(msg, task=future)
       throw(ex)
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      ex <- AsyncTaskError(msg, task=task)
+      ex <- AsyncTaskError(msg, task=future)
       throw(ex)
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
-      ex <- AsyncTaskError(msg, task=task)
+      ex <- AsyncTaskError(msg, task=future)
       throw(ex)
     }
     if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
-    ex <- AsyncTaskError(msg, task=task)
+    ex <- AsyncTaskError(msg, task=future)
     throw(ex)
   }
 
   ## Cleanup?
   if (cleanup) {
-    delete(task, delta=0.5*delta, alpha=alpha, ...)
+    delete(future, delta=0.5*delta, alpha=alpha, ...)
   }
 
   res
 } # await()
 
 
-#' Removes an asynchroneous task
+#' Removes an asynchroneous future
 #'
-#' @param task The asynchronously task
-#' @param onRunning Action if task is running or appears to run.
-#' @param onFailure Action if failing to delete task.
-#' @param onMissing Action if task does not exist.
+#' @param future The future.
+#' @param onRunning Action if future is running or appears to run.
+#' @param onFailure Action if failing to delete future.
+#' @param onMissing Action if future does not exist.
 #' @param maxTries The number of tries before giving up.
 #' @param delta The delay interval (in seconds) between retries.
 #' @param alpha A multiplicative penalty increasing the delay
@@ -472,13 +449,13 @@ await.BatchJobsFuture <- function(task, cleanup=TRUE, maxTries=getOption("async:
 #' @export
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.BatchJobsFuture <- function(task, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
   onRunning <- match.arg(onRunning)
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
 
   ## Identify registry
-  config <- task$config
+  config <- future$config
   reg <- config$reg
   path <- reg$file.dir
 
@@ -489,7 +466,7 @@ delete.BatchJobsFuture <- function(task, onRunning=c("warning", "error", "skip")
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        ex <- AsyncTaskError(msg, task=task)
+        ex <- AsyncTaskError(msg, task=future)
         throw(ex)
       }
     }
@@ -497,16 +474,16 @@ delete.BatchJobsFuture <- function(task, onRunning=c("warning", "error", "skip")
   }
 
 
-  ## Does the task still run?  If so, then...
-  if (task$state == 'running') {
+  ## Does the future still run?  If so, then...
+  if (future$state == 'running') {
     if (onRunning == "skip") return(invisible(TRUE))
 
-    msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running task: %s", sQuote(path))
+    msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running future: %s", sQuote(path))
     if (onRunning == "warning") {
       warning(msg)
       return(invisible(TRUE))
     } else if (onRunning == "error") {
-      ex <- AsyncTaskError(msg, task=task)
+      ex <- AsyncTaskError(msg, task=future)
       throw(ex)
     }
   }
@@ -529,7 +506,7 @@ delete.BatchJobsFuture <- function(task, onRunning=c("warning", "error", "skip")
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        ex <- AsyncTaskError(msg, task=task)
+        ex <- AsyncTaskError(msg, task=future)
         throw(ex)
       }
     }
@@ -538,3 +515,29 @@ delete.BatchJobsFuture <- function(task, onRunning=c("warning", "error", "skip")
 
   invisible(TRUE)
 } # delete()
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# AsyncTask API
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#' @export
+#' @keywords internal
+error.BatchJobsFuture <- function(future, ...) {
+  stat <- status(future)
+  if (isNA(stat)) return(NULL)
+
+  if (!finished(future)) {
+    msg <- sprintf("%s has not finished yet", class(future)[1L])
+    ex <- AsyncTaskError(msg, task=future)
+    throw(ex)
+  }
+
+  if (!"error" %in% stat) return(NULL)
+
+  config <- future$config
+  reg <- config$reg
+  id <- config$id
+  msg <- getErrorMessages(reg, ids=id)
+  msg <- paste(sQuote(msg), collapse=", ")
+  msg
+} # error()

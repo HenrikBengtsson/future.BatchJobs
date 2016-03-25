@@ -2,21 +2,21 @@
 % Please edit documentation in R/BatchJobsFuture-class.R
 \name{delete.BatchJobsFuture}
 \alias{delete.BatchJobsFuture}
-\title{Removes an asynchroneous task}
+\title{Removes an asynchroneous future}
 \usage{
-\method{delete}{BatchJobsFuture}(task, onRunning = c("warning", "error",
+\method{delete}{BatchJobsFuture}(future, onRunning = c("warning", "error",
   "skip"), onFailure = c("error", "warning", "ignore"),
   onMissing = c("ignore", "warning", "error"), maxTries = 10L,
   delta = getOption("async::interval", 1), alpha = 1.01, ...)
 }
 \arguments{
-\item{task}{The asynchronously task}
+\item{future}{The future.}
 
-\item{onRunning}{Action if task is running or appears to run.}
+\item{onRunning}{Action if future is running or appears to run.}
 
-\item{onFailure}{Action if failing to delete task.}
+\item{onFailure}{Action if failing to delete future.}
 
-\item{onMissing}{Action if task does not exist.}
+\item{onMissing}{Action if future does not exist.}
 
 \item{maxTries}{The number of tries before giving up.}
 
@@ -31,7 +31,7 @@ for each failed try.}
 (invisibly) TRUE if deleted and FALSE otherwise.
 }
 \description{
-Removes an asynchroneous task
+Removes an asynchroneous future
 }
 \keyword{internal}
 

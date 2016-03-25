@@ -134,18 +134,7 @@ error.AsyncTask <- function(task, ...) {
   stop("Not implemented for class ", class(task)[1])
 }
 
-
-
-#' Starts an asynchroneous task
-#'
-#' @param task The asynchronously task.
-#' @param \ldots Not used.
-#'
-#' @return The the started task.
-#'
-#' @export
-#' @keywords internal
-run <- function(task, ...) UseMethod("run")
+run <- function(...) UseMethod("run")
 
 #' @export
 #' @keywords internal
@@ -176,7 +165,7 @@ run.AsyncTask <- function(task, ...) {
 #'
 #' @export
 #' @keywords internal
-await <- function(task, ...) UseMethod("await")
+await <- function(...) UseMethod("await")
 
 #' @export
 #' @keywords internal
