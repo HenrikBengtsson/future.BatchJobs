@@ -201,7 +201,7 @@ resolved.BatchJobsFuture <- function(x, ...) {
 #' @importFrom future value
 #' @export
 #' @keywords internal
-value.BatchJobsFuture <- function(future, onError=c("signal", "return"), onMissing=c("default", "error"), default=NULL, cleanup=TRUE, ...) {
+value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "error"), default=NULL, cleanup=TRUE, ...) {
   ## Has the value already been collected?
   if (future$state %in% c('finished', 'failed', 'interrupted')) {
     return(NextMethod("value"))
