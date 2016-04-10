@@ -4,7 +4,7 @@ Package: async
 Version: 0.7.5-9000 [2016-04-08]
 o batchjobs() function gained class attribute.
 o Renamed BatchJobsAsyncTask to BatchJobsFuture.
-o CLEANUP: Removed non-longer needed asyncBatchEvalQ() because
+o CLEANUP: Removed no-longer needed asyncBatchEvalQ() because
   BatchJobsFuture is now self sufficient.
 o BUG FIX: Global variables with the same name as objects in the
   base or the BatchJobs package would be overridden by the
