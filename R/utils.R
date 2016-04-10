@@ -99,3 +99,7 @@ importFuture <- function(name, default=NULL) {
   }
 }
 
+geval <- function(expr, ...) {
+  expr <- substitute(expr)
+  eval(expr, envir=.GlobalEnv)
+}
