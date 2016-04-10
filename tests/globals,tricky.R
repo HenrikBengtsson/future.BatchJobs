@@ -5,12 +5,23 @@ ovars <- ls()
 oopts <- options(warn=1)
 plan(batchjobs, backend="local")
 
-message("*** Trick use cases related to globals ...")
+message("*** Tricky use cases related to globals ...")
+
+message("- Globals with the same name as 'base' objects ...")
+
+## 'col' is masked by 'base::col' (Issue #55)
+
+col <- 3
+x %<-% { stopifnot(is.numeric(col)); col }
+stopifnot(x == col)
+
+
+message("- flapply(x, FUN=base::vector, ...) ...")
 
 flapply <- function(x, FUN, ...) {
   res <- listenv()
   for (ii in seq_along(x)) {
-    res[[ii]] %<=% FUN(x[[ii]], ...)
+    res[[ii]] %<-% FUN(x[[ii]], ...)
   }
   names(res) <- names(x)
 
@@ -20,9 +31,6 @@ flapply <- function(x, FUN, ...) {
 
   as.list(res)
 }
-
-
-message("- flapply(x, FUN=base::vector, ...) ...")
 
 x <- list(a="integer", b="numeric", c="character", c="list")
 str(list(x=x))
@@ -71,7 +79,7 @@ str(list(y=y))
 stopifnot(identical(y, y0))
 
 
-message("*** Trick use cases related to globals ... DONE")
+message("*** Tricky use cases related to globals ... DONE")
 
 
 ## Cleanup
