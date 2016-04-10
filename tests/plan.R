@@ -45,18 +45,18 @@ mpid <- Sys.getpid()
 print(mpid)
 
 ## Process ID of background R session
-pid %<=% { Sys.getpid() }
+pid %<-% { Sys.getpid() }
 print(pid)
 stopifnot(pid != mpid)
 
 ## Process ID of background R session
-pid %<=% { Sys.getpid() }
+pid %<-% { Sys.getpid() }
 print(pid)
 stopifnot(pid != mpid)
 
 ## Use interactive Batchjobs futures
 plan(batchjobs, backend="interactive")
-pid %<=% { Sys.getpid() }
+pid %<-% { Sys.getpid() }
 print(pid)
 stopifnot(pid == mpid)
 

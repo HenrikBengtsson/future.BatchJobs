@@ -6,7 +6,7 @@ use("async")
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 t0 <- Sys.time()
 
-v1 %<=% {
+v1 %<-% {
   cat("Calculation #1: ")
   for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
   cat(" [100%]\n")
@@ -14,14 +14,14 @@ v1 %<=% {
 }
 
 a <- 2
-v2 %<=% {
+v2 %<-% {
   cat("Calculation #2: ")
   for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
   cat(" [100%]\n")
   a
 }
 
-v3 %<=% {
+v3 %<-% {
   cat("Calculation #3: ")
   for (ii in 1:10) { cat("."); Sys.sleep(0.5) }
   cat(" [100%]\n")
