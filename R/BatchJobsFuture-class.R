@@ -362,7 +362,7 @@ run.BatchJobsFuture <- function(future, ...) {
   globals <- NULL
 
   ## 1. Add to BatchJobs for evaluation
-  id <- batchMap(reg, fun=geval, list(expr))
+  id <- batchMap(reg, fun=geval, list(expr), more.args=list(substitute=TRUE))
 
   ## 2. Update
   future$config$id <- id
