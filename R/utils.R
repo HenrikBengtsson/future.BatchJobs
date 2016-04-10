@@ -99,7 +99,13 @@ importFuture <- function(name, default=NULL) {
   }
 }
 
-geval <- function(expr, ...) {
+
+## Evaluates an expression in global environment.
+## Because geval() is exported, we want to keep environment(geval)
+## as small as possible, which is why we use local().  Without,
+## the environment would be that of the package itself and all of
+## the package would be exported.
+geval <- local(function(expr, ...) {
   expr <- substitute(expr)
   eval(expr, envir=.GlobalEnv)
-}
+})
