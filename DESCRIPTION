@@ -2,7 +2,7 @@ Package: async
 Version: 0.7.5-9000
 Depends:
     R (>= 3.1.2),
-    future (>= 0.12.5-9000)
+    future (>= 0.13.0)
 Imports:
     listenv,
     BatchJobs (>= 1.6),
