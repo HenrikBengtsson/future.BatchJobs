@@ -80,22 +80,6 @@ To reset, use `backend("reset")`
 (which is equivalent to `backend("default")`).
 
 
-
-### Multi-core processing
-Multi-core processing is when multiple R processes are used (instead
-of the default single-thread single-process R session we are all used
-to).  Note that multi-core processing is not available on Windows
-(this is a limitation of the R core package `parallel`).
-When specifying `plan(batchjobs, backend="multicore")`, all available
-cores are used on the machine.  For heavy computations, this might
-render the machine very slow and useless for other things.  To avoid
-this, one can specify how many cores to "spare", e.g. `plan(batchjobs,
-backend="multicore-2")` will use all but two cores. Note how the
-default (see above) is `plan(batchjobs, backend="multicore-1")`. As an
-alternative, it is also possible to specify the exact number of cores
-to be used, e.g. `plan(batchjobs, backend="multicore=3")`.
-
-
 ### Advanced configuration
 For more complicated backends (e.g. clusters), one has to use
 BatchJobs-specific configuration files as explained in the Appendix.
