@@ -2,7 +2,7 @@ source("incl/start.R")
 
 message("*** batchjobs() ...")
 
-## An asynchroneous future without globals
+## An asynchronous future without globals
 f <- batchjobs({ x <- 1 })
 print(f)
 v <- value(f)
@@ -10,7 +10,7 @@ print(v)
 stopifnot(v == 1)
 
 
-## An asynchroneous future with globals
+## An asynchronous future with globals
 a <- 2
 f <- batchjobs({ x <- a })
 print(f)
@@ -19,7 +19,7 @@ print(v)
 stopifnot(v == a)
 
 
-## An asynchroneous future with errors
+## An asynchronous future with errors
 f <- batchjobs({ x <- 5; stop("Woops!"); x })
 print(f)
 v <- value(f, signal=FALSE)

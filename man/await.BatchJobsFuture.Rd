@@ -33,7 +33,7 @@ Awaits the value of a BatchJobs future
 }
 \details{
 Note that \code{await()} should only be called once, because
-after being called the actual asynchroneous task may be removed
+after being called the actual asynchronous future may be removed
 and will no longer available in subsequent calls.  If called
 again, an error may be thrown.
 }
