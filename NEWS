@@ -10,6 +10,7 @@ o STANDARIZATION: Directories for BatchJobs are now created under
   Also, those subdirectories now use prefix 'BatchJobs_' (was 'async').
   This was done to have a common directory structure also for other
   future backends that needs to keep files on the file system.
+o CLEANUP: Removed AsyncError.
 o CLEANUP: Dropping AsyncListEnv.
 
 

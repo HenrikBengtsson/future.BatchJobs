@@ -1,19 +1,8 @@
-#' Exception class for async-related errors
+#' Exception class for BatchJobsFuture-related errors
 #'
-#' @usage AsyncError(...)
+#' @usage AsyncTaskError(...)
 #' @param \ldots Passed to \code{\link[R.oo]{Exception}}
 #'
-#' @aliases AsyncTaskError
-#' @export
-#' @importFrom R.oo setConstructorS3
-#' @importFrom R.oo extend
-#' @importFrom R.oo Exception
-#' @keywords internal
-AsyncError <- function(...) NULL  ## To please roxygen2
-setConstructorS3("AsyncError", function(...) {
-  extend(Exception(...), "AsyncError")
-})
-
 #' @export
 #' @importFrom R.oo setConstructorS3
 #' @importFrom R.oo extend
@@ -21,7 +10,7 @@ setConstructorS3("AsyncError", function(...) {
 #' @keywords internal
 AsyncTaskError <- function(...) NULL  ## To please roxygen2
 setConstructorS3("AsyncTaskError", function(..., task=NULL) {
-  error <- extend(AsyncError(...), "AsyncTaskError")
+  error <- extend(Exception(...), "AsyncTaskError")
   error$task <- task
   error
 })
