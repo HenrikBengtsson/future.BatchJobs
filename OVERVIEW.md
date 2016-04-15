@@ -102,7 +102,6 @@ The [future] package provdides a demo using futures for calculating a
 set of Mandelbrot planes.  Except from using futures, the demo does
 not assume anything about what type of futures are used.  This is up
 to the user to control.
-
 For instance, to use `local` BatchJobs futures, run the demo as:
 ```r
 library("future.BatchJobs")
