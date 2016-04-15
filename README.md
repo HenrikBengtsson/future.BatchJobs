@@ -31,61 +31,11 @@ parallel on multiple cores:
 > library('async')
 > plan(batchjobs, backend='multicore')
 >
-> x %<=% { Sys.sleep(5); 3.14 }
-> y %<=% { Sys.sleep(5); 2.71 }
+> x %<-% { Sys.sleep(5); 3.14 }
+> y %<-% { Sys.sleep(5); 2.71 }
 > x + y
 [1] 5.85
 ```
-
-### Global variables
-
-Although the following expression is evaluated in an asynchronous
-environment - separated from the calling one - the asynchronous
-environment "inherits"(*) any "global" variables in the calling
-environment and its parents.  For example,
-```r
-a <- 2
-y %<=% { b <- a*3.14; b }
-```
-results in `y` being assigned `6.28`.
-
-If a global variable is one that is assigned by another asynchronous
-expression, then dependent asynchronous expressions will wait for the
-former to complete in order to resolve the global variables.  For
-example, in
-```r
-a %<=% { Sys.sleep(7); runif(1) }
-b %<=% { Sys.sleep(2); rnorm(1) }
-c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
-d <- runif(1)
-```
-the third asynchronous expression will not be evaluated until `a` and
-`b` have taken their values.  As a matter of fact, even if `c` is also
-an asynchronous assignment, R will pause (**) until global variables
-`a` and `b` are resolved.  In other words, the assignment of `d` will
-not take place until `a` and `b` are resolved (but there is no need to
-wait for `c`).  This pause can be avoided using nested asynchronous
-evaluation (see Section below).
-
-
-_Footnotes_:
-(\*) Since the asynchronous environment may be in a separate R session
-on a physically different machine, the "inheritance" of "global"
-variables is achieved by first identifying which variables in the
-asynchronous expression are global and then copy them from the calling
-environment to the asynchronous environment (using serialization).
-This has to be taken into consideration when working with large
-objects, which can take a substantial time to serialize.  Serialized
-objects may also be written to file which then a compute node reads
-back in. The global environments are identified using code inspection,
-cf. the [codetools] package.
-(\*\*) There is currently no lazy-evaluation mechanism for global
-variables from asynchronous evaluations.  However, theoretically, one
-could imagine that parts of an asynchronous expression can be
-evaluated while the required one is still being evaluated.  However,
-the current implementation is such that the asynchronous evaluation
-will not be _initiated_ until all global variables can be resolved.
-
 
 ### Interrupts
 Interrupts such as user interrupts ("Ctrl-C") will only interrupt any
@@ -94,7 +44,7 @@ the evaluation of asynchronous expressions running in separate R
 processes such as those pushed out on a cluster.  This can be useful
 when one tries to get the value of a asynchronous evaluation that
 took longer than expected causing R to pause.  By hitting Ctrl-C one
-can get back to the main prompt and do other tasks while waiting for
+can get back to the main prompt and do other futures while waiting for
 the long-running evaluation to complete.
 
 
@@ -173,9 +123,9 @@ Asynchronous expressions are processed by the default backend as given
 by `backend()`.  If another backend should be used to evaluate for a
 particular expression, operator `%plan%` can be used.  For example,
 ```r
-a %<=% { Sys.sleep(7); runif(1) } %plan% batchjobs(backend="multicore-2")
-b %<=% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="cluster-2")
-c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
+a %<-% { Sys.sleep(7); runif(1) } %plan% batchjobs(backend="multicore-2")
+b %<-% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="cluster-2")
+c %<-% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
 In this case expression `a` will be processed by the `multicore-2`
@@ -186,9 +136,9 @@ Backend specifications can also be used in nested asynchronous
 evaluations:
 ```r
 plan(batchjobs, backend="cluster")
-a %<=% { Sys.sleep(7); runif(1) }
-c %<=% {
-  b %<=% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="multicore=2")
+a %<-% { Sys.sleep(7); runif(1) }
+c %<-% {
+  b %<-% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="multicore=2")
   x <- a*b; Sys.sleep(2); abs(x)
 }
 d <- runif(1)
@@ -221,7 +171,7 @@ repos <- c(CRAN="http://cran.r-project.org",
 urls <- sapply(repos, file.path, "src/contrib/PACKAGES", fsep="/")
 files <- new.env()
 for (name in names(urls)) {
-  files[[name]] %<=% downloadFile(urls[[name]], path=name)
+  files[[name]] %<-% downloadFile(urls[[name]], path=name)
 }
 str(as.list(files))
 ```
@@ -234,78 +184,6 @@ This package is only available via GitHub.  Install in R as:
 install.packages('future')
 source('http://callr.org/install#HenrikBengtsson/async')
 ```
-
-
-## Future directions
-The above, which is a fully functional prototype, relies 100% on
-[BatchJobs] as the backend.  Unfortunately, BatchJobs has some
-limitations as it stands.  The most important one is the fact that [all
-machines, including the head machine, have to share the same file
-system](https://github.com/tudo-r/BatchJobs/issues/71).  This means
-that it is, for instance, not possible to do asynchronous evaluation
-on remote hosts, e.g. over ssh.  If that would be possible, then one
-can imagine doing things such as:
-```r
-# The world's computer resources at your R prompt
-library(async)
-plan(batchjobs)
-
-tasks %<=% {
-  update.packages()
-} %backends% c("local", "cluster", "AmazonEC2", "GoogleCompEngine")
-
-tcga %<=% {
-  plan(batchjobs, backend="cluster")
-
-  a %<=% {
-    doCRMAv2("BreastCancer", chipType="GenomeWideSNP_6")
-  }
-
-  b %<=% {
-    doCRMAv2("ProstateCancer", chipType="Mapping250K_Nsp")
-  }
-
-  list(a=a, b=b)
-} %plan% batchjobs(backend="AmazonEC2")
-
-hapmap %<=% {
-  plan(batchjobs, backend="cluster")
-
-  normals %<=% {
-    doCRMAv2("HapMap2", chipType="GenomeWideSNP_6")
-  }
-
-  normals
-} %plan% batchjobs(backend="GoogleCompEngine")
-
-```
-Obviously great care needs to be taken in order to minimize the amount
-of data sent back and forth, e.g. returning really large objects.
-
-In order for the above to work, one would have to extend the
-BatchJobs Registry framework to work across file systems, which
-would requiring serialization and communicating over sockets.
-A better approach is probably to instead use the [BiocParallel]
-package as the main framework for backends.  BiocParallel "aims to
-provide a unified interface to existing parallel infrastructure where
-code can be easily executed in different environments".  It already
-has built in support for BatchJobs.  More importantly, it support many
-other backends, including Simple Network of Workstations ("SNOW")
-style clusters. A SNOW cluster consists of a set of local or remote
-workers that communicates with the head node/machine via sockets such
-that data and commands can be transferred across using a serialized
-protocol.  For example, from the BiocParallel vignette:
-```r
-hosts <- c("rhino01", "rhino01", "rhino02")
-param <- SnowParam(workers = hosts, type = "PSOCK")
-Execute FUN 4 times across the workers.
-> FUN <- function(i) system("hostname", intern=TRUE)
-> bplapply(1:4, FUN, BPPARAM = param)
-```
-
-Because of this, the next plan is to update 'async' to work on top of
-BiocParallel instead.
-
 
 ## Appendix
 
@@ -349,7 +227,6 @@ see the [BatchJobs configuration] wiki page.
 
 
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
-[BiocParallel]: http://bioconductor.org/packages/release/bioc/html/BiocParallel.html
 [brew]: http://cran.r-project.org/package=brew
 [codetools]: http://cran.r-project.org/package=codetools
 [globals]: http://cran.r-project.org/package=globals
@@ -359,7 +236,7 @@ see the [BatchJobs configuration] wiki page.
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 
 ---
-Copyright Henrik Bengtsson, 2015
+Copyright Henrik Bengtsson, 2015-2016
 
 ## Installation
 R package async is only available via [GitHub](https://github.com/HenrikBengtsson/async) and can be installed in R as:
