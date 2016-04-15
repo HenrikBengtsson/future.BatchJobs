@@ -171,7 +171,7 @@ error.BatchJobsFuture <- function(future, ...) {
 
   if (!finished(future)) {
     msg <- sprintf("%s has not finished yet", class(future)[1L])
-    ex <- AsyncTaskError(msg, task=future)
+    ex <- BatchJobsFutureError(msg, task=future)
     throw(ex)
   }
 
@@ -491,23 +491,23 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("futu
     } else if ("error" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobError: %s", error(future))
-      ex <- AsyncTaskError(msg, task=future)
+      ex <- BatchJobsFutureError(msg, task=future)
       throw(ex)
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      ex <- AsyncTaskError(msg, task=future)
+      ex <- BatchJobsFutureError(msg, task=future)
       throw(ex)
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
-      ex <- AsyncTaskError(msg, task=future)
+      ex <- BatchJobsFutureError(msg, task=future)
       throw(ex)
     }
     if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchroneous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
-    ex <- AsyncTaskError(msg, task=future)
+    ex <- BatchJobsFutureError(msg, task=future)
     throw(ex)
   }
 
@@ -556,7 +556,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        ex <- AsyncTaskError(msg, task=future)
+        ex <- BatchJobsFutureError(msg, task=future)
         throw(ex)
       }
     }
@@ -573,7 +573,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
       warning(msg)
       return(invisible(TRUE))
     } else if (onRunning == "error") {
-      ex <- AsyncTaskError(msg, task=future)
+      ex <- BatchJobsFutureError(msg, task=future)
       throw(ex)
     }
   }
@@ -596,7 +596,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        ex <- AsyncTaskError(msg, task=future)
+        ex <- BatchJobsFutureError(msg, task=future)
         throw(ex)
       }
     }
