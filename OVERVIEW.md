@@ -198,27 +198,27 @@ are used by default if available.  They also be explicitly specified
 by `plan(batchjobs, backend=".BatchJobs.R")`.
 
 For example, to configure BatchJobs to distribute computations on a
-set of known machines (for which you have ssh access and that
-[share the same file system as your head
-machine](https://github.com/tudo-r/BatchJobs/issues/71)), let the
-`.BatchJobs.R` file contain:
-```r
-cluster.functions <- makeClusterFunctionsSSH(
-  makeSSHWorker(nodename="n6", max.jobs=2),
-  makeSSHWorker(nodename="n8"),
-  makeSSHWorker(nodename="n12")
-)
-```
+ compute cluster with a TORQUE/PBS job scheduler, you  can use:
 
-To use a more formal cluster system with a Torque/PBS job queue
-mechanism, use:
+let the `.BatchJobs.R` file contain:
 ```r
 cluster.functions <- local({
-  tmpl <- system.file(package="async", "config", "pbs.tmpl")
-  makeClusterFunctionsTorque(tmpl)
+  makeClusterFunctionsTorque(R.utils::tmpfile('
+#PBS -N <%= job.name %>
+## merge standard error and output
+#PBS -j oe
+## direct streams to our logfile
+#PBS -o <%= log.file %>
+#PBS -l walltime=<%= resources$walltime %>,nodes=<%= resources$nodes %>,vmem=<%= resources$memory %>M
+## remove this line if your cluster does not support arrayjobs
+#PBS -t 1-<%= arrayjobs %>
+  
+## Run R:
+## we merge R output with stdout from PBS, which gets then logged via -o option
+R CMD BATCH --no-save --no-restore "<%= rscript %>" /dev/stdout
+  '))
 })
 ```
-where the "tmpl" file is a [brew]-embedded PBS script template.
 
 For further details and examples on how to configure BatchJobs,
 see the [BatchJobs configuration] wiki page.
@@ -226,10 +226,7 @@ see the [BatchJobs configuration] wiki page.
 
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
 [brew]: http://cran.r-project.org/package=brew
-[codetools]: http://cran.r-project.org/package=codetools
-[globals]: http://cran.r-project.org/package=globals
 [future]: http://cran.r-project.org/package=future
-[listenv]: http://cran.r-project.org/package=listenv
 [async]: https://github.com/HenrikBengtsson/async/
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 
