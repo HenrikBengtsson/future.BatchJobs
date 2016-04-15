@@ -8,7 +8,7 @@ asyncPath <- local({
       id <- gsub("Rtmp", "", id, fixed=TRUE)
       timestamp <- format(Sys.time(), format="%Y%m%d_%H%M%S")
       dir <- sprintf("%s-%s", timestamp, id)
-      pathT <- file.path(".async", dir)
+      pathT <- file.path(".future", dir)
       if (create && !isDirectory(pathT)) {
         mkdirs(pathT)
         pathnameT <- file.path(pathT, "sessioninfo.txt")
@@ -27,7 +27,7 @@ asyncPath <- local({
 tempRegistry <- local({
   regs <- new.env()
 
-  function(backend=NULL, prefix="async", path=NULL, file.dir=NULL, ...) {
+  function(backend=NULL, prefix="BatchJobs_", path=NULL, file.dir=NULL, ...) {
     id <- tempvar(prefix=prefix, value=NA, envir=regs)
     if (is.null(path)) path <- asyncPath()
     if (is.null(file.dir)) file.dir <- file.path(path, paste0(id, "-files"))
