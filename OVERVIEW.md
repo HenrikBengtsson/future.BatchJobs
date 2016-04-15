@@ -1,52 +1,21 @@
 ## Introduction
-This package provides a Future API for the [BatchJobs] package by
-enhancing the [future] package.  For an introduction how to use
-futures in R, please consult the vignettes of the [future] package.
-A large fraction of the below text is just an adopted iteration
-of what is already documented in [future].
-
-
-## Asynchronous evaluation
-_Asynchronous evaluation_ is a method for evaluating multiple R
-expressions in, typically, a parallel or distributed fashion such that
-the "observed" total time for computing all values is less that if the
-expressions would be evaluated synchronously (sequentially).
-For instance, the following evaluation, which is synchronous, takes
-about 10 seconds to complete:
-
-```r
-> x <- { Sys.sleep(5); 3.14 }
-> y <- { Sys.sleep(5); 2.71 }
-> x + y
-[1] 5.85
-```
-
-whereas the following _asynchronous_ evaluation using BatchJobs
-futures only takes about 5 seconds to complete since it done in
-parallel on multiple cores:
-
+This package provides [BatchJobs] futures on the Future API
+defined by the [future] package.  This means that all of the
+BatchJobs machinery can be utilized using futures, e.g.
 ```r
 > library('async')
-> plan(batchjobs, backend='multicore')
+> plan(batchjobs, backend='.BatchJobs.R')
 >
 > x %<-% { Sys.sleep(5); 3.14 }
 > y %<-% { Sys.sleep(5); 2.71 }
 > x + y
 [1] 5.85
 ```
-
-### Interrupts
-Interrupts such as user interrupts ("Ctrl-C") will only interrupt any
-evaluation running in the same R session.  They will not interrupts
-the evaluation of asynchronous expressions running in separate R
-processes such as those pushed out on a cluster.  This can be useful
-when one tries to get the value of a asynchronous evaluation that
-took longer than expected causing R to pause.  By hitting Ctrl-C one
-can get back to the main prompt and do other futures while waiting for
-the long-running evaluation to complete.
+For an introduction how to use futures in R, please consult the
+vignettes of the [future] package.
 
 
-## Choosing backend
+## Choosing BatchJobs backend
 The asynchronous evaluation done by the [async] package uses the
 [BatchJobs] package as a backend for effectuating the computations.
 This can be configured using `plan(batchjobs, backend=...)`.
@@ -99,33 +68,6 @@ and `"local"`.  After setting an alias it can be specified as:
 plan(batchjobs, backend="cluster")
 ```
 
-
-### Evaluate asynchronous expression on specific backend
-Asynchronous expressions are processed by the default backend as given
-by `backend()`.  If another backend should be used to evaluate for a
-particular expression, operator `%plan%` can be used.  For example,
-```r
-a %<-% { Sys.sleep(7); runif(1) } %plan% batchjobs(backend="multicore-2")
-b %<-% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="cluster-2")
-c %<-% { x <- a*b; Sys.sleep(2); abs(x) }
-d <- runif(1)
-```
-In this case expression `a` will be processed by the `multicore-2`
-backend, expression `c` by the `cluster` backend, and expression `c`
-by the default backend.
-
-Backend specifications can also be used in nested asynchronous
-evaluations:
-```r
-plan(batchjobs, backend="cluster")
-a %<-% { Sys.sleep(7); runif(1) }
-c %<-% {
-  b %<-% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="multicore=2")
-  x <- a*b; Sys.sleep(2); abs(x)
-}
-d <- runif(1)
-```
-
 ## Demos and Examples
 
 ### Mandelbrot demo
@@ -141,30 +83,6 @@ R session:
 library(async)
 plan(batchjobs, batchjobs="local")
 demo("mandelbrot", package="future", ask=FALSE)
-```
-
-
-### Download files in parallel
-```r
-library('async')
-library('R.utils')
-repos <- c(CRAN="http://cran.r-project.org",
-           Bioc="http://www.bioconductor.org/packages/release/bioc")
-urls <- sapply(repos, file.path, "src/contrib/PACKAGES", fsep="/")
-files <- new.env()
-for (name in names(urls)) {
-  files[[name]] %<-% downloadFile(urls[[name]], path=name)
-}
-str(as.list(files))
-```
-
-
-## Availability
-This package is only available via GitHub.  Install in R as:
-
-```s
-install.packages('future')
-source('http://callr.org/install#HenrikBengtsson/async')
 ```
 
 ## Appendix
