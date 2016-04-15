@@ -4,11 +4,12 @@ Depends:
     R (>= 3.1.2),
     future (>= 0.13.0)
 Imports:
-    listenv,
     BatchJobs (>= 1.6),
     R.methodsS3,
     R.oo,
     R.utils
+Suggests:
+    listenv
 Title: A Future for BatchJobs
 Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
                                           email = "henrikb@braju.com"))

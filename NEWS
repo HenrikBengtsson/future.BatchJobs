@@ -1,6 +1,10 @@
 Package: async
 ==============
 
+Version: 0.8.0-9000 [2016-04-14]
+o CLEANUP: Dropping AsyncListEnv.
+
+
 Version: 0.8.0 [2016-04-14]
 o batchjobs() function gained class attribute.
 o Renamed BatchJobsAsyncTask to BatchJobsFuture.
