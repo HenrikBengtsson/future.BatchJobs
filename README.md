@@ -123,15 +123,15 @@ demo("mandelbrot", package="future", ask=FALSE)
 Copyright Henrik Bengtsson, 2015-2016
 
 ## Installation
-R package future.BatchJobs is only available via [GitHub](https://github.com/HenrikBengtsson/async) and can be installed in R as:
+R package future.BatchJobs is only available via [GitHub](https://github.com/HenrikBengtsson/future.BatchJobs) and can be installed in R as:
 ```r
-source('http://callr.org/install#HenrikBengtsson/async')
+source('http://callr.org/install#HenrikBengtsson/future.BatchJobs')
 ```
 
 ### Pre-release version
 To install the pre-release version that is available in branch `develop`, use:
 ```r
-source('http://callr.org/install#HenrikBengtsson/async@develop')
+source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@develop')
 ```
 This will install the package from source.  
 
@@ -142,5 +142,5 @@ This will install the package from source.
 | Resource:     | GitHub        | Travis CI     | Appveyor         |
 | ------------- | ------------------- | ------------- | ---------------- |
 | _Platforms:_  | _Multiple_          | _Linux_       | _Windows_        |
-| R CMD check   |  | <a href="https://travis-ci.org/HenrikBengtsson/async"><img src="https://travis-ci.org/HenrikBengtsson/async.svg" alt="Build status"></a> | <a href="https://ci.appveyor.com/project/HenrikBengtsson/async"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/async?svg=true" alt="Build status"></a> |
-| Test coverage |                     | <a href="https://coveralls.io/r/HenrikBengtsson/async"><img src="https://coveralls.io/repos/HenrikBengtsson/async/badge.svg?branch=develop" alt="Coverage Status"/></a>   |                  |
+| R CMD check   |  | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a> | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
+| Test coverage |                     | <a href="https://coveralls.io/r/HenrikBengtsson/future.BatchJobs"><img src="https://coveralls.io/repos/HenrikBengtsson/future.BatchJobs/badge.svg?branch=develop" alt="Coverage Status"/></a>   |                  |
