@@ -37,5 +37,4 @@ README[.]md
 # Package specific
 #----------------------------
 ^[.]BatchJobs[.]R$
-[.]async
-
+[.]future

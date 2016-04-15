@@ -3,13 +3,13 @@ source("incl/start.R")
 message("*** plan() ...")
 
 message("*** Set strategy via future::plan(future::batchjobs)")
-oplan <- future::plan(async::batchjobs)
+oplan <- future::plan(future.BatchJobs::batchjobs)
 print(future::plan())
 future::plan(oplan)
 print(future::plan())
 
 
-library("async")
+library("future.BatchJobs")
 backend("local")
 
 for (backend in c("interactive", "local")) {

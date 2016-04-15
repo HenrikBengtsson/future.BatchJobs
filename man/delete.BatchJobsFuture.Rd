@@ -7,7 +7,7 @@
 \method{delete}{BatchJobsFuture}(future, onRunning = c("warning", "error",
   "skip"), onFailure = c("error", "warning", "ignore"),
   onMissing = c("ignore", "warning", "error"), maxTries = 10L,
-  delta = getOption("async::interval", 1), alpha = 1.01, ...)
+  delta = getOption("future.interval", 1), alpha = 1.01, ...)
 }
 \arguments{
 \item{future}{The future.}

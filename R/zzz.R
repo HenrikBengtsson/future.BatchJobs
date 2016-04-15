@@ -7,7 +7,7 @@
 
   ## (b) Remove BatchJobs root directory if only a set
   ##     of known files exists, i.e. not any directories etc.
-  path <- asyncPath(create=FALSE)
+  path <- futureCachePath(create=FALSE)
   ## Only known files left?
   files <- dir(path=path)
   knownFiles <- c("sessioninfo.txt")

@@ -2,11 +2,11 @@ source("incl/start.R")
 
 message("*** BatchJobsFuture() ...")
 
-task <- BatchJobsFuture({ x <- 1 })
-print(task)
+f <- BatchJobsFuture({ x <- 1 })
+print(f)
 
-try(print(delete(task)))
-try(print(delete(task)))
+try(print(delete(f)))
+try(print(delete(f)))
 
 message("*** BatchJobsFuture() ... DONE")
 

@@ -1,5 +1,20 @@
-Package: async
-==============
+Package: future.BatchJobs
+=========================
+
+Version: 0.9.0 [2016-04-15]
+o Package renamed to future.BatchJobs (was async).
+o Package requires R (>= 3.2.0) just so Mandelbrot demo works.
+o STANDARIZATION Now using option and environment names already defined
+  by the future package, i.e. future.maxTries, future.interval, and
+  R_FUTURE_MAXTRIES (used to be named async::* and R_ASYNC_*).
+o STANDARIZATION: Directories for BatchJobs are now created under
+  .future/<session>/ of the current directory (was .async/<session>/).
+  Also, those subdirectories now use prefix 'BatchJobs_' (was 'async').
+  This was done to have a common directory structure also for other
+  future backends that needs to keep files on the file system.
+o CLEANUP: Renamed AsyncTaskError to BatchJobsFutureError.
+o CLEANUP: Dropping AsyncListEnv.
+
 
 Version: 0.8.0 [2016-04-14]
 o batchjobs() function gained class attribute.
