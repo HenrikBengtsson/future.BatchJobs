@@ -26,19 +26,19 @@ e.g.
 
 Below are the most common types of BatchJobs backends.  The default is `backend="default"`.  
 
-| Backend                   | OSes        | Description       | Alternative in future package
-|:--------------------------|:------------|:------------------|:-------------------------------
-| _synchronous:_            |             | _non-parallel:_   |
-| `interactive`             | all         | non-parallel processing in the current R process.  | plan(eager)
-| `local`                   | all         | non-parallel processing in a separate R process.   | plan(multisession, maxCores=2)
-| _asynchronous:_           |             | _parallel_:       |
-| `multicore`               | not Windows | forked R processes (on current machine) using all available cores   | plan(multicore, maxCores=availableCores())
-| `multicore-1`             | not Windows | forked R processes (on current machine) using all but one of the available cores   | plan(multicore, maxCores=availableCores()-1L)
-| `multicore=<n>`             | not Windows | forked R processes (on current machine) using `<n>` the available cores   | plan(multicore, maxCores=<n>)
-| _generic:_                |             |                   |
-| `/path/to.BatchJobs.R`    | all         | According to specific `/path/to/.BatchJobs.R` configuration file.  | N/A
-| `.BatchJobs.R`            | all         | According to `./.BatchJobs.R` or `~/.BatchJobs.R`.  | N/A
-| `default`                 | all         | Same as `c(".BatchJobs.R", "multicore-1", "local")`.  This is the default.  | N/A
+| Backend                   | OSes        | Description                                                               | Alternative in future package
+|:--------------------------|:------------|:--------------------------------------------------------------------------|:------------------------------------------------
+| _synchronous:_            |             | _non-parallel:_                                                           |
+| `interactive`             | all         | non-parallel processing in the current R process                          | `plan(eager)`
+| `local`                   | all         | non-parallel processing in a separate R process (on current machine)      | `plan(multisession, maxCores=2)`
+| _asynchronous:_           |             | _parallel_:                                                               |
+| `multicore`               | not Windows | forked R processes (on current machine) using all available cores         | `plan(multicore, maxCores=availableCores())`
+| `multicore-1`             | not Windows | `multicore` using all but one of the available cores                      | `plan(multicore, maxCores=availableCores()-1L)`
+| `multicore=<n>`           | not Windows | `multicore` using `<n>` the available cores                               | `plan(multicore, maxCores=<n>)`
+| _generic:_                |             |                                                                           |
+| `/path/to.BatchJobs.R`    | all         | According to specific `/path/to/.BatchJobs.R` configuration file          | N/A
+| `.BatchJobs.R`            | all         | According to `./.BatchJobs.R` or `~/.BatchJobs.R`                         | N/A
+| `default`                 | all         | Same as `c(".BatchJobs.R", "multicore-1", "local")`.  This is the default | N/A
 
 It is possible to specify a set of backend alternatives,
 e.g. `plan(batchjobs, backend=c("multicore", "local"))`.  The first
