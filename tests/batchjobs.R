@@ -22,7 +22,7 @@ stopifnot(v == a)
 ## An asynchroneous future with errors
 f <- batchjobs({ x <- 5; stop("Woops!"); x })
 print(f)
-v <- value(f, onError="return")
+v <- value(f, signal=FALSE)
 print(v)
 
 res <- try(value(f), silent=TRUE)
@@ -47,7 +47,7 @@ print(v)
 stopifnot(v == 42L)
 
 message("- future assignment without globals ...")
-v %<=% {
+v %<-% {
   42L
 }
 print(v)
@@ -55,12 +55,12 @@ stopifnot(v == 42L)
 
 message("- future assignment with globals ...")
 a <- 3.14
-v %<=% { x <- a }
+v %<-% { x <- a }
 print(v)
 stopifnot(v == a)
 
 message("- future assignment with error ...")
-v %<=% {
+v %<-% {
   x <- 3
   stop("Woops!")
   x

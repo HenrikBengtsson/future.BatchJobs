@@ -1,12 +1,11 @@
 Package: async
-Version: 0.7.1
+Version: 0.8.0
 Depends:
     R (>= 3.1.2),
-    future
+    future (>= 0.13.0)
 Imports:
     listenv,
     BatchJobs (>= 1.6),
-    globals,
     R.methodsS3,
     R.oo,
     R.utils
@@ -14,7 +13,7 @@ Title: A Future for BatchJobs
 Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
                                           email = "henrikb@braju.com"))
 Description: Simple parallel and distributed processing using futures
-    implemented for the 'BatchJobs' framework, e.g. 'fit %<=% { glm.fit(x, y) }'.
+    implemented for the 'BatchJobs' framework, e.g. 'fit %<-% { glm.fit(x, y) }'.
     This package extends the Future API of the 'future' package.
 License: Private for now [will become LGPL (>= 2.1) when published]
 LazyLoad: TRUE

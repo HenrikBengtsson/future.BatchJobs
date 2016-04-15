@@ -7,7 +7,7 @@ sum_fcns <- list()
 
 sum_fcns$A <- function(x, ...) {
   message("Arguments '...' exists: ", exists("...", inherits=TRUE))
-  y %<=% { sum(x, ...) }
+  y %<-% { sum(x, ...) }
   y
 }
 
@@ -15,7 +15,7 @@ sum_fcns$A <- function(x, ...) {
 sum_fcns$B <- function(x, ...) {
   sumt <- function(x) {
     message("Arguments '...' exists: ", exists("...", inherits=TRUE))
-    y %<=% { sum(x, ...) }
+    y %<-% { sum(x, ...) }
     y
   }
   sumt(x)
@@ -23,18 +23,18 @@ sum_fcns$B <- function(x, ...) {
 
 sum_fcns$C <- function(x, y) {
   message("Arguments '...' exists: ", exists("...", inherits=TRUE))
-  y %<=% { sum(x, y) }
+  y %<-% { sum(x, y) }
   y
 }
 
 sum_fcns$D <- function(x, y) {
   message("Arguments '...' exists: ", exists("...", inherits=TRUE))
-  y %<=% { sum(x, y, ...) }
+  y %<-% { sum(x, y, ...) }
   y
 }
 
 
-for (strategy in c("eager", "lazy", "multicore", "batchjobs")) {
+for (strategy in c("eager", "lazy", "multiprocess", "batchjobs")) {
   plan(strategy, substitute=FALSE)
 
   for (name in names(sum_fcns)) {

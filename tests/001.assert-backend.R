@@ -20,22 +20,22 @@ for (be in TEST_BACKENDS) {
   stopifnot(v == be)
 
   message(" - Future evaluation (current environment)")
-  a %<=% be
+  a %<-% be
   print(a)
   stopifnot(a == be)
 
   message(" - Future evaluation (environment)")
-  env$b %<=% be
+  env$b %<-% be
   print(env$b)
   stopifnot(env$b == be)
 
   message(" - Future evaluation (list environment - name)")
-  lenv$b %<=% be
+  lenv$b %<-% be
   print(lenv$b)
   stopifnot(lenv$b == be)
 
   message(" - Future evaluation (list environment - index)")
-  lenv[[3]] %<=% be
+  lenv[[3]] %<-% be
   print(lenv[[3]])
   stopifnot(lenv[[3]] == be)
 }

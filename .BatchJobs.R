@@ -1,5 +1,5 @@
 cluster.functions <- local({
-  backend <- if (.Platform$OS == "windows") "local" else "multicore"
+  backend <- if (.Platform$OS.type == "windows") "local" else "multicore"
   backend <- Sys.getenv("R_ASYNC_BACKEND", backend)
 ##  message(".BatchJobs.R: Package 'async' using backend '", backend, "'")
 ##  backend <- "tipcc"

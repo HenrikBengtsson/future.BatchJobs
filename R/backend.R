@@ -84,7 +84,7 @@ backend <- local({
     assignConf <- get("assignConf", mode="function", envir=ns)
     readConfs <- get("readConfs", mode="function", envir=ns)
 
-    debug <- getOption("async::debug", FALSE)
+    debug <- getOption("future.debug", FALSE)
 
     ## Set custom aliases?
     custom <- list(...)
@@ -141,7 +141,7 @@ backend <- local({
     }
 
     ## Multicore processing is not supported on Windows :(
-    if (.Platform$OS == "windows") {
+    if (.Platform$OS.type == "windows") {
       dropped <- c(dropped, grep("^multicore", what, value=TRUE))
       what <- setdiff(what, dropped)
     }
@@ -156,17 +156,23 @@ backend <- local({
 
     ## Inform about dropped requests?
     if (length(dropped) > 0L && explicit_what && getOption("async::on_unkown_backend", "ignore") == "warn") {
-      warning(sprintf("Some of the preferred backends (%s) are either not available or not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS, sQuote(what)))
+      warning(sprintf("Some of the preferred backends (%s) are either not available or not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS.type, sQuote(what)))
     }
 
     ## Load specific or global BatchJobs config file?
     if (file_test("-f", what)) {
+      if (debug) mprintf("backend(): file='%s'\n", what)
       conf <- sourceConfFiles(what)
+      if (debug) {
+        mprintf("Setting BatchJobs configuration:\n")
+        mstr(as.list(conf))
+      }
       assignConf(conf)
       ## Record last used
       last <<- what
       return(what)
     } else if (what == ".BatchJobs.R") {
+      if (debug) mprintf("backend(): First available '.BatchJobs.R'\n")
       if (quietly) {
         suppressPackageStartupMessages(readConfs())
       } else {
@@ -208,8 +214,10 @@ backend <- local({
           }
         }
       }
+      if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d)\n", ncpus)
       conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus)
     } else if (what == "local") {
+      if (debug) mprintf("backend(): makeClusterFunctionsLocal()\n")
       conf$cluster.functions = makeClusterFunctionsLocal()
     } else if (what == "interactive") {
       conf$cluster.functions = makeClusterFunctionsInteractive()

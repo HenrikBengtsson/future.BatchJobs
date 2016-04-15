@@ -30,9 +30,9 @@ print(x)
 
 
 message("*** AsyncListEnv: Asynchroneous evaluation (by name)")
-x$a %<=% { 1 }
-x$b %<=% { stop("Wow!"); 2 }
-x$c %<=% { list(foo=3, bar=letters) }
+x$a %<-% { 1 }
+x$b %<-% { stop("Wow!"); 2 }
+x$c %<-% { list(foo=3, bar=letters) }
 print(x)
 
 message("*** AsyncListEnv: Inspection")
@@ -41,9 +41,9 @@ print(tasks)
 
 
 message("*** AsyncListEnv: Asynchroneous evaluation (by index)")
-x[[1]] %<=% { 1 }
-x[[2]] %<=% { stop("Wow!"); 2 }
-x[[3]] %<=% { list(foo=3, bar=letters) }
+x[[1]] %<-% { 1 }
+x[[2]] %<-% { stop("Wow!"); 2 }
+x[[3]] %<-% { list(foo=3, bar=letters) }
 print(x)
 
 
@@ -54,7 +54,7 @@ if (any(failed(x))) print(error(x))
 
 
 message("*** AsyncListEnv: Reassign asynchroneous evaluation")
-x[[2]] %<=% { 2 }
+x[[2]] %<-% { 2 }
 
 print(x)
 print(status(x))

@@ -1,6 +1,17 @@
 Package: async
 ==============
 
+Version: 0.8.0 [2016-04-14]
+o batchjobs() function gained class attribute.
+o Renamed BatchJobsAsyncTask to BatchJobsFuture.
+o CLEANUP: Removed no-longer needed asyncBatchEvalQ() because
+  BatchJobsFuture is now self sufficient.
+o BUG FIX: Global variables with the same name as objects in the
+  base or the BatchJobs package would be overridden by the
+  latter, e.g. a global variable 'col' would be masked by
+  'base::col'. (Issue #55)
+
+
 Version: 0.7.1 [2016-01-04]
 o BUG FIX: New BatchJobs work directories would encode 08:03 as
   ' 803' instead of '0803' resulting in a BatchJobs assertion

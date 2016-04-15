@@ -50,8 +50,8 @@ hpaste <- function(..., sep="", collapse=", ", lastCollapse=NULL, maxHead=if (mi
 
   # Abbreviate?
   if (n > maxHead + maxTail + 1) {
-    head <- x[seq(length=maxHead)]
-    tail <- rev(rev(x)[seq(length=maxTail)])
+    head <- x[seq_len(maxHead)]
+    tail <- rev(rev(x)[seq_len(maxTail)])
     x <- c(head, abbreviate, tail)
     n <- length(x)
   }
@@ -84,3 +84,28 @@ captureOutput <- function(expr, envir=parent.frame(), ...) {
 trim <- function(x, ...) {
   sub("[\t\n\f\r ]*$", "", sub("^[\t\n\f\r ]*", "", x))
 }
+
+
+## We are currently importing the following non-exported functions:
+## * future:::getGlobalsAndPackages()
+importFuture <- function(name, default=NULL) {
+  ns <- getNamespace("future")
+  if (exists(name, mode="function", envir=ns, inherits=FALSE)) {
+    get(name, mode="function", envir=ns, inherits=FALSE)
+  } else if (!is.null(default)) {
+    default
+  } else {
+    stop(sprintf("No such 'future' function: %s()", name))
+  }
+}
+
+
+## Evaluates an expression in global environment.
+## Because geval() is exported, we want to keep its environment()
+## as small as possible, which is why we use local().  Without,
+## the environment would be that of the package itself and all of
+## the package would be exported.
+geval <- local(function(expr, substitute=FALSE, envir=.GlobalEnv, ...) {
+  if (substitute) expr <- substitute(expr)
+  eval(expr, envir=envir)
+})

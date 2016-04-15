@@ -6,23 +6,22 @@
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
 #' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
-#' @param finalize If TRUE, any underlying registries are
-#' deleted when this object is garbage collected, otherwise not.
-#' @param \ldots Additional arguments pass to \code{\link{AsyncTask}()}.
+#' @param resources A named list of resources needed by this future.
+#' @param \ldots Additional arguments pass to \code{\link{BatchJobsFuture}()}.
 #'
-#' @return Returns a BatchJobsAsyncTask object that also is
-#' a \link[future]{Future}.
+#' @return An object of class \code{BatchJobsFuture}.
 #'
 #' @export
-batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, finalize=getOption("async::finalize", TRUE), ...) {
+batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), ...) {
   if (substitute) expr <- substitute(expr)
 
   ## 1. Create
-  future <- BatchJobsAsyncTask(expr=expr, envir=envir, substitute=FALSE,
-                               backend=backend, finalize=finalize, ...)
+  future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
+                            backend=backend, resources=resources, ...)
 
   ## 2. Launch
   future <- run(future)
 
   future
 }
+class(batchjobs) <- c("batchjobs", "future", "function")

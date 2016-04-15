@@ -11,7 +11,7 @@ backend("interactive")
 mprintf("Current backend: %s\n", backend(NULL))
 
 a <- 3.14
-x %<=% { a }
+x %<-% { a }
 mprintf("x=%g\n", x)
 stopifnot(x == a)
 
@@ -19,7 +19,7 @@ stopifnot(x == a)
 backend(c("multicore", "local"))
 mprintf("Current backend: %s\n", backend(NULL))
 
-y %<=% { 2*a }
+y %<-% { 2*a }
 mprintf("y=%g\n", y)
 stopifnot(y == 2*a)
 
@@ -30,7 +30,7 @@ mprintf("Current backend: %s\n", backend(NULL))
 if (!"covr" %in% loadedNamespaces())
   stopifnot(backend(NULL) == obackend)
 
-z %<=% { y / 2 }
+z %<-% { y / 2 }
 mprintf("z=%g\n", z)
 stopifnot(z == x)
 
@@ -39,9 +39,9 @@ stopifnot(z == x)
 backend("spare"=c("multicore-2", "local"))
 mprintf("Current backend: %s\n", backend(NULL))
 
-x %<=% { y / 2 } %plan% batchjobs(backend="interactive")
-y %<=% { 2*a } %plan% batchjobs(backend="local")
-z %<=% { y / 2 } %plan% batchjobs(backend="spare")
+x %<-% { y / 2 } %plan% batchjobs(backend="interactive")
+y %<-% { 2*a } %plan% batchjobs(backend="local")
+z %<-% { y / 2 } %plan% batchjobs(backend="spare")
 mprintf("x=%g\n", x)
 mprintf("y=%g\n", y)
 mprintf("z=%g\n", z)

@@ -2,7 +2,7 @@ library("async")
 
 ## Record original state
 ovars <- ls()
-oopts <- options(warn=1, "async::debug"=TRUE)
+oopts <- options(warn=1, future.debug=TRUE)
 oplan <- plan()
 obackend <- backend()
 
@@ -20,7 +20,6 @@ if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
   backend("local")
 }
 
-AsyncListEnv <- async:::AsyncListEnv
 attachedPackages <- async:::attachedPackages
 tempRegistry <- async:::tempRegistry
 isNA <- async:::isNA
