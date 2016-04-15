@@ -6,7 +6,7 @@
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
   backend = NULL, resources = list(),
-  finalize = getOption("async::finalize", TRUE), ...)
+  finalize = getOption("future.finalize", TRUE), ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}

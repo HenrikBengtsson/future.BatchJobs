@@ -5,8 +5,9 @@
 \title{Awaits the value of a BatchJobs future}
 \usage{
 \method{await}{BatchJobsFuture}(future, cleanup = TRUE,
-  maxTries = getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES",
-  1000)), delta = getOption("async::interval", 1), alpha = 1.01, ...)
+  maxTries = getOption("future.maxTries", Sys.getenv("R_FUTURE_MAXTRIES",
+  1000)), delta = getOption("future.interval", 1),
+  alpha = getOption("future.alpha", 1.01), ...)
 }
 \arguments{
 \item{future}{The future.}
