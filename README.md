@@ -104,7 +104,6 @@ The [future] package provdides a demo using futures for calculating a
 set of Mandelbrot planes.  Except from using futures, the demo does
 not assume anything about what type of futures are used.  This is up
 to the user to control.
-
 For instance, to use `local` BatchJobs futures, run the demo as:
 ```r
 library("future.BatchJobs")
@@ -129,9 +128,9 @@ source('http://callr.org/install#HenrikBengtsson/future.BatchJobs')
 ```
 
 ### Pre-release version
-To install the pre-release version that is available in branch `develop`, use:
+To install the pre-release version that is available in branch `release/0.9.0`, use:
 ```r
-source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@develop')
+source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@release/0.9.0')
 ```
 This will install the package from source.  
 
