@@ -1,5 +1,4 @@
-R.utils::use()
-use("async")
+library("async")
 
 ## - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ## Asynchroneous evaluation

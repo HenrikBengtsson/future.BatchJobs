@@ -1,4 +1,4 @@
-library(async)
+library("async")
 
 ovars <- ls()
 oopts <- options(warn=1L)
