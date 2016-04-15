@@ -155,7 +155,7 @@ backend <- local({
     if (debug) mprintf("backend(): what='%s'\n", what)
 
     ## Inform about dropped requests?
-    if (length(dropped) > 0L && explicit_what && getOption("async::on_unkown_backend", "ignore") == "warn") {
+    if (length(dropped) > 0L && explicit_what && getOption("future.on_unkown_backend", "ignore") == "warn") {
       warning(sprintf("Some of the preferred backends (%s) are either not available or not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS.type, sQuote(what)))
     }
 
