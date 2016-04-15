@@ -613,7 +613,7 @@ add_finalizer.BatchJobsFuture <- function(future, ...) {
   ## Register finalizer (will clean up registries etc.)
 
   reg.finalizer(future, f=function(gcenv) {
-    if (inherits(future, "BatchJobsFuture") && "async" %in% loadedNamespaces()) {
+    if (inherits(future, "BatchJobsFuture") && "future.BatchJobs" %in% loadedNamespaces()) {
       try({
         delete(future, onRunning="skip", onMissing="ignore", onFailure="warning")
       })

@@ -1,12 +1,12 @@
-# async: A Future for BatchJobs
+# future.BatchJobs: A Future for BatchJobs
 
 ## Introduction
-The [async] package provides [BatchJobs] futures according to
+The [future.BatchJobs] package provides [BatchJobs] futures according to
 the Future API defined by the [future] package.
 This means that all of the BatchJobs machinery can be
 utilized using futures, e.g.
 ```r
-> library('async')
+> library('future.BatchJobs')
 > plan(batchjobs, backend='.BatchJobs.R')
 >
 > x %<-% { Sys.sleep(5); 3.14 }
@@ -19,7 +19,7 @@ vignettes of the [future] package.
 
 
 ## Choosing BatchJobs backend
-The async package implements a generic future wrapper for all
+The future.BatchJobs package implements a generic future wrapper for all
 BatchJobs backends, which can be specified via the `backend` argument,
 e.g.
 ```r
@@ -71,7 +71,7 @@ backend configured by a `.BatchJobs.R` file.  For example, to use
 future that are distributed on a compute cluster via a TORQUE/PBS job
 scheduler, use:
 ```r
-library("async")
+library("future.BatchJobs")
 plan(batchjobs)
 ```
 and then use a `.BatchJobs.R` file (in the working directory or in
@@ -107,7 +107,7 @@ to the user to control.
 
 For instance, to use `local` BatchJobs futures, run the demo as:
 ```r
-library("async")
+library("future.BatchJobs")
 plan(batchjobs, batchjobs="local")
 demo("mandelbrot", package="future", ask=FALSE)
 ```
@@ -116,14 +116,14 @@ demo("mandelbrot", package="future", ask=FALSE)
 [BatchJobs]: http://cran.r-project.org/package=BatchJobs
 [brew]: http://cran.r-project.org/package=brew
 [future]: http://cran.r-project.org/package=future
-[async]: https://github.com/HenrikBengtsson/async/
+[future.BatchJobs]: https://github.com/HenrikBengtsson/future.BatchJobs/
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 
 ---
 Copyright Henrik Bengtsson, 2015-2016
 
 ## Installation
-R package async is only available via [GitHub](https://github.com/HenrikBengtsson/async) and can be installed in R as:
+R package future.BatchJobs is only available via [GitHub](https://github.com/HenrikBengtsson/async) and can be installed in R as:
 ```r
 source('http://callr.org/install#HenrikBengtsson/async')
 ```

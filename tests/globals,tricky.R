@@ -1,4 +1,4 @@
-library("async")
+library("future.BatchJobs")
 library("listenv")
 
 ovars <- ls()

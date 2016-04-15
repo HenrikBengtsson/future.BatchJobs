@@ -1,4 +1,4 @@
-library("async")
+library("future.BatchJobs")
 
 ovars <- ls()
 oopts <- options(warn=1L)

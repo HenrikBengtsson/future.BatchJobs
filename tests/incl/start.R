@@ -1,4 +1,4 @@
-library("async")
+library("future.BatchJobs")
 
 ## Record original state
 ovars <- ls()
@@ -20,14 +20,14 @@ if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
   backend("local")
 }
 
-attachedPackages <- async:::attachedPackages
-tempRegistry <- async:::tempRegistry
-isNA <- async:::isNA
-isFALSE <- async:::isFALSE
-trim <- async:::trim
-hpaste <- async:::hpaste
-printf <- async:::printf
-mcat <- async:::mcat
-mprintf <- async:::mprintf
-mprint <- async:::mprint
-mstr <- async:::mstr
+attachedPackages <- future.BatchJobs:::attachedPackages
+tempRegistry <- future.BatchJobs:::tempRegistry
+isNA <- future.BatchJobs:::isNA
+isFALSE <- future.BatchJobs:::isFALSE
+trim <- future.BatchJobs:::trim
+hpaste <- future.BatchJobs:::hpaste
+printf <- future.BatchJobs:::printf
+mcat <- future.BatchJobs:::mcat
+mprintf <- future.BatchJobs:::mprintf
+mprint <- future.BatchJobs:::mprint
+mstr <- future.BatchJobs:::mstr
