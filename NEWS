@@ -2,6 +2,7 @@ Package: async
 ==============
 
 Version: 0.8.0-9000 [2016-04-15]
+o Package requires R (>= 3.2.0) just so Mandelbrot demo works.
 o STANDARIZATION Now using option and environment names already defined
   by the future package, i.e. future.maxTries, future.interval, and
   R_FUTURE_MAXTRIES (used to be named async::* and R_ASYNC_*).

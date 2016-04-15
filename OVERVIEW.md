@@ -1,7 +1,8 @@
 ## Introduction
-This package provides [BatchJobs] futures on the Future API
-defined by the [future] package.  This means that all of the
-BatchJobs machinery can be utilized using futures, e.g.
+This package provides [BatchJobs] futures according to
+the Future API defined by the [future] package.
+This means that all of the BatchJobs machinery can be
+utilized using futures, e.g.
 ```r
 > library('async')
 > plan(batchjobs, backend='.BatchJobs.R')
