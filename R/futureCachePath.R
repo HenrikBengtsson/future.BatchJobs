@@ -1,4 +1,4 @@
-#' @importFrom R.utils isDirectory mkdirs captureOutput
+#' @importFrom R.utils isDirectory mkdirs
 #' @importFrom utils sessionInfo
 futureCachePath <- local({
   ## The path used for this session
