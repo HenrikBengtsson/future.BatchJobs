@@ -29,8 +29,8 @@ parallel on multiple cores:
 > library('async')
 > plan(batchjobs, backend='multicore')
 >
-> x %<=% { Sys.sleep(5); 3.14 }
-> y %<=% { Sys.sleep(5); 2.71 }
+> x %<-% { Sys.sleep(5); 3.14 }
+> y %<-% { Sys.sleep(5); 2.71 }
 > x + y
 [1] 5.85
 ```
@@ -43,7 +43,7 @@ environment "inherits"(*) any "global" variables in the calling
 environment and its parents.  For example,
 ```r
 a <- 2
-y %<=% { b <- a*3.14; b }
+y %<-% { b <- a*3.14; b }
 ```
 results in `y` being assigned `6.28`.
 
@@ -52,9 +52,9 @@ expression, then dependent asynchronous expressions will wait for the
 former to complete in order to resolve the global variables.  For
 example, in
 ```r
-a %<=% { Sys.sleep(7); runif(1) }
-b %<=% { Sys.sleep(2); rnorm(1) }
-c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
+a %<-% { Sys.sleep(7); runif(1) }
+b %<-% { Sys.sleep(2); rnorm(1) }
+c %<-% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
 the third asynchronous expression will not be evaluated until `a` and
@@ -92,7 +92,7 @@ the evaluation of asynchronous expressions running in separate R
 processes such as those pushed out on a cluster.  This can be useful
 when one tries to get the value of a asynchronous evaluation that
 took longer than expected causing R to pause.  By hitting Ctrl-C one
-can get back to the main prompt and do other tasks while waiting for
+can get back to the main prompt and do other futures while waiting for
 the long-running evaluation to complete.
 
 
@@ -171,9 +171,9 @@ Asynchronous expressions are processed by the default backend as given
 by `backend()`.  If another backend should be used to evaluate for a
 particular expression, operator `%plan%` can be used.  For example,
 ```r
-a %<=% { Sys.sleep(7); runif(1) } %plan% batchjobs(backend="multicore-2")
-b %<=% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="cluster-2")
-c %<=% { x <- a*b; Sys.sleep(2); abs(x) }
+a %<-% { Sys.sleep(7); runif(1) } %plan% batchjobs(backend="multicore-2")
+b %<-% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="cluster-2")
+c %<-% { x <- a*b; Sys.sleep(2); abs(x) }
 d <- runif(1)
 ```
 In this case expression `a` will be processed by the `multicore-2`
@@ -184,9 +184,9 @@ Backend specifications can also be used in nested asynchronous
 evaluations:
 ```r
 plan(batchjobs, backend="cluster")
-a %<=% { Sys.sleep(7); runif(1) }
-c %<=% {
-  b %<=% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="multicore=2")
+a %<-% { Sys.sleep(7); runif(1) }
+c %<-% {
+  b %<-% { Sys.sleep(2); rnorm(1) } %plan% batchjobs(backend="multicore=2")
   x <- a*b; Sys.sleep(2); abs(x)
 }
 d <- runif(1)
@@ -219,7 +219,7 @@ repos <- c(CRAN="http://cran.r-project.org",
 urls <- sapply(repos, file.path, "src/contrib/PACKAGES", fsep="/")
 files <- new.env()
 for (name in names(urls)) {
-  files[[name]] %<=% downloadFile(urls[[name]], path=name)
+  files[[name]] %<-% downloadFile(urls[[name]], path=name)
 }
 str(as.list(files))
 ```
@@ -248,28 +248,28 @@ can imagine doing things such as:
 library(async)
 plan(batchjobs)
 
-tasks %<=% {
+tasks %<-% {
   update.packages()
 } %backends% c("local", "cluster", "AmazonEC2", "GoogleCompEngine")
 
-tcga %<=% {
+tcga %<-% {
   plan(batchjobs, backend="cluster")
 
-  a %<=% {
+  a %<-% {
     doCRMAv2("BreastCancer", chipType="GenomeWideSNP_6")
   }
 
-  b %<=% {
+  b %<-% {
     doCRMAv2("ProstateCancer", chipType="Mapping250K_Nsp")
   }
 
   list(a=a, b=b)
 } %plan% batchjobs(backend="AmazonEC2")
 
-hapmap %<=% {
+hapmap %<-% {
   plan(batchjobs, backend="cluster")
 
-  normals %<=% {
+  normals %<-% {
     doCRMAv2("HapMap2", chipType="GenomeWideSNP_6")
   }
 
@@ -357,4 +357,4 @@ see the [BatchJobs configuration] wiki page.
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 
 ---
-Copyright Henrik Bengtsson, 2015
+Copyright Henrik Bengtsson, 2015-2016
