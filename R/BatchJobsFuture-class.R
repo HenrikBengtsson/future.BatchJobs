@@ -17,7 +17,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("async::finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
   stopifnot(is.list(resources),
             length(resources) == 0 || !is.null(names(resources)))
@@ -422,7 +422,7 @@ await <- function(...) UseMethod("await")
 #' @importFrom R.methodsS3 throw
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("async::maxTries", Sys.getenv("R_ASYNC_MAXTRIES", 1000)), delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("future.maxTries", Sys.getenv("R_FUTURE_MAXTRIES", 1000)), delta=getOption("future.interval", 1.0), alpha=1.01, ...) {
   throw <- R.methodsS3::throw
 
   maxTries <- as.integer(maxTries)
@@ -541,7 +541,7 @@ delete <- function(...) UseMethod("delete")
 #' @export
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("async::interval", 1.0), alpha=1.01, ...) {
+delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("future.interval", 1.0), alpha=1.01, ...) {
   onRunning <- match.arg(onRunning)
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
