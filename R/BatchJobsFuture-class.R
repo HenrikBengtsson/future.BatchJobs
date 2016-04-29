@@ -584,7 +584,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
   if (!getOption("future.delete", interactive())) {
     status <- status(future)
     if (any(c("error", "expired") %in% status)) {
-      msg <- sprintf("Will not remove BatchJob registry, because the status of the BatchJobs was %s and option 'future.delete' is not set to FALSE: %s", sQuote(status), sQuote(path))
+      msg <- sprintf("Will not remove BatchJob registry, because the status of the BatchJobs was %s and option 'future.delete' is not set to FALSE: %s", paste(sQuote(status), collapse=", "), sQuote(path))
       warning(msg)
       return(invisible(FALSE))
     }
