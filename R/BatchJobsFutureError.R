@@ -25,10 +25,11 @@ getMessage.BatchJobsFutureError <- function(x, ...) {
   msg <- R.oo::getMessage.Exception(x, ...)
   future <- x$future
   if (!is.null(future)) {
+    output <- getOutput(x, tail=30L, collapse="\n")
     info <- captureOutput(print(future))
     info <- trim(info)
-    info <- paste(info, collapse="; ")
-    msg <- sprintf("%s [DEBUG INFORMATION: %s]", msg, info)
+    info <- paste(info, collapse="\n")
+    msg <- sprintf("%s\n\n*** [BEGIN TROUBLESHOOTING HELP]\n** End of output captured by BatchJobs:\n%s\n** Information on %s future:\n%s\n*** [END TROUBLESHOOTING HELP]\n", msg, output, class(future)[1], info)
   }
   msg
 }
