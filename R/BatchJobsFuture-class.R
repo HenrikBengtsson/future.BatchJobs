@@ -100,7 +100,8 @@ loggedOutput <- function(...) UseMethod("loggedOutput")
 #'
 #' @return A character vector or a logical scalar.
 #'
-#' @aliases status finished completed failed expired value error
+#' @aliases status finished completed failed expired value
+#'          loggedError loggedOutput
 #' @keywords internal
 #'
 #' @export
@@ -188,6 +189,7 @@ loggedError.BatchJobsFuture <- function(future, ...) {
 } # loggedError()
 
 
+#' @importFrom BatchJobs getLogFiles
 #' @export
 #' @keywords internal
 loggedOutput.BatchJobsFuture <- function(future, ...) {

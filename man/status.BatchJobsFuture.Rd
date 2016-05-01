@@ -2,10 +2,11 @@
 % Please edit documentation in R/BatchJobsFuture-class.R
 \name{status.BatchJobsFuture}
 \alias{completed}
-\alias{error}
 \alias{expired}
 \alias{failed}
 \alias{finished}
+\alias{loggedError}
+\alias{loggedOutput}
 \alias{status}
 \alias{status.BatchJobsFuture}
 \alias{value}
