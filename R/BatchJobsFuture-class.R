@@ -1,4 +1,4 @@
-#' A BatchJobs future is a future whose value will be resolved via BatchJobs
+' A BatchJobs future is a future whose value will be resolved via BatchJobs
 #'
 #' @param expr The R expression to be evaluated
 #' @param envir The environment in which global environment
@@ -552,6 +552,8 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
 
+  debug <- getOption("future.debug", FALSE)
+
   ## Identify registry
   config <- future$config
   reg <- config$reg
@@ -561,6 +563,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
   if (is.null(path) || !file_test("-d", path)) {
     if (onMissing %in% c("warning", "error")) {
       msg <- sprintf("Cannot remove BatchJob registry, because directory does not exist: %s", sQuote(path))
+      if (debug) mprintf("delete(): %s\n", msg)
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
@@ -577,6 +580,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     if (onRunning == "skip") return(invisible(TRUE))
     status <- status(future)
     msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a non-resolved future (state=%s; BatchJobs status=%s): %s", sQuote(future$state), paste(sQuote(status), collapse=", "), sQuote(path))
+    if (debug) mprintf("delete(): %s\n", msg)
     if (onRunning == "warning") {
       warning(msg)
       return(invisible(TRUE))
@@ -591,6 +595,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     if (onRunning == "skip") return(invisible(TRUE))
 
     msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running future: %s", sQuote(path))
+    if (debug) mprintf("delete(): %s\n", msg)
     if (onRunning == "warning") {
       warning(msg)
       return(invisible(TRUE))
@@ -607,6 +612,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     status <- status(future)
     if (any(c("error", "expired") %in% status)) {
       msg <- sprintf("Will not remove BatchJob registry, because the status of the BatchJobs was %s and option 'future.delete' is not set to FALSE: %s", paste(sQuote(status), collapse=", "), sQuote(path))
+      if (debug) mprintf("delete(): %s\n", msg)
       warning(msg)
       return(invisible(FALSE))
     }
@@ -627,6 +633,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
   if (file_test("-d", path)) {
     if (onFailure %in% c("warning", "error")) {
       msg <- sprintf("Failed to remove BatchJob registry: %s", sQuote(path))
+      if (debug) mprintf("delete(): %s\n", msg)
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
@@ -636,6 +643,8 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     }
     return(invisible(FALSE))
   }
+
+  if (debug) mprintf("delete(): BatchJobs registry deleted: %s\n", sQuote(path))
 
   invisible(TRUE)
 } # delete()
