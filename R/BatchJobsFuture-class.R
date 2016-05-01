@@ -193,8 +193,14 @@ error.BatchJobsFuture <- function(future, ...) {
 #' @export
 #' @keywords internal
 resolved.BatchJobsFuture <- function(x, ...) {
+  ## Has internal future state already been switched to be resolved
+  resolved <- NextMethod("resolved")
+  if (resolved) return(TRUE)
+
+  ## If not, checks the BatchJobs registry status
   resolved <- finished(x)
   if (is.na(resolved)) return(FALSE)
+
   resolved
 }
 
@@ -304,9 +310,11 @@ run.BatchJobsFuture <- function(future, ...) {
       if (debug) mcat(msg)
     }
 
-    ## FIXME: The below can be removed with
-    ##        fail (>= 1.3) and BatchJobs (>= 1.7)
-    ##        /HB 2015-10-20
+    ## COMMENTS:
+    ## * The below can be removed with fail (>= 1.3) AND
+    ##   BatchJobs (>= 1.7) /HB 2015-10-20
+    ## * fail 1.3 is on CRAN but BatchJobs needs to be
+    ##   updated too /HB 2016-05-01
     ## BatchJobs::loadExports() ignores exported variables that
     ## start with a period.
     ## Details: https://github.com/tudo-r/BatchJobs/issues/103
@@ -564,8 +572,22 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
   }
 
 
+  ## Is the future still not resolved?  If so, then...
+  if (!resolved(future)) {
+    if (onRunning == "skip") return(invisible(TRUE))
+    status <- status(future)
+    msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a non-resolved future (state=%s; BatchJobs status=%s): %s", sQuote(future$state), paste(sQuote(status), collapse=", "), sQuote(path))
+    if (onRunning == "warning") {
+      warning(msg)
+      return(invisible(TRUE))
+    } else if (onRunning == "error") {
+      ex <- BatchJobsFutureError(msg, future=future)
+      throw(ex)
+    }
+  }
+
   ## Does the future still run?  If so, then...
-  if (future$state == 'running') {
+  if (FALSE && future$state == 'running') {
     if (onRunning == "skip") return(invisible(TRUE))
 
     msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running future: %s", sQuote(path))
