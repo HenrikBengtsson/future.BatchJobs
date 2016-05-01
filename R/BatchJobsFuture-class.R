@@ -1,4 +1,4 @@
-' A BatchJobs future is a future whose value will be resolved via BatchJobs
+#' A BatchJobs future is a future whose value will be resolved via BatchJobs
 #'
 #' @param expr The R expression to be evaluated
 #' @param envir The environment in which global environment
@@ -71,7 +71,7 @@ print.BatchJobsFuture <- function(x, ...) {
   ## Ask for status once
   status <- status(x)
   printf("Status: %s\n", paste(sQuote(status), collapse=", "))
-  if ("error" %in% status) printf("Error: %s\n", error(x))
+  if ("error" %in% status) printf("Error: %s\n", loggedError(x))
 
   printf("BatchJobs configuration:\n")
   config <- x$config
@@ -90,7 +90,8 @@ finished <- function(...) UseMethod("finished")
 completed <- function(...) UseMethod("completed")
 failed <- function(...) UseMethod("failed")
 expired <- function(...) UseMethod("expired")
-error <- function(...) UseMethod("error")
+loggedError <- function(...) UseMethod("loggedError")
+loggedOutput <- function(...) UseMethod("loggedOutput")
 
 #' Status of BatchJobs future
 #'
@@ -109,7 +110,8 @@ error <- function(...) UseMethod("error")
 #' @export failed
 #' @export expired
 #' @export value
-#' @export error
+#' @export loggedError
+#' @export loggedOutput
 #' @importFrom BatchJobs getStatus
 status.BatchJobsFuture <- function(future, ...) {
   config <- future$config
@@ -165,7 +167,7 @@ expired.BatchJobsFuture <- function(future, ...) {
 
 #' @export
 #' @keywords internal
-error.BatchJobsFuture <- function(future, ...) {
+loggedError.BatchJobsFuture <- function(future, ...) {
   stat <- status(future)
   if (isNA(stat)) return(NULL)
 
@@ -183,7 +185,30 @@ error.BatchJobsFuture <- function(future, ...) {
   msg <- getErrorMessages(reg, ids=id)
   msg <- paste(sQuote(msg), collapse=", ")
   msg
-} # error()
+} # loggedError()
+
+
+#' @export
+#' @keywords internal
+loggedOutput.BatchJobsFuture <- function(future, ...) {
+  stat <- status(future)
+  if (isNA(stat)) return(NULL)
+
+  if (!finished(future)) {
+    msg <- sprintf("%s has not finished yet", class(future)[1L])
+    ex <- BatchJobsFutureError(msg, future=future)
+    throw(ex)
+  }
+
+  if (!"error" %in% stat) return(NULL)
+
+  config <- future$config
+  reg <- config$reg
+  id <- config$id
+  pathname <- getLogFiles(reg, ids=id)
+  bfr <- readLines(pathname)
+  bfr
+} # loggedOutput()
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -498,13 +523,13 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("futu
       res <- loadResult(reg, id=id)
     } else if ("error" %in% stat) {
       cleanup <- FALSE
-      msg <- sprintf("BatchJobError: %s", error(future))
-      ex <- BatchJobsFutureError(msg, future=future)
+      msg <- sprintf("BatchJobError: %s", loggedError(future))
+      ex <- BatchJobsFutureError(msg, future=future, output=loggedOutput(future))
       throw(ex)
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      ex <- BatchJobsFutureError(msg, future=future)
+      ex <- BatchJobsFutureError(msg, future=future, output=loggedOutput(future))
       throw(ex)
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
