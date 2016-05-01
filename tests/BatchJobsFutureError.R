@@ -1,0 +1,68 @@
+source("incl/start.R")
+
+message("*** BatchJobsFutureError() ...")
+
+plan(batchjobs, backend="local")
+
+for (cleanup in c(FALSE, TRUE)) {
+  message(sprintf("*** BatchJobs future error w/ future.delete=%s ...", cleanup))
+
+  options(future.delete=cleanup)
+
+  f <- future({
+    x <- 1
+    print(x)
+    stop("Woops!")
+  })
+  print(f)
+
+  resolve(f)
+
+  ## FIXME: When using value(), there is something causing the
+  ## future object 'f' to not be garbage collected within the
+  ## same iteration of the for loop. This seems to only occur
+  ## when there is an error in the future, cf. BatchJobsFuture,gc.R.
+  ## /HB 2016-05-01
+##  res <- try(value(f, cleanup=FALSE), silent=TRUE)
+##  stopifnot(inherits(res, "try-error"))
+##  rm(list="res") ## IMPORTANT: Because 'res' holds the future 'f' internally
+
+  ## Assert future is listed as resolved
+  stopifnot(resolved(f))
+
+  reg <- f$config$reg
+
+  ## Force garbage collection of future which will possibly
+  ## result in the removal of BatchJobs registry files
+  reg.finalizer(f, function(f) {
+    message("Garbage collection future ...")
+    print(f)
+    message("Garbage collection future ... DONE")
+  }, onexit=TRUE)
+  rm(list="f")
+  gc()
+  message(" - Future removed and garbage collected.")
+  message(sprintf(" - BatchJobs Registry path (%s) exists: %s", sQuote(reg$file.dir), file_test("-d", reg$file.dir)))
+
+  ## Assert removal of files only happens if there was not
+  ## a failure and option future.delete is not TRUE.
+  if (!cleanup) {
+    stopifnot(file_test("-d", reg$file.dir))
+    log <- getLogFiles(reg, ids=1L)
+    print(log)
+
+    ## Now manually delete BatchJobs Registry
+    removeRegistry(reg, ask="no")
+  }
+
+  stopifnot(!file_test("-d", reg$file.dir))
+  fail <- try(checkIds(reg, ids=1L), silent=TRUE)
+  stopifnot(inherits(fail, "try-error"))
+
+  message(sprintf("*** BatchJobs future error w/ future.delete=%s ... DONE", cleanup))
+} ## for (cleanup ...)
+
+
+message("*** BatchJobsFutureError() ... DONE")
+
+source("incl/end.R")
