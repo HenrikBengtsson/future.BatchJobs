@@ -608,6 +608,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
 
   ## To simplify post mortem troubleshooting in non-interactive sessions,
   ## should the BatchJobs registry files be removed or not?
+  if (debug) mprintf("delete(): Option 'future.delete=%s\n", sQuote(getOption("future.delete", "<NULL>")))
   if (!getOption("future.delete", interactive())) {
     status <- status(future)
     if (any(c("error", "expired") %in% status)) {
