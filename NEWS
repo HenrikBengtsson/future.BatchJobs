@@ -1,7 +1,7 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.9.0-9000 [2016-05-01]
+Version: 0.10.0 [2016-05-03]
 o Now the BatchJobsFutureError records the captured BatchJobs
   output to further simplify post mortem troubleshooting.
 o Now delete() for BatchJobsFuture will not remove the BatchJobs
