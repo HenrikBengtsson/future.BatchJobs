@@ -7,7 +7,7 @@ This means that all of the BatchJobs machinery can be
 utilized using futures, e.g.
 ```r
 > library('future.BatchJobs')
-> plan(batchjobs, backend='.BatchJobs.R')
+> plan(batchjobs)
 >
 > x %<-% { Sys.sleep(5); 3.14 }
 > y %<-% { Sys.sleep(5); 2.71 }
@@ -128,6 +128,11 @@ source('http://callr.org/install#HenrikBengtsson/future.BatchJobs')
 ```
 
 ### Pre-release version
+To install the pre-release version that is available in branch `develop`, use:
+```r
+source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@develop')
+```
+This will install the package from source.  
 
 
 

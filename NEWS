@@ -1,6 +1,20 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.10.0 [2016-05-03]
+o Now the BatchJobsFutureError records the captured BatchJobs
+  output to further simplify post mortem troubleshooting.
+o Now delete() for BatchJobsFuture will not remove the BatchJobs
+  registry files if the BatchJobs has status 'error' or 'expired'
+  and (new) option 'future.delete' is not set to FALSE (which it
+  is if running in interactive mode).  The new setup is useful
+  for troubleshooting failed BatchJobs futures in non-interactive
+  R sessions, which otherwise would be cleaned out when the R
+  session terminates (due to garbage collection calling delete()).
+o BUG FIX: resolved() on a BatchJobs future could return FALSE
+  even after value() was called.  Added package test.
+
+
 Version: 0.9.0 [2016-04-15]
 o Package renamed to future.BatchJobs (was async).
 o Package requires R (>= 3.2.0) just so Mandelbrot demo works.

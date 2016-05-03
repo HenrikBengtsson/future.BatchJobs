@@ -5,7 +5,7 @@ This means that all of the BatchJobs machinery can be
 utilized using futures, e.g.
 ```r
 > library('future.BatchJobs')
-> plan(batchjobs, backend='.BatchJobs.R')
+> plan(batchjobs)
 >
 > x %<-% { Sys.sleep(5); 3.14 }
 > y %<-% { Sys.sleep(5); 2.71 }

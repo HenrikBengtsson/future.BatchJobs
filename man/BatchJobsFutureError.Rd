@@ -3,6 +3,7 @@
 \docType{data}
 \name{BatchJobsFutureError}
 \alias{BatchJobsFutureError}
+\alias{getOutput}
 \title{Exception class for BatchJobsFuture-related errors}
 \format{An object of class \code{Class} (inherits from \code{Object}) of length 1.}
 \usage{
