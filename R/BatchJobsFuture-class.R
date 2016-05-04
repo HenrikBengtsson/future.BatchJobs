@@ -263,7 +263,7 @@ value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "e
 
 run <- function(...) UseMethod("run")
 
-## @importFrom future getExpression
+#' @importFrom future getExpression
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
 run.BatchJobsFuture <- function(future, ...) {
   mdebug <- importFuture("mdebug")
@@ -283,7 +283,6 @@ run.BatchJobsFuture <- function(future, ...) {
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
-  getExpression <- importFuture("getExpression", default=function(future) future$expr)
   expr <- getExpression(future)
 
   ## Always evaluate in local environment
