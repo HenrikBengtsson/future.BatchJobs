@@ -23,6 +23,8 @@ for (cleanup in c(FALSE, TRUE)) {
   ## same iteration of the for loop. This seems to only occur
   ## when there is an error in the future, cf. BatchJobsFuture,gc.R.
   ## /HB 2016-05-01
+  ## Maybe it's because base::geterrmessage() holds on to the
+  ## last error preventing it from being garbage collected? /HB 2016-05-04
 ##  res <- try(value(f, cleanup=FALSE), silent=TRUE)
 ##  stopifnot(inherits(res, "try-error"))
 ##  rm(list="res") ## IMPORTANT: Because 'res' holds the future 'f' internally
