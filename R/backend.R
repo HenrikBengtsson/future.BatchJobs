@@ -76,6 +76,9 @@ backend <- local({
   )
   last = NULL
 
+  ## WORKAROUND: See comment below.
+  dyld_envs <- list()
+
   function(what=NULL, ..., quietly=TRUE) {
     ## Imported private functions from BatchJobs
     ns <- getNamespace("BatchJobs")
@@ -214,6 +217,27 @@ backend <- local({
           }
         }
       }
+
+      ## WORKAROUND:
+      ## On some OS X systems, a system call to 'ps' may output an error message
+      ## "dyld: DYLD_ environment variables being ignored because main executable
+      ##  (/bin/ps) is setuid or setgid" to standard error that is picked up by
+      ## BatchJobs which incorrectly tries to parse it.  By unsetting all DYLD_*
+      ## environment variables, we avoid this message.  For more info, see:
+      ## * https://github.com/tudo-r/BatchJobs/issues/117
+      ## * https://github.com/HenrikBengtsson/future.BatchJobs/issues/59
+      ## /HB 2016-05-07
+      dyld_envs <<- tryCatch({
+        envs <- list()
+        res <- system2("ps", stdout=TRUE, stderr=TRUE)
+        if (any(grepl("DYLD_", res))) {
+          envs <- Sys.getenv()
+          envs <- envs[grepl("^DYLD_", names(envs))]
+          if (length(envs) > 0L) lapply(names(envs), FUN=Sys.unsetenv)
+        }
+        envs
+      }, error = function(ex) list())
+
       if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d)\n", ncpus)
       conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus)
     } else if (what == "local") {
@@ -224,6 +248,13 @@ backend <- local({
     } else {
       stop("Unknown backend: ", sQuote(what))
     }
+
+
+    ## WORKAROUND: Undo above multicore OS X workaround, iff ever done.
+    if (!grepl("^multicore", what) && length(dyld_envs) > 0L) {
+      do.call(Sys.setenv, args=as.list(dyld_envs))
+    }
+
 
     conf$mail.start = "none"
     conf$mail.done = "none"
