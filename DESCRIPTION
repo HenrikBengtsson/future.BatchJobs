@@ -2,7 +2,7 @@ Package: future.BatchJobs
 Version: 0.10.0-9000
 Depends:
     R (>= 3.2.0),
-    future (>= 0.13.0)
+    future (>= 0.13.0-9000)
 Imports:
     BatchJobs (>= 1.6),
     R.methodsS3,
