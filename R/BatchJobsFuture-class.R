@@ -174,8 +174,7 @@ loggedError.BatchJobsFuture <- function(future, ...) {
 
   if (!finished(future)) {
     msg <- sprintf("%s has not finished yet", class(future)[1L])
-    ex <- BatchJobsFutureError(msg, future=future)
-    throw(ex)
+    stop(BatchJobsFutureError(msg, future=future))
   }
 
   if (!"error" %in% stat) return(NULL)
@@ -198,8 +197,7 @@ loggedOutput.BatchJobsFuture <- function(future, ...) {
 
   if (!finished(future)) {
     msg <- sprintf("%s has not finished yet", class(future)[1L])
-    ex <- BatchJobsFutureError(msg, future=future)
-    throw(ex)
+    stop(BatchJobsFutureError(msg, future=future))
   }
 
   if (!"error" %in% stat) return(NULL)
@@ -453,7 +451,6 @@ await <- function(...) UseMethod("await")
 #' again, an error may be thrown.
 #'
 #' @export
-#' @importFrom R.methodsS3 throw
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
 await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("future.maxTries", Sys.getenv("R_FUTURE_MAXTRIES", 1000)), delta=getOption("future.interval", 1.0), alpha=getOption("future.alpha", 1.01), ...) {
@@ -525,24 +522,20 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("futu
     } else if ("error" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobError: %s", loggedError(future))
-      ex <- BatchJobsFutureError(msg, future=future, output=loggedOutput(future))
-      throw(ex)
+      stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
-      ex <- BatchJobsFutureError(msg, future=future, output=loggedOutput(future))
-      throw(ex)
+      stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
-      ex <- BatchJobsFutureError(msg, future=future)
-      throw(ex)
+      stop(BatchJobsFutureError(msg, future=future))
     }
     if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchronous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
-    ex <- BatchJobsFutureError(msg, future=future)
-    throw(ex)
+    stop(BatchJobsFutureError(msg, future=future))
   }
 
   ## Cleanup?
@@ -593,8 +586,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        ex <- BatchJobsFutureError(msg, future=future)
-        throw(ex)
+        stop(BatchJobsFutureError(msg, future=future))
       }
     }
     return(invisible(TRUE))
@@ -611,8 +603,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
       warning(msg)
       return(invisible(TRUE))
     } else if (onRunning == "error") {
-      ex <- BatchJobsFutureError(msg, future=future)
-      throw(ex)
+      stop(BatchJobsFutureError(msg, future=future))
     }
   }
 
@@ -626,8 +617,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
       warning(msg)
       return(invisible(TRUE))
     } else if (onRunning == "error") {
-      ex <- BatchJobsFutureError(msg, future=future)
-      throw(ex)
+      stop(BatchJobsFutureError(msg, future=future))
     }
   }
 
@@ -664,8 +654,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
-        ex <- BatchJobsFutureError(msg, future=future)
-        throw(ex)
+        stop(BatchJobsFutureError(msg, future=future))
       }
     }
     return(invisible(FALSE))

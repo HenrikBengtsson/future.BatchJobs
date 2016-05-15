@@ -5,8 +5,6 @@ Depends:
     future (>= 0.13.0-9000)
 Imports:
     BatchJobs (>= 1.6),
-    R.methodsS3,
-    R.oo,
     R.utils
 Suggests:
     listenv
