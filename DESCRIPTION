@@ -7,7 +7,10 @@ Imports:
     BatchJobs (>= 1.6),
     R.utils
 Suggests:
-    listenv
+    listenv,
+    markdown,
+    R.rsp
+VignetteBuilder: R.rsp
 Title: A Future for BatchJobs
 Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
                                           email = "henrikb@braju.com"))
