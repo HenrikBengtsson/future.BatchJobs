@@ -2,14 +2,15 @@ Package: future.BatchJobs
 Version: 0.10.0-9000
 Depends:
     R (>= 3.2.0),
-    future (>= 0.13.0)
+    future (>= 0.13.0-9000)
 Imports:
     BatchJobs (>= 1.6),
-    R.methodsS3,
-    R.oo,
     R.utils
 Suggests:
-    listenv
+    listenv,
+    markdown,
+    R.rsp
+VignetteBuilder: R.rsp
 Title: A Future for BatchJobs
 Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
                                           email = "henrikb@braju.com"))
