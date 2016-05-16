@@ -53,7 +53,6 @@ install:
  - $RENV install_github HenrikBengtsson/future@develop
  - $RENV install_deps
 
-
 script:
   - $RENV run_build
   - $RENV run_check
