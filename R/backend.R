@@ -143,11 +143,42 @@ backend <- local({
       }
     }
 
-    ## Multicore processing is not supported on Windows :(
-    if (.Platform$OS.type == "windows") {
-      dropped <- c(dropped, grep("^multicore", what, value=TRUE))
-      what <- setdiff(what, dropped)
-    }
+
+    ## Check if multicore processing is supported or makes sense
+    ncpus0 <- availableCores()
+    for (kk in seq_along(what)) {
+      if (!grepl("^multicore", what[kk])) next
+
+      ## Multicore processing is not supported on Windows
+      if (.Platform$OS.type == "windows") dropped <- c(dropped, what[kk])
+
+      ## Default number of cores to use
+      ncpus <- ncpus0
+      
+      if (grepl("^multicore=", what[kk])) {
+        ncpus <- suppressWarnings(as.integer(gsub("^multicore=", "", what[kk])))
+        if (!is.finite(ncpus) || ncpus < 1L) {
+          stop("Invalid number of cores specified: ", sQuote(what[kk]))
+        }
+      } else {
+        ## Leave some cores for other things?
+        if (grepl("^multicore-", what[kk])) {
+          save <- suppressWarnings(as.integer(gsub("^multicore-", "", what[kk])))
+          if (!is.finite(save) || save < 0L) {
+            stop("Invalid number of cores specified: ", sQuote(what[kk]))
+          }
+          ncpus <- min(1L, ncpus-save)  ## At least one core
+        }
+      }
+      
+      ## If only one core is available or one one was requested, then
+      ## there is no point using multicore processing.
+      if (ncpus < 2L) {
+        dropped <- c(dropped, what[kk])
+      }
+    } ## for (kk ...)
+
+    what <- setdiff(what, dropped)
 
     ## Always fall back to using the 'local' configuration
     if (length(what) == 0L) what <- "local"
@@ -155,11 +186,12 @@ backend <- local({
     ## The final choice
     what <- what[1L]
 
+
     if (debug) mprintf("backend(): what='%s'\n", what)
 
     ## Inform about dropped requests?
     if (length(dropped) > 0L && explicit_what && getOption("future.on_unkown_backend", "ignore") == "warn") {
-      warning(sprintf("Some of the preferred backends (%s) are either not available or not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS.type, sQuote(what)))
+      warning(sprintf("Some of the preferred backends (%s) are either not available, pointless (e.g. multicore=1), or not supported on your operating system ('%s'). Will use the following backend instead: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS.type, sQuote(what)))
     }
 
     ## Load specific or global BatchJobs config file?
@@ -189,8 +221,11 @@ backend <- local({
     if (debug) mprintf("backend(): Finding action for what='%s'\n", what)
 
     conf <- getBatchJobsConf()
+    
     if (grepl("^multicore", what)) {
-      ncpus0 <- availableCores()
+      ## Sanity check (see above)
+      stopifnot(ncpus0 >= 2L)
+      
       if (grepl("^multicore=", what)) {
         ncpus <- suppressWarnings(as.integer(gsub("^multicore=", "", what)))
         if (!is.finite(ncpus) || ncpus < 1L) {
@@ -201,22 +236,17 @@ backend <- local({
         }
       } else {
         ncpus <- ncpus0
-        if (ncpus == 1L) {
-          warning(sprintf("This system has only a single core (either it's old machine or availableCores() returns an incorrect value) available for the '%s' backend.", what))
-        } else {
-            ## Leave some cores for other things?
-          if (grepl("^multicore-", what)) {
-            save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
-            if (!is.finite(save) || save < 0L) {
-              stop("Invalid number of cores specified: ", sQuote(what))
-            }
-            ncpus <- min(1L, ncpus-save)
-            if (ncpus == 1L) {
-              warning(sprintf("Only 1 core (out of the %d availble on this system) will be used for the '%s' backend.", ncpus0, what))
-            }
-          }
+
+        ## Leave some cores for other things?
+        if (grepl("^multicore-", what)) {
+          save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
+          ncpus <- ncpus - save
         }
       }
+
+      ## Sanity check (see above)
+      stopifnot(ncpus >= 2L)
+
 
       ## WORKAROUND:
       ## On some OS X systems, a system call to 'ps' may output an error message
@@ -240,32 +270,6 @@ backend <- local({
 
 
       ## PROBLEM 1:
-      ## BatchJobs' multicore cluster functions tries to be responsive such that the
-      ## total number of running R processes on the local machine should not be more
-      ## than 3 times 'ncpus'.  For instance, with ncpus=4, it will allow at at most
-      ## 3*4-1=11 running R process in order to spawn off another multicore R processes.
-      ## This means that other users on the same machine can starve out BatchJobs
-      ## multicore jobs.  If ncpus=1, then there can be at most two other R processes
-      ## running.  If there are 3 or more, then BatchJobs will block until there are
-      ## only two.  However, when running 'R CMD check', there are already 3 R processes
-      ## running from scratch.  In other words, in such cases 'ncpus' must not be one,
-      ## because then the BatchJob job will never be submitted.  For more details,
-      ## see BatchJobs:::getWorkerSchedulerStatus(), i.e.
-      ##  if (worker$status$n.jobs >= worker$max.jobs)  return("J")
-      ##  if (worker$status$load[1L] > worker$max.load) return("L")
-      ##  if (worker$status$n.rprocs.50 >= worker$ncpus) return("R")
-      ##  if (worker$status$n.rprocs >= 3 * worker$ncpus) return("r")
-      ##						      
-      ## WORKAROUND:
-      ## Force ncpus >= 2L.
-      ## /HB 2016-05-16
-      if (ncpus == 1L) {
-        ncpus <- 2L
-        warning("WORKAROUND: Detected 'ncpus=1', which is likely to result in endless waiting, e.g. when running 'R CMD check'. This is because BatchJobs allows at most 3*ncpus R processes. Forcing 'ncpus=2'.")
-      }
-
-
-      ## PROBLEM 2:
       ## BatchJobs' multicore cluster functions tries to be responsive to the overall
       ## CPU load of the machine (as reported by Linux command 'uptime') and it will
       ## not submit new jobs if the load is greater than its 'max.load' parameter.

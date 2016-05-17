@@ -14,8 +14,9 @@ o WORKAROUND: The BatchJobs multicore cluster functions are designed
   especially if the number of cores on the machine is small and/or if
   mc.cores is set to a small number.  Because of this, we disable this
   mechanism (by using BatchJobs parameter max.load=+Inf).
-o BUG FIX: backend("multicore-3") was interpreted as
-  backend("multicore").
+o backend("multicore=1") or other multicore specifications that
+  result in single-core processing will use backend("local") instead.
+o BUG FIX: backend("multicore-3") was interpreted as backend("multicore").
 
 
 Version: 0.10.0 [2016-05-03]
