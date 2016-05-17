@@ -204,7 +204,7 @@ backend <- local({
         if (ncpus == 1L) {
           warning(sprintf("This system has only a single core (either it's old machine or availableCores() returns an incorrect value) available for the '%s' backend.", what))
         } else {
-          ## Leave some cores for other things?
+            ## Leave some cores for other things?
           if (grepl("^multicore=", what)) {
             save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
             if (!is.finite(save) || save < 0L) {
