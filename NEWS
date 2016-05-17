@@ -4,6 +4,16 @@ Package: future.BatchJobs
 Version: 0.10.0-9000 [2016-05-16]
 o Add package vignette.
 o Now BatchJobsFutureError extends FutureError.
+o WORKAROUND: The BatchJobs multicore cluster functions are designed
+  to give some leeway for other processes on the local machine.
+  Unfortunately, this may result in endless or extremeley long waiting
+  for free resources before BatchJobs multicore jobs can be submitted.
+  One reason is that BatchJobs tries to keep the average CPU load
+  below a threshold that is calculated based on the number of cores.
+  Unfortunately, this can result in starvation due to other processes,
+  especially if the number of cores on the machine is small and/or if
+  mc.cores is set to a small number.  Because of this, we disable this
+  mechanism (by using BatchJobs parameter max.load=+Inf).
 o BUG FIX: backend("multicore-3") was interpreted as
   backend("multicore").
 

@@ -197,7 +197,7 @@ backend <- local({
           stop("Invalid number of cores specified: ", sQuote(what))
         }
         if (ncpus > ncpus0) {
-          warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available accoring to availableCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
+          warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available according to availableCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
         }
       } else {
         ncpus <- ncpus0
@@ -238,8 +238,55 @@ backend <- local({
         envs
       }, error = function(ex) list())
 
-      if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d)\n", ncpus)
-      conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus)
+
+      ## PROBLEM 1:
+      ## BatchJobs' multicore cluster functions tries to be responsive such that the
+      ## total number of running R processes on the local machine should not be more
+      ## than 3 times 'ncpus'.  For instance, with ncpus=4, it will allow at at most
+      ## 3*4-1=11 running R process in order to spawn off another multicore R processes.
+      ## This means that other users on the same machine can starve out BatchJobs
+      ## multicore jobs.  If ncpus=1, then there can be at most two other R processes
+      ## running.  If there are 3 or more, then BatchJobs will block until there are
+      ## only two.  However, when running 'R CMD check', there are already 3 R processes
+      ## running from scratch.  In other words, in such cases 'ncpus' must not be one,
+      ## because then the BatchJob job will never be submitted.  For more details,
+      ## see BatchJobs:::getWorkerSchedulerStatus(), i.e.
+      ##  if (worker$status$n.jobs >= worker$max.jobs)  return("J")
+      ##  if (worker$status$load[1L] > worker$max.load) return("L")
+      ##  if (worker$status$n.rprocs.50 >= worker$ncpus) return("R")
+      ##  if (worker$status$n.rprocs >= 3 * worker$ncpus) return("r")
+      ##						      
+      ## WORKAROUND:
+      ## Force ncpus >= 2L.
+      ## /HB 2016-05-16
+      if (ncpus == 1L) {
+        ncpus <- 2L
+        warning("WORKAROUND: Detected 'ncpus=1', which is likely to result in endless waiting, e.g. when running 'R CMD check'. This is because BatchJobs allows at most 3*ncpus R processes. Forcing 'ncpus=2'.")
+      }
+
+
+      ## PROBLEM 2:
+      ## BatchJobs' multicore cluster functions tries to be responsive to the overall
+      ## CPU load of the machine (as reported by Linux command 'uptime') and it will
+      ## not submit new jobs if the load is greater than its 'max.load' parameter.
+      ## This parameter is by default set to one less than number of available cores
+      ## on the machine (as reported by parallel::detectCores()).  This way it tries
+      ## to leave some leeway for other processes avoiding clogging up the machine.
+      ## If 'mc.cores' is set, that it taken as the number of available cores instead.
+      ## See BatchJobs:::makeWorker() for code.  However, the CPU load is still relative
+      ## to the true number of cores available.  In other words, the check that the
+      ## observed CPU load is less than 'max.load' (== mc.cores-1) is not correct and
+      ## may end up never to be meet, resulting in an endless waiting to submit jobs.
+      ## WORKAROUND:
+      ## A better estimate may be to set 'max.load' to be parallel::detectCores()-1.
+      ## However, it appears that that may also stall the processing in some cases.
+      ## Because of this, we set the limit to +Inf.  This should be alright because
+      ## max.jobs=ncpus (also the default if not specified).  If a user wish to use
+      ## other settings, this can be done via a custom .BatchJobs.R file.
+      ## /HB 2016-05-16
+      max.load <- +Inf
+      if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d, max.jobs=%d, max.load=%g)\n", ncpus, ncpus, max.load)
+      conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
     } else if (what == "local") {
       if (debug) mprintf("backend(): makeClusterFunctionsLocal()\n")
       conf$cluster.functions = makeClusterFunctionsLocal()
