@@ -126,9 +126,9 @@ source('http://callr.org/install#HenrikBengtsson/future.BatchJobs')
 ```
 
 ### Pre-release version
-To install the pre-release version that is available in branch `feature/FutureError`, use:
+To install the pre-release version that is available in branch `develop`, use:
 ```r
-source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@feature/FutureError')
+source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@develop')
 ```
 This will install the package from source.  
 
