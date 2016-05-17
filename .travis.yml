@@ -50,7 +50,6 @@ before_install:
     fi
 
 install:
- - $RENV install_github HenrikBengtsson/future@develop
  - $RENV install_deps
 
 script:
