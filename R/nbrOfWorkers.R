@@ -25,19 +25,24 @@ nbrOfWorkers.batchjobs <- function(evaluator) {
   backend <- eval(expr)
 
   ## 2. If not set, look toward backend()
-  if (is.null(backend)) backend <- backend()
+  if (is.null(backend)) {
+    backend <- backend()
+    callBackend <- FALSE
+  } else {
+    callBackend <- TRUE
+  }
 
   ## Known uni-process backends
   if (backend %in% c("local", "interactive")) return(1L)
 
   ## Try to infer from the BatchJobs configuration
   workers <- local({
-    ## Make sure to undo
-    obackend <- backend()
-    on.exit(backend(obackend))
-
-    ## Set backend temporarily
-    backend(backend)
+    ## Temporarily, set backend(backend)?
+    if (callBackend) {
+      obackend <- backend()
+      on.exit(backend(obackend))
+      backend(backend)
+    }
 
     conf <- getBatchJobsConf()
     cf <- conf$cluster.functions
