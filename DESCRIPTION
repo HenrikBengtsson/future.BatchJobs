@@ -2,7 +2,7 @@ Package: future.BatchJobs
 Version: 0.10.0-9000
 Depends:
     R (>= 3.2.0),
-    future (>= 0.13.0-9000)
+    future (>= 0.14.0)
 Imports:
     BatchJobs (>= 1.6),
     R.utils
@@ -18,7 +18,7 @@ Description: Simple parallel and distributed processing using futures
     that utilizes the 'BatchJobs' framework, e.g. 'fit %<-% { glm.fit(x, y) }'.
     This package implements the Future API of the 'future' package.
     To use BatchJobs futures, just specify 'plan(batchjobs)'.
-License: Private for now [will become LGPL (>= 2.1) when published]
+License: LGPL (>= 2.1)
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/future.BatchJobs
 BugReports: https://github.com/HenrikBengtsson/future.BatchJobs/issues

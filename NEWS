@@ -1,7 +1,7 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.10.0-9000 [2016-05-15]
+Version: 0.10.0-9000 [2016-05-16]
 o Add package vignette.
 o Now BatchJobsFutureError extends FutureError.
 
