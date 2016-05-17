@@ -205,7 +205,7 @@ backend <- local({
           warning(sprintf("This system has only a single core (either it's old machine or availableCores() returns an incorrect value) available for the '%s' backend.", what))
         } else {
             ## Leave some cores for other things?
-          if (grepl("^multicore=", what)) {
+          if (grepl("^multicore-", what)) {
             save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
             if (!is.finite(save) || save < 0L) {
               stop("Invalid number of cores specified: ", sQuote(what))
