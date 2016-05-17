@@ -1,10 +1,24 @@
 # future.BatchJobs: A Future for BatchJobs
 
 ## Introduction
-The [future.BatchJobs] package provides [BatchJobs] futures according to
-the Future API defined by the [future] package.
-This means that all of the BatchJobs machinery can be
-utilized using futures, e.g.
+The [future] package provides a generic API for using futures in R.
+A future is a simple yet powerful mechanism to evaluate an R expression
+and retrieve its value at some point in time.  Futures can be resolved
+in many different ways depending on which strategy is used.
+There are various types of synchronous and asynchronous futures to
+choose from in the [future] package.
+
+This package, [future.BatchJobs], provides a type of futures that
+utilizes the [BatchJobs] package.  This means that _any_ type of
+backend that the BatchJobs package supports can be used as a future.
+More specifically, future.BatchJobs will allow you or users of your
+package to leverage the compute power of high-performance computing
+(HPC) clusters via a simple switch in settings - without having to
+change any code at all.
+
+For instance, if BatchJobs is properly configures, the below two
+expressions for futures `x` and `y` will be processed on two different
+compute nodes:
 ```r
 > library("future.BatchJobs")
 > plan(batchjobs)
@@ -14,8 +28,12 @@ utilized using futures, e.g.
 > x + y
 [1] 5.85
 ```
-For an introduction how to use futures in R, please consult the
-vignettes of the [future] package.
+This is obviously a toy example to illustrate what futures look like
+and how to work with them.  For and introduction and for full details,
+please consult the package vignettes of the [future] package.
+
+To see a fun Mandelbrot demo that can process multiple Mandelbrot sets
+in parallel, skip to the very end of this document.
 
 
 ## Choosing BatchJobs backend
@@ -68,7 +86,7 @@ plan(batchjobs, backend="cluster")
 ### Example: A `.BatchJobs.R` file for TORQUE/PBS
 The most powerful and most common usage of BatchJobs futures is via a
 backend configured by a `.BatchJobs.R` file.  For example, to use
-future that are distributed on a compute cluster via a TORQUE/PBS job
+futures that are distributed on a compute cluster via a TORQUE/PBS job
 scheduler, use:
 ```r
 library("future.BatchJobs")
@@ -98,7 +116,7 @@ the [BatchJobs configuration] wiki page.
 
 
 ## Demos
-The [future] package provdides a demo using futures for calculating a
+The [future] package provides a demo using futures for calculating a
 set of Mandelbrot planes.  Except from using futures, the demo does
 not assume anything about what type of futures are used.  This is up
 to the user to control.
