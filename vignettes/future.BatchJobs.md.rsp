@@ -1,4 +1,24 @@
-# future.BatchJobs: A Future for BatchJobs
+<%@meta language="R-vignette" content="--------------------------------
+%\VignetteIndexEntry{A Future for BatchJobs}
+%\VignetteAuthor{Henrik Bengtsson}
+%\VignetteKeyword{R}
+%\VignetteKeyword{package}
+%\VignetteKeyword{vignette}
+%\VignetteKeyword{future}
+%\VignetteKeyword{synchronous}
+%\VignetteKeyword{asynchronous}
+%\VignetteKeyword{parallel}
+%\VignetteKeyword{cluster}
+%\VignetteKeyword{BatchJobs}
+%\VignetteEngine{R.rsp::rsp}
+%\VignetteTangle{FALSE}
+--------------------------------------------------------------------"%>
+<%
+library("R.utils")
+options("withCapture/newline"=FALSE)
+options(mc.cores=2L)
+%>
+# A Future for BatchJobs
 
 ## Introduction
 The [future.BatchJobs] package provides [BatchJobs] futures according to
@@ -78,18 +98,18 @@ and then use a `.BatchJobs.R` file (in the working directory or in
 your home directory) with the following content:
 ```r
 cluster.functions <- makeClusterFunctionsTorque(R.utils::tmpfile('
-#PBS -N <%= job.name %>
+#PBS -N <%%= job.name %%>
 ## merge standard error and output
 #PBS -j oe
 ## direct streams to our logfile
-#PBS -o <%= log.file %>
-#PBS -l walltime=<%= resources$walltime %>,nodes=<%= resources$nodes %>,vmem=<%= resources$memory %>M
+#PBS -o <%%= log.file %%>
+#PBS -l walltime=<%%= resources$walltime %%>,nodes=<%%= resources$nodes %%>,vmem=<%%= resources$memory %%>M
 ## remove this line if your cluster does not support arrayjobs
-#PBS -t 1-<%= arrayjobs %>
+#PBS -t 1-<%%= arrayjobs %%>
   
 ## Run R:
 ## we merge R output with stdout from PBS, which gets then logged via -o option
-R CMD BATCH --no-save --no-restore "<%= rscript %>" /dev/stdout
+R CMD BATCH --no-save --no-restore "<%%= rscript %%>" /dev/stdout
 '))
 ```
 For further details and examples on how to configure BatchJobs, see
@@ -116,26 +136,5 @@ demo("mandelbrot", package="future", ask=FALSE)
 [future.BatchJobs]: https://github.com/HenrikBengtsson/future.BatchJobs/
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 
-
-## Installation
-R package future.BatchJobs is only available via [GitHub](https://github.com/HenrikBengtsson/future.BatchJobs) and can be installed in R as:
-```r
-source('http://callr.org/install#HenrikBengtsson/future.BatchJobs')
-```
-
-### Pre-release version
-To install the pre-release version that is available in branch `develop`, use:
-```r
-source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@develop')
-```
-This will install the package from source.  
-
-
-
-## Software status
-
-| Resource:     | GitHub        | Travis CI     | Appveyor         |
-| ------------- | ------------------- | ------------- | ---------------- |
-| _Platforms:_  | _Multiple_          | _Linux_       | _Windows_        |
-| R CMD check   |  | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a> | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
-| Test coverage |                     | <a href="https://coveralls.io/r/HenrikBengtsson/future.BatchJobs"><img src="https://coveralls.io/repos/HenrikBengtsson/future.BatchJobs/badge.svg?branch=develop" alt="Coverage Status"/></a>   |                  |
+---
+Copyright Henrik Bengtsson, 2015-2016

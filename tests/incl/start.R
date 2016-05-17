@@ -2,7 +2,7 @@ library("future.BatchJobs")
 
 ## Record original state
 ovars <- ls()
-oopts <- options(warn=1, future.debug=TRUE)
+oopts <- options(warn=1L, mc.cores=2L, future.debug=TRUE)
 oopts$future.delete <- getOption("future.delete")
 oplan <- plan()
 obackend <- backend()
@@ -21,6 +21,7 @@ if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
   backend("local")
 }
 
+delete <- future.BatchJobs:::delete
 attachedPackages <- future.BatchJobs:::attachedPackages
 tempRegistry <- future.BatchJobs:::tempRegistry
 isNA <- future.BatchJobs:::isNA

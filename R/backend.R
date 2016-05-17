@@ -76,6 +76,9 @@ backend <- local({
   )
   last = NULL
 
+  ## WORKAROUND: See comment below.
+  dyld_envs <- list()
+
   function(what=NULL, ..., quietly=TRUE) {
     ## Imported private functions from BatchJobs
     ns <- getNamespace("BatchJobs")
@@ -140,11 +143,47 @@ backend <- local({
       }
     }
 
-    ## Multicore processing is not supported on Windows :(
-    if (.Platform$OS.type == "windows") {
-      dropped <- c(dropped, grep("^multicore", what, value=TRUE))
-      what <- setdiff(what, dropped)
-    }
+
+    ## Check if multicore processing is supported or makes sense
+    ncpus0 <- availableCores()
+    for (kk in seq_along(what)) {
+      if (!grepl("^multicore", what[kk])) next
+
+      ## Multicore processing is not supported on Windows
+      if (.Platform$OS.type == "windows") dropped <- c(dropped, what[kk])
+
+      ## Default number of cores to use
+      ncpus <- ncpus0
+
+      if (grepl("^multicore=", what[kk])) {
+        ncpus <- suppressWarnings(as.integer(gsub("^multicore=", "", what[kk])))
+        if (!is.finite(ncpus) || ncpus < 1L) {
+          stop("Invalid number of cores specified: ", sQuote(what[kk]))
+        }
+      } else {
+        ## Leave some cores for other things?
+        if (grepl("^multicore-", what[kk])) {
+          save <- suppressWarnings(as.integer(gsub("^multicore-", "", what[kk])))
+          if (!is.finite(save) || save < 0L) {
+            stop("Invalid number of cores specified: ", sQuote(what[kk]))
+          }
+          ncpus <- min(1L, ncpus-save)  ## At least one core
+        }
+      }
+
+      ## If only one core is available or one one was requested, then
+      ## there is no point using multicore processing.
+      ## NOTE: This also solves the problem that BatchJobs will wait
+      ## endlessly if 'ncpus=1' and there are already 3 R processes
+      ## running on the same machine, which happens for instance when
+      ## 'R CMD check' runs tests.  For more details on this "feature",
+      ## see runBatchJobs:::getWorkerSchedulerStatus(). /HB 2016-05-16
+      if (ncpus < 2L) {
+        dropped <- c(dropped, what[kk])
+      }
+    } ## for (kk ...)
+
+    what <- setdiff(what, dropped)
 
     ## Always fall back to using the 'local' configuration
     if (length(what) == 0L) what <- "local"
@@ -152,11 +191,12 @@ backend <- local({
     ## The final choice
     what <- what[1L]
 
+
     if (debug) mprintf("backend(): what='%s'\n", what)
 
     ## Inform about dropped requests?
     if (length(dropped) > 0L && explicit_what && getOption("future.on_unkown_backend", "ignore") == "warn") {
-      warning(sprintf("Some of the preferred backends (%s) are either not available or not supported on your operating system ('%s'). Will use the following backend: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS.type, sQuote(what)))
+      warning(sprintf("Some of the preferred backends (%s) are either not available, pointless (e.g. multicore=1), or not supported on your operating system ('%s'). Will use the following backend instead: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS.type, sQuote(what)))
     }
 
     ## Load specific or global BatchJobs config file?
@@ -186,36 +226,76 @@ backend <- local({
     if (debug) mprintf("backend(): Finding action for what='%s'\n", what)
 
     conf <- getBatchJobsConf()
+
     if (grepl("^multicore", what)) {
-      ncpus0 <- availableCores()
+      ## Sanity check (see above)
+      stopifnot(ncpus0 >= 2L)
+
       if (grepl("^multicore=", what)) {
         ncpus <- suppressWarnings(as.integer(gsub("^multicore=", "", what)))
         if (!is.finite(ncpus) || ncpus < 1L) {
           stop("Invalid number of cores specified: ", sQuote(what))
         }
         if (ncpus > ncpus0) {
-          warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available accoring to availableCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
+          warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available according to availableCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
         }
       } else {
         ncpus <- ncpus0
-        if (ncpus == 1L) {
-          warning(sprintf("This system has only a single core (either it's old machine or availableCores() returns an incorrect value) available for the '%s' backend.", what))
-        } else {
-          ## Leave one some cores for other things?
-          if (grepl("^multicore=", what)) {
-            save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
-            if (!is.finite(save) || save < 0L) {
-              stop("Invalid number of cores specified: ", sQuote(what))
-            }
-            ncpus <- min(1L, ncpus-save)
-            if (ncpus == 1L) {
-              warning(sprintf("Only 1 core (out of the %d availble on this system) will be used for the '%s' backend.", ncpus0, what))
-            }
-          }
+
+        ## Leave some cores for other things?
+        if (grepl("^multicore-", what)) {
+          save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
+          ncpus <- ncpus - save
         }
       }
-      if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d)\n", ncpus)
-      conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus)
+
+      ## Sanity check (see above)
+      stopifnot(ncpus >= 2L)
+
+
+      ## WORKAROUND:
+      ## On some OS X systems, a system call to 'ps' may output an error message
+      ## "dyld: DYLD_ environment variables being ignored because main executable
+      ##  (/bin/ps) is setuid or setgid" to standard error that is picked up by
+      ## BatchJobs which incorrectly tries to parse it.  By unsetting all DYLD_*
+      ## environment variables, we avoid this message.  For more info, see:
+      ## * https://github.com/tudo-r/BatchJobs/issues/117
+      ## * https://github.com/HenrikBengtsson/future.BatchJobs/issues/59
+      ## /HB 2016-05-07
+      dyld_envs <<- tryCatch({
+        envs <- list()
+        res <- system2("ps", stdout=TRUE, stderr=TRUE)
+        if (any(grepl("DYLD_", res))) {
+          envs <- Sys.getenv()
+          envs <- envs[grepl("^DYLD_", names(envs))]
+          if (length(envs) > 0L) lapply(names(envs), FUN=Sys.unsetenv)
+        }
+        envs
+      }, error = function(ex) list())
+
+
+      ## PROBLEM 1:
+      ## BatchJobs' multicore cluster functions tries to be responsive to the overall
+      ## CPU load of the machine (as reported by Linux command 'uptime') and it will
+      ## not submit new jobs if the load is greater than its 'max.load' parameter.
+      ## This parameter is by default set to one less than number of available cores
+      ## on the machine (as reported by parallel::detectCores()).  This way it tries
+      ## to leave some leeway for other processes avoiding clogging up the machine.
+      ## If 'mc.cores' is set, that it taken as the number of available cores instead.
+      ## See BatchJobs:::makeWorker() for code.  However, the CPU load is still relative
+      ## to the true number of cores available.  In other words, the check that the
+      ## observed CPU load is less than 'max.load' (== mc.cores-1) is not correct and
+      ## may end up never to be meet, resulting in an endless waiting to submit jobs.
+      ## WORKAROUND:
+      ## A better estimate may be to set 'max.load' to be parallel::detectCores()-1.
+      ## However, it appears that that may also stall the processing in some cases.
+      ## Because of this, we set the limit to +Inf.  This should be alright because
+      ## max.jobs=ncpus (also the default if not specified).  If a user wish to use
+      ## other settings, this can be done via a custom .BatchJobs.R file.
+      ## /HB 2016-05-16
+      max.load <- +Inf
+      if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d, max.jobs=%d, max.load=%g)\n", ncpus, ncpus, max.load)
+      conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
     } else if (what == "local") {
       if (debug) mprintf("backend(): makeClusterFunctionsLocal()\n")
       conf$cluster.functions = makeClusterFunctionsLocal()
@@ -224,6 +304,13 @@ backend <- local({
     } else {
       stop("Unknown backend: ", sQuote(what))
     }
+
+
+    ## WORKAROUND: Undo above multicore OS X workaround, iff ever done.
+    if (!grepl("^multicore", what) && length(dyld_envs) > 0L) {
+      do.call(Sys.setenv, args=as.list(dyld_envs))
+    }
+
 
     conf$mail.start = "none"
     conf$mail.done = "none"
