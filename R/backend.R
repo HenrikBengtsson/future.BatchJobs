@@ -154,7 +154,7 @@ backend <- local({
 
       ## Default number of cores to use
       ncpus <- ncpus0
-      
+
       if (grepl("^multicore=", what[kk])) {
         ncpus <- suppressWarnings(as.integer(gsub("^multicore=", "", what[kk])))
         if (!is.finite(ncpus) || ncpus < 1L) {
@@ -170,9 +170,14 @@ backend <- local({
           ncpus <- min(1L, ncpus-save)  ## At least one core
         }
       }
-      
+
       ## If only one core is available or one one was requested, then
       ## there is no point using multicore processing.
+      ## NOTE: This also solves the problem that BatchJobs will wait
+      ## endlessly if 'ncpus=1' and there are already 3 R processes
+      ## running on the same machine, which happens for instance when
+      ## 'R CMD check' runs tests.  For more details on this "feature",
+      ## see runBatchJobs:::getWorkerSchedulerStatus(). /HB 2016-05-16
       if (ncpus < 2L) {
         dropped <- c(dropped, what[kk])
       }
@@ -221,11 +226,11 @@ backend <- local({
     if (debug) mprintf("backend(): Finding action for what='%s'\n", what)
 
     conf <- getBatchJobsConf()
-    
+
     if (grepl("^multicore", what)) {
       ## Sanity check (see above)
       stopifnot(ncpus0 >= 2L)
-      
+
       if (grepl("^multicore=", what)) {
         ncpus <- suppressWarnings(as.integer(gsub("^multicore=", "", what)))
         if (!is.finite(ncpus) || ncpus < 1L) {
