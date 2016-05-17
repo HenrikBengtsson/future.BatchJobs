@@ -26,7 +26,7 @@ the Future API defined by the [future] package.
 This means that all of the BatchJobs machinery can be
 utilized using futures, e.g.
 ```r
-> library('future.BatchJobs')
+> library("future.BatchJobs")
 > plan(batchjobs)
 >
 > x %<-% { Sys.sleep(5); 3.14 }
@@ -55,17 +55,17 @@ Below are the most common types of BatchJobs backends.  The default is
 
 | Backend                | OSes        | Description                                                               | Alternative in future package
 |:-----------------------|:------------|:--------------------------------------------------------------------------|:------------------------------------------------
-| _synchronous:_         |             | _non-parallel:_                                                           |
-| `interactive`          | all         | non-parallel processing in the current R process                          | `plan(eager)`
-| `local`                | all         | non-parallel processing in a separate R process (on current machine)      | `plan(multisession, maxCores=2)`
-| _asynchronous:_        |             | _parallel_:                                                               |
-| `multicore`            | not Windows | forked R processes (on current machine) using all available cores         | `plan(multicore, maxCores=availableCores())`
-| `multicore-1`          | not Windows | `multicore` using all but one of the available cores                      | `plan(multicore, maxCores=availableCores()-1L)`
-| `multicore=n`          | not Windows | `multicore` using `n` the available cores                                 | `plan(multicore, maxCores=n)`
 | _generic:_             |             |                                                                           |
 | `/path/to.BatchJobs.R` | all         | According to specific `/path/to/.BatchJobs.R` configuration file          | N/A
 | `.BatchJobs.R`         | all         | According to `./.BatchJobs.R` or `~/.BatchJobs.R`                         | N/A
 | `default`              | all         | Same as `c(".BatchJobs.R", "multicore-1", "local")`.  This is the default | N/A
+| _synchronous:_         |             | _non-parallel:_                                                           |
+| `interactive`          | all         | non-parallel processing in the current R process                          | `plan(transparent)`
+| `local`                | all         | non-parallel processing in a separate R process (on current machine)      | `plan(multisession, workers=2)`
+| _asynchronous:_        |             | _parallel_:                                                               |
+| `multicore`            | not Windows | forked R processes (on current machine) using all available cores         | `plan(multicore, workers=availableCores())`
+| `multicore-k`          | not Windows | `multicore` using all but `k` of the available cores                      | `plan(multicore, workers=availableCores()-kL)`
+| `multicore=n`          | not Windows | `multicore` using `n` the available cores                                 | `plan(multicore, workers=n)`
 
 It is possible to specify a set of backend alternatives,
 e.g. `plan(batchjobs, backend=c("multicore", "local"))`.  The first
@@ -97,8 +97,7 @@ plan(batchjobs)
 and then use a `.BatchJobs.R` file (in the working directory or in
 your home directory) with the following content:
 ```r
-cluster.functions <- local({
-  makeClusterFunctionsTorque(R.utils::tmpfile('
+cluster.functions <- makeClusterFunctionsTorque(R.utils::tmpfile('
 #PBS -N <%%= job.name %%>
 ## merge standard error and output
 #PBS -j oe
@@ -111,8 +110,7 @@ cluster.functions <- local({
 ## Run R:
 ## we merge R output with stdout from PBS, which gets then logged via -o option
 R CMD BATCH --no-save --no-restore "<%%= rscript %%>" /dev/stdout
-  '))
-})
+'))
 ```
 For further details and examples on how to configure BatchJobs, see
 the [BatchJobs configuration] wiki page.
