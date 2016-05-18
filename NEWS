@@ -1,6 +1,10 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.11.0-9000 [2016-05-16]
+o Add nbrOfWorkers() for BatchJobs futures.
+
+
 Version: 0.11.0 [2016-05-16]
 o Add package vignette.
 o Now BatchJobsFutureError extends FutureError.
