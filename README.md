@@ -29,26 +29,72 @@ compute nodes:
 [1] 5.85
 ```
 This is obviously a toy example to illustrate what futures look like
-and how to work with them.  For and introduction and for full details,
+and how to work with them.
+
+A more realistic example comes from the field of cancer research
+where very large data FASTQ files, which hold a large number of short
+DNA sequence reads, are produced.  The first step toward a biological
+interpretation of these data is to align the reads in each sample
+(one FASTQ file) toward the human genome.  In order to speed this up,
+we can have each file be processed by a separate compute node and each
+node we can use 24 parallel processes such that each process aligns a
+separate chromosomes.  Here is an outline of how this nested parallelism
+could be implemented using futures.
+```r
+library("future")
+library("listenv")
+## The first level of futures should be submitted to the
+## cluster using BatchJobs.  The second level of futures
+## should be using multiprocessing, where the number of
+## parallel processes is automatically decided based on
+## what the cluster allots to each compute node.
+plan(list(batchjobs, multiprocess))
+
+## Find all samples (one FASTQ file per sample)
+fqs <- dir(pattern="[.]fastq$")
+
+## The aligned results are stored in BAM files
+bams <- listenv()
+
+## For all samples (FASTQ files) ...
+for (ss in seq_along(fqs)) {
+  fq <- fqs[ss]
+
+  ## ... use futures to align them ...
+  bams[[ss]] %<-% {
+    bams_ss <- listenv()
+	## ... and for each FASTQ file use a second layer
+	## of futures to align the individual chromosomes
+    for (cc in 1:24) {
+      bams_ss[[cc]] %<-% htseq::align(fq, chr=cc)
+    }
+	## Resolve the "chromosome" futures and return as a list
+    as.list(bams_ss)
+  }
+}
+## Resolve the "sample" futures and return as a list
+bams <- as.list(bams)
+```
+Note that a user who do not have access to a cluster could use the same script processing samples sequentially and chromosomes in parallel on a single machine using:
+```r
+plan(list(eager, multiprocess))
+```
+or samples in parallel and chromosomes sequentially using:
+```r
+plan(list(multiprocess, eager))
+```
+
+For an introduction as well as full details on how to use futures,
 please consult the package vignettes of the [future] package.
 
-To see a fun Mandelbrot demo that can process multiple Mandelbrot sets
-in parallel, skip to the very end of this document.
 
 
 ## Choosing BatchJobs backend
 The future.BatchJobs package implements a generic future wrapper for all
-BatchJobs backends, which can be specified via the `backend` argument,
-e.g.
-```r
-> plan(batchjobs, backend='.BatchJobs.R')
-```
-
-Below are the most common types of BatchJobs backends.  The default is
-`backend="default"`.  That is, it is often enough to just use:
-```r
-> plan(batchjobs)
-```
+BatchJobs backends and by default it looks for a `.BatchJobs.R`
+configuration file and if not found it falls back to multicore
+processing if supported, otherwise single-core processing.
+Below are the most common types of BatchJobs backends.
 
 
 | Backend                | OSes        | Description                                                               | Alternative in future package
@@ -59,11 +105,11 @@ Below are the most common types of BatchJobs backends.  The default is
 | `default`              | all         | Same as `c(".BatchJobs.R", "multicore-1", "local")`.  This is the default | N/A
 | _synchronous:_         |             | _non-parallel:_                                                           |
 | `interactive`          | all         | non-parallel processing in the current R process                          | `plan(transparent)`
-| `local`                | all         | non-parallel processing in a separate R process (on current machine)      | `plan(multisession, workers=2)`
+| `local`                | all         | non-parallel processing in a separate R process (on current machine)      | `plan(eager)`
 | _asynchronous:_        |             | _parallel_:                                                               |
-| `multicore`            | not Windows | forked R processes (on current machine) using all available cores         | `plan(multicore, workers=availableCores())`
-| `multicore-k`          | not Windows | `multicore` using all but `k` of the available cores                      | `plan(multicore, workers=availableCores()-kL)`
-| `multicore=n`          | not Windows | `multicore` using `n` the available cores                                 | `plan(multicore, workers=n)`
+| `multicore`            | not Windows | forked R processes (on current machine) using all available / allotted cores  | `plan(multicore)`
+| `multicore-k`          | not Windows | `multicore` using all but `k` of the available / allotted cores               | `plan(multicore, workers=availableCores()-kL)`
+| `multicore=n`          | not Windows | `multicore` using `n` cores                                                   | `plan(multicore, workers=n)`
 
 It is possible to specify a set of backend alternatives,
 e.g. `plan(batchjobs, backend=c("multicore", "local"))`.  The first
@@ -118,12 +164,12 @@ the [BatchJobs configuration] wiki page.
 ## Demos
 The [future] package provides a demo using futures for calculating a
 set of Mandelbrot planes.  Except from using futures, the demo does
-not assume anything about what type of futures are used.  This is up
-to the user to control.
+not assume anything about what type of futures are used.
+_The user has full control of how futures are evaluated_.
 For instance, to use `local` BatchJobs futures, run the demo as:
 ```r
 library("future.BatchJobs")
-plan(batchjobs, batchjobs="local")
+plan(batchjobs, backend="local")
 demo("mandelbrot", package="future", ask=FALSE)
 ```
 
