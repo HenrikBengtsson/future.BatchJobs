@@ -1,12 +1,14 @@
+#' @importFrom BatchJobs makeClusterFunctionsInteractive
 #' @export
 batchjobs_interactive <- function(expr, envir=parent.frame(), substitute=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
 
-  ## 1. Create
+  cf <- makeClusterFunctionsInteractive()
+
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
+                            cluster.functions=cf,
                             backend="interactive", ...)
 
-  ## 2. Launch
   future <- run(future)
 
   future

@@ -225,8 +225,7 @@ backend <- local({
 
     if (debug) mprintf("backend(): Finding action for what='%s'\n", what)
 
-    conf <- getBatchJobsConf()
-
+    cluster.functions <- NULL
     if (grepl("^multicore", what)) {
       ## Sanity check (see above)
       stopifnot(ncpus0 >= 2L)
@@ -295,12 +294,12 @@ backend <- local({
       ## /HB 2016-05-16
       max.load <- +Inf
       if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d, max.jobs=%d, max.load=%g)\n", ncpus, ncpus, max.load)
-      conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
+      cluster.functions <- makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
     } else if (what == "local") {
       if (debug) mprintf("backend(): makeClusterFunctionsLocal()\n")
-      conf$cluster.functions = makeClusterFunctionsLocal()
+      cluster.functions <- makeClusterFunctionsLocal()
     } else if (what == "interactive") {
-      conf$cluster.functions = makeClusterFunctionsInteractive()
+      cluster.functions <- makeClusterFunctionsInteractive()
     } else {
       stop("Unknown backend: ", sQuote(what))
     }
@@ -311,25 +310,13 @@ backend <- local({
       do.call(Sys.setenv, args=as.list(dyld_envs))
     }
 
+    conf <- makeBatchJobsConf(cluster.functions)
 
-    conf$mail.start = "none"
-    conf$mail.done = "none"
-    conf$mail.error = "none"
-    conf$db.driver = "SQLite"
-    conf$db.options = list()
-    conf$default.resources = list()
-    conf$debug = FALSE
-    conf$raise.warnings = FALSE
-    conf$staged.queries = TRUE
-    conf$max.concurrent.jobs = Inf
-    conf$fs.timeout = NA_real_
-
+    ## Use it!
     if (debug) {
       mprintf("Setting BatchJobs configuration:\n")
       mstr(as.list(conf))
     }
-
-    ## Use it!
     assignConf(conf)
 
     ## Record last used
@@ -360,3 +347,24 @@ hasUserClusterFunctions <- function(pathnames=NULL, debug=FALSE) {
 
   exists("cluster.functions", mode="list", envir=config)
 }
+
+
+makeBatchJobsConf <- function(cluster.functions, ...) {
+  getBatchJobsConf <- importBatchJobs("getBatchJobsConf")
+
+  conf <- getBatchJobsConf()
+  conf$cluster.functions <- cluster.functions
+  conf$mail.start <- "none"
+  conf$mail.done <- "none"
+  conf$mail.error <- "none"
+  conf$db.driver <- "SQLite"
+  conf$db.options <- list()
+  conf$default.resources <- list()
+  conf$debug <- FALSE
+  conf$raise.warnings <- FALSE
+  conf$staged.queries <- TRUE
+  conf$max.concurrent.jobs <- Inf
+  conf$fs.timeout <- NA_real_
+
+  conf
+} ## makeBatchJobsConf()

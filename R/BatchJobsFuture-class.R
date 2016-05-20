@@ -5,6 +5,7 @@
 #' should be located.
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
+#' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
 #' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
 #' @param resources A named list of resources needed by this future.
 #' @param finalize If TRUE, any underlying registries are
@@ -17,8 +18,13 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, cluster.functions=NULL, backend=NULL, resources=list(), finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
+
+  if (!is.null(cluster.functions)) {
+    stopifnot(is.list(cluster.functions))
+  }
+
   stopifnot(is.list(resources),
             length(resources) == 0 || !is.null(names(resources)))
 
@@ -39,7 +45,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ba
   future$globals <- gp$globals
   future$packages <- gp$packages
   future$config <- list(reg=reg, id=NA_integer_,
-                      cluster.functions=NULL,
+                      cluster.functions=cluster.functions,
                       resources=resources,
                       backend=backend)
 

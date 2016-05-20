@@ -20,10 +20,9 @@
 #'
 #' @seealso
 #' An alternative to BatchJobs local futures is to use
-#' \link[future:eager]{eager} futures of the \pkg{future}.
-#' The only difference is that a BatchJobs local future will be
-#' evaluated in a separate background R session, whereas an
-#' eager future will be resolved in the calling/current R process.
+#' \link[future:cluster]{cluster} futures of the \pkg{future}
+#' with a single local background session, i.e.
+#' \code{plan(cluster, workers="localhost")}.
 #'
 #' An alternative to BatchJobs interactive futures is to use
 #' \link[future:transparent]{transparent} futures of the \pkg{future}.
@@ -32,12 +31,16 @@
 #' \code{\link[BatchJobs]{makeClusterFunctionsInteractive}()} are used
 #' to create the BatchJobs cluster-function backends.
 #'
+#' @importFrom BatchJobs makeClusterFunctionsLocal
 #' @aliases batchjobs_interactive
 #' @export
 batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, ...) {
   if (substitute) expr <- substitute(expr)
 
+  cf <- makeClusterFunctionsLocal()
+
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
+                            cluster.functions=cf,
                             backend="local", ...)
 
   future <- run(future)

@@ -5,7 +5,7 @@
 \title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  backend = NULL, resources = list(),
+  cluster.functions = NULL, backend = NULL, resources = list(),
   finalize = getOption("future.finalize", TRUE), ...)
 }
 \arguments{
@@ -16,6 +16,8 @@ should be located.}
 
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
+
+\item{cluster.functions}{A BatchJobs \link[BatchJobs]{ClusterFunctions} object.}
 
 \item{backend}{The BatchJobs backend to use, cf. \code{\link{backend}()}.}
 
