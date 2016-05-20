@@ -7,7 +7,7 @@
 #'                   \code{substitute()}:d or not.
 #' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
 #' @param resources A named list of resources needed by this future.
-#' @param \ldots Additional arguments pass to \code{\link{BatchJobsFuture}()}.
+#' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
 #'

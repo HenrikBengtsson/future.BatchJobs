@@ -20,7 +20,7 @@ are search from.}
 
 \item{resources}{A named list of resources needed by this future.}
 
-\item{\ldots}{Additional arguments pass to \code{\link{BatchJobsFuture}()}.}
+\item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }
 \value{
 An object of class \code{BatchJobsFuture}.

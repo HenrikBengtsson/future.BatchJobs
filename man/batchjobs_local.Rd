@@ -16,7 +16,7 @@ are search from.}
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
 
-\item{\ldots}{Additional arguments pass to \code{\link{BatchJobsFuture}()}.}
+\item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }
 \value{
 An object of class \code{BatchJobsFuture}.

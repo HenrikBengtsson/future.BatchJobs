@@ -24,7 +24,7 @@ should be located.}
 \item{finalize}{If TRUE, any underlying registries are
 deleted when this object is garbage collected, otherwise not.}
 
-\item{\ldots}{Additional arguments pass to \code{\link[future]{Future}()}.}
+\item{\ldots}{Additional arguments passed to \code{\link[future]{Future}()}.}
 }
 \value{
 A BatchJobsFuture object

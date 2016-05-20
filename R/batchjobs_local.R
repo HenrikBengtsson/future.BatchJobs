@@ -13,7 +13,7 @@
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
-#' @param \ldots Additional arguments pass to \code{\link{BatchJobsFuture}()}.
+#' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
 #'

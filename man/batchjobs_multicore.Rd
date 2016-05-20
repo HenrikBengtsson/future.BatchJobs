@@ -19,7 +19,7 @@ are search from.}
 \item{workers}{The number of multicore processes to be available
 for concurrent BatchJobs multicore futures.}
 
-\item{\ldots}{Additional arguments pass to \code{\link{BatchJobsFuture}()}.}
+\item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }
 \value{
 An object of class \code{BatchJobsFuture}.

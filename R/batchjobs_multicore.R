@@ -10,7 +10,7 @@
 #'                   \code{substitute()}:d or not.
 #' @param workers The number of multicore processes to be available
 #' for concurrent BatchJobs multicore futures.
-#' @param \ldots Additional arguments pass to \code{\link{BatchJobsFuture}()}.
+#' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
 #'
