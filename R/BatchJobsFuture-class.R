@@ -271,11 +271,11 @@ run <- function(...) UseMethod("run")
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
 run.BatchJobsFuture <- function(future, ...) {
   mdebug <- importFuture("mdebug")
+  assignConf <- importBatchJobs("assignConf")
 
   getClusterFunctions <- function() {
-    ns <- getNamespace("BatchJobs")
-    getBatchJobsConf <- get("getBatchJobsConf", envir=ns, mode="function")
-    getClusterFunctions <- get("getClusterFunctions", envir=ns, mode="function")
+    getBatchJobsConf <- importBatchJobs("getBatchJobsConf")
+    getClusterFunctions <- importBatchJobs("getClusterFunctions")
     getClusterFunctions(getBatchJobsConf())
   }
 
@@ -406,24 +406,61 @@ run.BatchJobsFuture <- function(future, ...) {
   future$config$id <- id
   if (debug) mprintf("Created %s future #%d\n", class(future)[1], id)
 
-  ## 3. Set backend here
-  ## Use a non-default backend?
-  backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
-  if (!is.null(backend)) {
-    obackend <- backend()
-    on.exit(backend(obackend))
-    backend(backend)
+  ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
+  ## If/when makeRegistry() attaches BatchJobs, we need
+  ## to prevent it from overriding the configuration
+  ## already set by backend().
+  oopts <- options(BatchJobs.load.config=FALSE)
+  on.exit(options(oopts))
 
-    ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
-    ## If/when makeRegistry() attaches BatchJobs, we need
-    ## to prevent it from overriding the configuration
-    ## already set by backend().
-    oopts <- options(BatchJobs.load.config=FALSE)
-    on.exit(options(oopts), add=TRUE)
+  ## 3. Create BatchJobs backend configuration
+  cluster.functions <- future$cluster.functions
+  if (!is.null(cluster.functions)) {
+    conf <- makeBatchJobsConf(cluster.functions)
+    if (debug) {
+      mprintf("Setting BatchJobs configuration:\n")
+      mstr(as.list(conf))
+    }
+    assignConf(conf)
+
+  } else {
+    ## Set backend here? (legacy code)
+    ## Use a non-default backend?
+    backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
+    if (!is.null(backend)) {
+      obackend <- backend()
+      on.exit(backend(obackend), add=TRUE)
+      backend(backend)
+    }
+
+    ## Record
+    cluster.functions <- getClusterFunctions()
   }
 
-  ## 4. Record
-  future$config$cluster.functions <- getClusterFunctions()
+  ## BACKWARD COMPATIBILITY: Clean this up. /HB 2016-05-20
+  future$config$cluster.functions <- cluster.functions
+
+  ## WORKAROUND: (For multicore and OS X only)
+  if (cluster.functions$name == "Multicore") {
+    ## On some OS X systems, a system call to 'ps' may output an error message
+    ## "dyld: DYLD_ environment variables being ignored because main executable
+    ##  (/bin/ps) is setuid or setgid" to standard error that is picked up by
+    ## BatchJobs which incorrectly tries to parse it.  By unsetting all DYLD_*
+    ## environment variables, we avoid this message.  For more info, see:
+    ## * https://github.com/tudo-r/BatchJobs/issues/117
+    ## * https://github.com/HenrikBengtsson/future.BatchJobs/issues/59
+    ## /HB 2016-05-07
+    dyld_envs <- tryCatch({
+      envs <- list()
+      res <- system2("ps", stdout=TRUE, stderr=TRUE)
+      if (any(grepl("DYLD_", res))) {
+        envs <- Sys.getenv()
+        envs <- envs[grepl("^DYLD_", names(envs))]
+        if (length(envs) > 0L) lapply(names(envs), FUN=Sys.unsetenv)
+      }
+      envs
+    }, error = function(ex) list())
+  }
 
   ## 5. Submit
   future$state <- 'running'
@@ -431,7 +468,7 @@ run.BatchJobsFuture <- function(future, ...) {
   if (debug) mprintf("Launched future #%d\n", id)
 
   invisible(future)
-}
+} ## run()
 
 
 await <- function(...) UseMethod("await")
