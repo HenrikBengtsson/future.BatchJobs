@@ -5,12 +5,8 @@ message("*** batchjobs_custom() ...")
 
 ## BatchJobs configuration R scripts to be tested
 path <- system.file("conf", package="future.BatchJobs")
-filenames <- dir(path=path, pattern="[.]R$")
-
-## Don't test SSH backends, because it requires working ssh
-## clients and daemons, which might not be the case everywhere
-filenames <- setdiff(filenames, "ssh.R")
-
+filenames <- c("local.R", "interactive.R")
+if (availableCores("multicore") > 1L) filenames <- c(filenames, "multicore.R")
 pathnames <- file.path(path, filenames)
 
 

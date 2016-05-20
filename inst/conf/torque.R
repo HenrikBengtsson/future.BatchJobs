@@ -1,0 +1,12 @@
+cluster.functions <- makeClusterFunctionsTorque(R.utils::tmpfile('
+#PBS -N <%%= job.name %%>
+## merge standard error and output
+#PBS -j oe
+## direct streams to our logfile
+#PBS -o <%%= log.file %%>
+#PBS -l walltime=<%%= resources$walltime %%>,nodes=<%%= resources$nodes %%>,vmem=<%%= resources$memory %%>M
+
+## Run R:
+## we merge R output with stdout from PBS, which gets then logged via -o option
+R CMD BATCH --no-save --no-restore "<%%= rscript %%>" /dev/stdout
+'))
