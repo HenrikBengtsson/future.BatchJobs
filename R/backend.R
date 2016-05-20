@@ -200,7 +200,7 @@ backend <- local({
 
     ## Load specific or global BatchJobs config file?
     if (file_test("-f", what)) {
-      .Deprecated(new=sprintf("plan(batchjobs_conf, pathname='%s')", what))
+      .Deprecated(new=sprintf("plan(batchjobs_conf, pathnames='%s')", what))
       if (debug) mprintf("backend(): file='%s'\n", what)
       conf <- sourceConfFiles(what)
       if (debug) {
@@ -212,6 +212,7 @@ backend <- local({
       last <<- what
       return(what)
     } else if (what == ".BatchJobs.R") {
+      .Deprecated(new=sprintf("plan(batchjobs_conf)", what))
       if (debug) mprintf("backend(): First available '.BatchJobs.R'\n")
       if (quietly) {
         suppressPackageStartupMessages(readConfs())
