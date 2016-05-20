@@ -414,16 +414,8 @@ run.BatchJobsFuture <- function(future, ...) {
   on.exit(options(oopts))
 
   ## 3. Create BatchJobs backend configuration
-  cluster.functions <- future$cluster.functions
-  if (!is.null(cluster.functions)) {
-    conf <- makeBatchJobsConf(cluster.functions)
-    if (debug) {
-      mprintf("Setting BatchJobs configuration:\n")
-      mstr(as.list(conf))
-    }
-    assignConf(conf)
-
-  } else {
+  cluster.functions <- future$config$cluster.functions
+  if (is.null(cluster.functions)) {
     ## Set backend here? (legacy code)
     ## Use a non-default backend?
     backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
@@ -435,10 +427,16 @@ run.BatchJobsFuture <- function(future, ...) {
 
     ## Record
     cluster.functions <- getClusterFunctions()
+    future$config$cluster.functions <- cluster.functions
   }
 
-  ## BACKWARD COMPATIBILITY: Clean this up. /HB 2016-05-20
-  future$config$cluster.functions <- cluster.functions
+  conf <- makeBatchJobsConf(cluster.functions)
+  if (debug) {
+    mprintf("Setting BatchJobs configuration:\n")
+    mstr(as.list(conf))
+  }
+  assignConf(conf)
+
 
   ## WORKAROUND: (For multicore and OS X only)
   if (cluster.functions$name == "Multicore") {
