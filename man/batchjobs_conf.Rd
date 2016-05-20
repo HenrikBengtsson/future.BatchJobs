@@ -4,8 +4,8 @@
 \alias{batchjobs_conf}
 \title{BatchJobs conf futures}
 \usage{
-batchjobs_conf(expr, envir = parent.frame(), substitute = TRUE, pathnames,
-  ...)
+batchjobs_conf(expr, envir = parent.frame(), substitute = TRUE,
+  pathnames = NULL, ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -16,8 +16,9 @@ are search from.}
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
 
-\item{pathnames}{Pathnames to one or more BatchJobs configuration files
-to be loaded in order.}
+\item{pathnames}{Pathnames to one or more BatchJobs configuration
+files to be loaded in order.  If NULL, then the \pkg{BatchJobs}
+package will search for such configuration files.}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }
@@ -25,8 +26,17 @@ to be loaded in order.}
 An object of class \code{BatchJobsFuture}.
 }
 \description{
-A conf BatchJobs future uses one or more BatchJobs configuration
-files to define the BatchJobs configuration environment,
-e.g. \file{.BatchJobs.R}.
+A conf BatchJobs future sources one or more BatchJobs configuration
+files (R source scripts) to define the BatchJobs configuration
+environment, e.g. \file{.BatchJobs.R}.
+}
+\details{
+If \code{pathnames=NULL} (default), the \pkg{BatchJobs} is configured
+to use (in order) each of following configuration files that exist:
+\itemize{
+ \item \code{system("etc", "BatchJobs_global_config.R", package="BatchJobs")}
+ \item \code{~/.BatchJobs.R} (in user's home directory)
+ \item \code{.BatchJobs.R} (in the current directory)
+}
 }
 
