@@ -78,4 +78,4 @@ stopifnot(inherits(res, "try-error"))
 
 message("*** batchjobs() ... OK")
 
-#source("incl/end.R")
+source("incl/end.R")

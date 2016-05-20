@@ -81,3 +81,14 @@ nbrOfWorkers.batchjobs <- function(evaluator) {
   NextMethod("batchjobs")
 }
 
+
+nbrOfWorkers.batchjobs_local <- function(evaluator) 1L
+
+nbrOfWorkers.batchjobs_interactive <- function(evaluator) 1L
+
+nbrOfWorkers.batchjobs_multicore <- function(evaluator) {
+  expr <- formals(evaluator)$workers
+  workers <- eval(expr)
+  stopifnot(length(workers) == 1, is.finite(workers), workers >= 1)
+  workers
+}

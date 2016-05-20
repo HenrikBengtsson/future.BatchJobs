@@ -1,7 +1,8 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.11.0-9000 [2016-05-16]
+Version: 0.11.0-9000 [2016-05-19]
+o Add batchjobs_local(), batchjobs_interactive(), batchjobs_multicore().
 o Add nbrOfWorkers() for BatchJobs futures.
 
 
