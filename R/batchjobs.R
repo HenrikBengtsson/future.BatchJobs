@@ -32,7 +32,7 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
         workers <- as.integer(gsub("^multicore=", "", backend))
         return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, workers=workers, ...))
       } else if (grepl("^multicore-", backend)) {
-        total <- availableCores(constraint="multicore")
+        total <- availableCores(constraints="multicore")
         save <- as.integer(gsub("^multicore-", "", backend))
         workers <- total - save
         return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, workers=workers, ...))
