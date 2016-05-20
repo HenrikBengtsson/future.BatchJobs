@@ -100,34 +100,13 @@ Below are the most common types of BatchJobs backends.
 | Backend                | OSes        | Description                                                               | Alternative in future package
 |:-----------------------|:------------|:--------------------------------------------------------------------------|:------------------------------------------------
 | _generic:_             |             |                                                                           |
-| `/path/to.BatchJobs.R` | all         | According to specific `/path/to/.BatchJobs.R` configuration file          | N/A
-| `.BatchJobs.R`         | all         | According to `./.BatchJobs.R` or `~/.BatchJobs.R`                         | N/A
-| `default`              | all         | Same as `c(".BatchJobs.R", "multicore-1", "local")`.  This is the default | N/A
+| `batchjobs_conf`       | all         | Uses BatchJobs configuration script files, e.g. `.BatchJobs.R`            | N/A
 | _synchronous:_         |             | _non-parallel:_                                                           |
-| `interactive`          | all         | non-parallel processing in the current R process                          | `plan(transparent)`
-| `local`                | all         | non-parallel processing in a separate R process (on current machine)      | `plan(eager)`
+| `batchjobs_interactive`| all         | non-parallel processing in the current R process                          | `plan(transparent)`
+| `batchjobs_local`      | all         | non-parallel processing in a separate R process (on current machine)      | `plan(cluster, workers="localhost")`
 | _asynchronous:_        |             | _parallel_:                                                               |
-| `multicore`            | not Windows | forked R processes (on current machine) using all available / allotted cores  | `plan(multicore)`
-| `multicore-k`          | not Windows | `multicore` using all but `k` of the available / allotted cores               | `plan(multicore, workers=availableCores()-kL)`
-| `multicore=n`          | not Windows | `multicore` using `n` cores                                                   | `plan(multicore, workers=n)`
+| `batchjobs_multicore`  | not Windows | forked R processes (on current machine)                                   | `plan(multicore)`
 
-It is possible to specify a set of backend alternatives,
-e.g. `plan(batchjobs, backend=c("multicore", "local"))`.  The first
-available and supported backend on the running system will be used.
-The fallback when any of the specified backends are not supported is
-to use `backend="local"`.
-
-It is also possible to define aliases for commonly used sets of
-backends.  For instance,
-```r
-backend(cluster=c(".BatchJobs.R", "multicore", "local"))
-```
-creates backend alias `"cluster"` using whatever BatchJobs
-configuration file is available with fallback to `"multicore"` and
-`"local"`.  With this, we can use the above set of alternatives as:
-```r
-plan(batchjobs, backend="cluster")
-```
 
 ### Example: A `.BatchJobs.R` file for TORQUE/PBS
 The most powerful and most common usage of BatchJobs futures is via a
@@ -136,7 +115,7 @@ futures that are distributed on a compute cluster via a TORQUE/PBS job
 scheduler, use:
 ```r
 library("future.BatchJobs")
-plan(batchjobs)
+plan(batchjobs_conf)
 ```
 and then use a `.BatchJobs.R` file (in the working directory or in
 your home directory) with the following content:
@@ -169,7 +148,7 @@ _The user has full control of how futures are evaluated_.
 For instance, to use `local` BatchJobs futures, run the demo as:
 ```r
 library("future.BatchJobs")
-plan(batchjobs, backend="local")
+plan(batchjobs_local)
 demo("mandelbrot", package="future", ask=FALSE)
 ```
 
