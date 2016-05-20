@@ -2,6 +2,9 @@
 % Please edit documentation in R/nbrOfWorkers.R
 \name{nbrOfWorkers.batchjobs}
 \alias{nbrOfWorkers.batchjobs}
+\alias{nbrOfWorkers.batchjobs_interactive}
+\alias{nbrOfWorkers.batchjobs_local}
+\alias{nbrOfWorkers.batchjobs_multicore}
 \title{Gets the number of BatchJobs workers}
 \usage{
 \method{nbrOfWorkers}{batchjobs}(evaluator)

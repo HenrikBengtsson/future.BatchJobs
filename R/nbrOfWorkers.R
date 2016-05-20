@@ -10,6 +10,7 @@
 #'
 #' @return A number in [1,Inf].
 #'
+#' @aliases nbrOfWorkers.batchjobs_local nbrOfWorkers.batchjobs_interactive nbrOfWorkers.batchjobs_multicore
 #' @importFrom future nbrOfWorkers
 #' @export
 nbrOfWorkers.batchjobs <- function(evaluator) {
@@ -82,10 +83,13 @@ nbrOfWorkers.batchjobs <- function(evaluator) {
 }
 
 
+#' @export
 nbrOfWorkers.batchjobs_local <- function(evaluator) 1L
 
+#' @export
 nbrOfWorkers.batchjobs_interactive <- function(evaluator) 1L
 
+#' @export
 nbrOfWorkers.batchjobs_multicore <- function(evaluator) {
   expr <- formals(evaluator)$workers
   workers <- eval(expr)
