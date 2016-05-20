@@ -74,6 +74,6 @@ For instance, \code{backend(spare=c("multicore-2", "local"))}
 \emph{defines} the \code{"spare"} backend \emph{set}.  To use this set,
 do \code{backend("spare")}.  One predefined alias set exists at startup,
 i.e. \code{backend(default = c(".BatchJobs.R", "multicore-1",
-           "multicore", "local", "interactive"))}.
+           "multicore", "local"))}.
 }
 

@@ -1,7 +1,7 @@
 source("incl/start.R")
 library("listenv")
 
-message("*** batchjobs_custom() ...")
+message("*** batchjobs_conf() ...")
 
 ## BatchJobs configuration R scripts to be tested
 path <- system.file("conf", package="future.BatchJobs")
@@ -11,8 +11,8 @@ pathnames <- file.path(path, filenames)
 
 
 for (pathname in pathnames) {
-  message(sprintf("- plan(batchjobs_custom, pathname='%s') ...", pathname))
-  plan(batchjobs_custom, pathname=pathname)
+  message(sprintf("- plan(batchjobs_conf, pathnames='%s') ...", pathname))
+  plan(batchjobs_conf, pathnames=pathname)
 
   f <- future({
     42L
@@ -36,10 +36,10 @@ for (pathname in pathnames) {
   print(v)
   stopifnot(v == 0)
 
-  message(sprintf("- plan(batchjobs_custom, pathname='%s') ... DONE", pathname))
+  message(sprintf("- plan(batchjobs_conf, pathnames='%s') ... DONE", pathname))
 } ## for (pathname ...)
 
 
-message("*** batchjobs_custom() ... DONE")
+message("*** batchjobs_conf() ... DONE")
 
 source("incl/end.R")
