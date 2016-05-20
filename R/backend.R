@@ -80,12 +80,10 @@ backend <- local({
   dyld_envs <- list()
 
   function(what=NULL, ..., quietly=TRUE) {
-    ## Imported private functions from BatchJobs
-    ns <- getNamespace("BatchJobs")
-    getBatchJobsConf <- get("getBatchJobsConf", mode="function", envir=ns)
-    sourceConfFiles <- get("sourceConfFiles", mode="function", envir=ns)
-    assignConf <- get("assignConf", mode="function", envir=ns)
-    readConfs <- get("readConfs", mode="function", envir=ns)
+    ## Import private functions from BatchJobs
+    sourceConfFiles <- importBatchJobs("sourceConfFiles")
+    assignConf <- importBatchJobs("assignConf")
+    readConfs <- importBatchJobs("readConfs")
 
     debug <- getOption("future.debug", FALSE)
 
