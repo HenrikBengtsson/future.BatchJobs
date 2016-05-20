@@ -33,10 +33,9 @@ therefore any assignments will be made to calling environment
 }
 \seealso{
 An alternative to BatchJobs local futures is to use
-\link[future:eager]{eager} futures of the \pkg{future}.
-The only difference is that a BatchJobs local future will be
-evaluated in a separate background R session, whereas an
-eager future will be resolved in the calling/current R process.
+\link[future:cluster]{cluster} futures of the \pkg{future}
+with a single local background session, i.e.
+\code{plan(cluster, workers="localhost")}.
 
 An alternative to BatchJobs interactive futures is to use
 \link[future:transparent]{transparent} futures of the \pkg{future}.

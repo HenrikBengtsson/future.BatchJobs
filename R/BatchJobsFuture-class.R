@@ -5,6 +5,7 @@
 #' should be located.
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
+#' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
 #' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
 #' @param resources A named list of resources needed by this future.
@@ -18,11 +19,16 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, cluster.functions=NULL, backend=NULL, resources=list(), finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, backend=NULL, resources=list(), finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
+
+  if (!is.null(conf)) {
+    stopifnot(is.environment(conf))
+  }
 
   if (!is.null(cluster.functions)) {
     stopifnot(is.list(cluster.functions))
+    conf$cluster.functions <- cluster.functions
   }
 
   stopifnot(is.list(resources),
@@ -44,6 +50,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, cl
 
   future$globals <- gp$globals
   future$packages <- gp$packages
+  future$conf <- conf
   future$config <- list(reg=reg, id=NA_integer_,
                       cluster.functions=cluster.functions,
                       resources=resources,
@@ -406,6 +413,7 @@ run.BatchJobsFuture <- function(future, ...) {
   future$config$id <- id
   if (debug) mprintf("Created %s future #%d\n", class(future)[1], id)
 
+
   ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
   ## If/when makeRegistry() attaches BatchJobs, we need
   ## to prevent it from overriding the configuration
@@ -413,33 +421,38 @@ run.BatchJobsFuture <- function(future, ...) {
   oopts <- options(BatchJobs.load.config=FALSE)
   on.exit(options(oopts))
 
-  ## 3. Create BatchJobs backend configuration
-  cluster.functions <- future$config$cluster.functions
-  if (is.null(cluster.functions)) {
-    ## Set backend here? (legacy code)
-    ## Use a non-default backend?
-    backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
-    if (!is.null(backend)) {
-      obackend <- backend()
-      on.exit(backend(obackend), add=TRUE)
-      backend(backend)
+  ## 3. Create BatchJobs configuration backend?
+  conf <- future$conf
+  if (is.null(conf)) {
+    ## 3. Create BatchJobs backend configuration
+    cluster.functions <- future$config$cluster.functions
+    if (is.null(cluster.functions)) {
+      ## Set backend here? (legacy code)
+      ## Use a non-default backend?
+      backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
+      if (!is.null(backend)) {
+        obackend <- backend()
+        on.exit(backend(obackend), add=TRUE)
+        backend(backend)
+      }
+
+      ## Record
+      cluster.functions <- getClusterFunctions()
+      future$config$cluster.functions <- cluster.functions
     }
 
-    ## Record
-    cluster.functions <- getClusterFunctions()
-    future$config$cluster.functions <- cluster.functions
+    conf <- makeBatchJobsConf(cluster.functions)
   }
 
-  conf <- makeBatchJobsConf(cluster.functions)
+  ## 4. Use BatchJobs configuration backend
   if (debug) {
     mprintf("Setting BatchJobs configuration:\n")
     mstr(as.list(conf))
   }
   assignConf(conf)
 
-
   ## WORKAROUND: (For multicore and OS X only)
-  if (cluster.functions$name == "Multicore") {
+  if (conf$cluster.functions$name == "Multicore") {
     ## On some OS X systems, a system call to 'ps' may output an error message
     ## "dyld: DYLD_ environment variables being ignored because main executable
     ##  (/bin/ps) is setuid or setgid" to standard error that is picked up by

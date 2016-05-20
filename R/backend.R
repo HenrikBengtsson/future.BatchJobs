@@ -351,6 +351,7 @@ makeBatchJobsConf <- function(cluster.functions, ...) {
   getBatchJobsConf <- importBatchJobs("getBatchJobsConf")
 
   conf <- getBatchJobsConf()
+
   conf$cluster.functions <- cluster.functions
   conf$mail.start <- "none"
   conf$mail.done <- "none"
@@ -363,6 +364,9 @@ makeBatchJobsConf <- function(cluster.functions, ...) {
   conf$staged.queries <- TRUE
   conf$max.concurrent.jobs <- Inf
   conf$fs.timeout <- NA_real_
+
+  ## Sanity check
+  stopifnot(is.environment(conf))
 
   conf
 } ## makeBatchJobsConf()
