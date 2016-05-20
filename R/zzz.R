@@ -20,8 +20,3 @@
   }
 }
 
-
-.onLoad <- function(libname, pkgname) {
-  backend("default")
-}
-

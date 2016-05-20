@@ -24,7 +24,7 @@ for character sets of backends.}
 Returns the name of the backend used, or a list of named aliases.
 }
 \description{
-Switch backend to be used for asynchronous processing
+\emph{This function is deprecated.}
 }
 \details{
 \itemize{

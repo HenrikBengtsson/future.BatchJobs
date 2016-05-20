@@ -1,5 +1,7 @@
 #' Switch backend to be used for asynchronous processing
 #'
+#' \emph{This function is deprecated.}
+#'
 #' @param what
 #'   A \code{character} \code{vector} of preferred backends to be used.
 #'   See Section Details below for supported backends.
@@ -199,6 +201,7 @@ backend <- local({
 
     ## Load specific or global BatchJobs config file?
     if (file_test("-f", what)) {
+      .Deprecated(new=sprintf("plan(batchjobs_custom, pathname='%s')", what))
       if (debug) mprintf("backend(): file='%s'\n", what)
       conf <- sourceConfFiles(what)
       if (debug) {
@@ -233,6 +236,8 @@ backend <- local({
         if (!is.finite(ncpus) || ncpus < 1L) {
           stop("Invalid number of cores specified: ", sQuote(what))
         }
+        .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=%d)", ncpus))
+
         if (ncpus > ncpus0) {
           warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available according to availableCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
         }
@@ -242,7 +247,10 @@ backend <- local({
         ## Leave some cores for other things?
         if (grepl("^multicore-", what)) {
           save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
+          .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=availableCores()-%d)", ncpus))
           ncpus <- ncpus - save
+        } else {
+          .Deprecated(new="plan(batchjobs_multicore)")
         }
       }
 
@@ -294,9 +302,10 @@ backend <- local({
       if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d, max.jobs=%d, max.load=%g)\n", ncpus, ncpus, max.load)
       cluster.functions <- makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
     } else if (what == "local") {
-      if (debug) mprintf("backend(): makeClusterFunctionsLocal()\n")
+      .Deprecated(new="plan(batchjobs_local)")
       cluster.functions <- makeClusterFunctionsLocal()
     } else if (what == "interactive") {
+      .Deprecated(new="plan(batchjobs_interactive)")
       cluster.functions <- makeClusterFunctionsInteractive()
     } else {
       stop("Unknown backend: ", sQuote(what))
