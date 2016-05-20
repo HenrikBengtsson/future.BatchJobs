@@ -64,7 +64,7 @@
 #' \emph{defines} the \code{"spare"} backend \emph{set}.  To use this set,
 #' do \code{backend("spare")}.  One predefined alias set exists at startup,
 #' i.e. \code{backend(default = c(".BatchJobs.R", "multicore-1",
-#'            "multicore", "local", "interactive"))}.
+#'            "multicore", "local"))}.
 #'
 #' @export
 #' @importFrom future availableCores
@@ -73,8 +73,7 @@
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
 backend <- local({
   aliases = list(
-    default = c(".BatchJobs.R", "multicore-1", "multicore",
-                "local", "interactive")
+    default = c(".BatchJobs.R", "multicore-1", "local")
   )
   last = NULL
 
