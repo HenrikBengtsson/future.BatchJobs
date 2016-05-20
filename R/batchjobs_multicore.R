@@ -18,6 +18,9 @@
 #' An alternative to BatchJobs multicore futures is to use
 #' \link[future:multicore]{multicore} futures of the \pkg{future}.
 #'
+#' Internally \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}
+#' is used to create the BatchJobs cluster-function backend.
+#'
 #' @export
 batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, workers=availableCores(constraints="multicore"), ...) {
   if (substitute) expr <- substitute(expr)

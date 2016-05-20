@@ -31,5 +31,8 @@ will be evaluated immediately and will not block.
 \seealso{
 An alternative to BatchJobs multicore futures is to use
 \link[future:multicore]{multicore} futures of the \pkg{future}.
+
+Internally \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}
+is used to create the BatchJobs cluster-function backend.
 }
 

@@ -1,7 +1,8 @@
 #' BatchJobs local and interactive futures
 #'
-#' A local and an interactive BatchJobs future is synchronous and uni-process,
-#' will be evaluated immediately, and will block until the future is resolved.
+#' A \emph{local} and an \emph{interactive} BatchJobs future is synchronous
+#' and uni-process, will be evaluated immediately, and will block until the
+#' future is resolved.
 #' The difference between a local and an interactive BatchJobs is that
 #' the former will be evaluated in a separate background R session whereas
 #' the latter will be evaluated in the current R session.  Furthermore,
@@ -26,6 +27,10 @@
 #'
 #' An alternative to BatchJobs interactive futures is to use
 #' \link[future:transparent]{transparent} futures of the \pkg{future}.
+#'
+#' Internally \code{\link[BatchJobs]{makeClusterFunctionsLocal}()} and
+#' \code{\link[BatchJobs]{makeClusterFunctionsInteractive}()} are used
+#' to create the BatchJobs cluster-function backends.
 #'
 #' @aliases batchjobs_interactive
 #' @export
