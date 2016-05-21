@@ -1,9 +1,6 @@
 cluster.functions <- local({
   backend <- if (.Platform$OS.type == "windows") "local" else "multicore"
-  backend <- Sys.getenv("R_ASYNC_BACKEND", backend)
-##  message(".BatchJobs.R: Package 'future.BatchJobs' using backend '", backend, "'")
-##  backend <- "tipcc"
-##  backend <- "cccore070"
+  backend <- Sys.getenv("R_FUTURE_BATCHJOBS_BACKEND", backend)
   if (backend == "interactive") {
     makeClusterFunctionsInteractive()
   } else if (backend == "local") {
@@ -12,8 +9,8 @@ cluster.functions <- local({
     ncpus <- parallel::detectCores()
     makeClusterFunctionsMulticore(ncpus=ncpus)
   } else if (backend == "torque") {
-    paths <- c(".", "~", system.file(package="future.BatchJobs", "config"))
-    tmpl <- file.path(paths, "pbs.tmpl")
+    paths <- c(".", "~", system.file(package="future.BatchJobs", "conf"))
+    tmpl <- file.path(paths, "torque.brew")
     tmpl <- tmpl[file_test("-f", tmpl)]
     stopifnot(length(tmpl) > 0L)
     tmpl <- tmpl[1L]
