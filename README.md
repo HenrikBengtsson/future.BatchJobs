@@ -98,14 +98,13 @@ Below are the most common types of BatchJobs backends.
 
 
 | Backend                | OSes        | Description                                                               | Alternative in future package
-|:-----------------------|:------------|:--------------------------------------------------------------------------|:------------------------------------------------
+|:-----------------------|:------------|:--------------------------------------------------------------------------|:------------------------------------
 | _generic:_             |             |                                                                           |
 | `batchjobs_conf`       | all         | Uses BatchJobs configuration script files, e.g. `.BatchJobs.R`            | N/A
-| _synchronous:_         |             | _non-parallel:_                                                           |
-| `batchjobs_interactive`| all         | non-parallel processing in the current R process                          | `plan(transparent)`
-| `batchjobs_local`      | all         | non-parallel processing in a separate R process (on current machine)      | `plan(cluster, workers="localhost")`
-| _asynchronous:_        |             | _parallel_:                                                               |
-| `batchjobs_multicore`  | not Windows | forked R processes (on current machine)                                   | `plan(multicore)`
+| _predefined:_          |             |                                                                           |
+| `batchjobs_interactive`| all         | synchronous evaluation in the calling R environment                       | `plan(transparent)`
+| `batchjobs_local`      | all         | synchronous evaluation in a separate R process (on current machine)       | `plan(cluster, workers="localhost")`
+| `batchjobs_multicore`  | not Windows | asynchronous forked R processes (on current machine)                      | `plan(multicore)`
 
 
 ### Example: A `.BatchJobs.R` file for TORQUE/PBS
