@@ -64,7 +64,7 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, p
   if (substitute) expr <- substitute(expr)
   type <- match.arg(type)
 
-  makeCF <- switch(type,
+  makeCFs <- switch(type,
     lsf      = makeClusterFunctionsLSF,
     openlava = importBatchJobs("makeClusterFunctionsOpenLava"),
     sge      = makeClusterFunctionsSGE,
@@ -75,13 +75,13 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, p
   if (is.null(pathname)) {
     path <- system.file("conf", package="future.BatchJobs")
     filename <- sprintf("%s.brew", type)
-    pathname <- file.path("conf", filename)
+    pathname <- file.path(path, filename)
   }
 
-  conf <- makeCF(pathname)
+  cluster.functions <- makeCFs(pathname)
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            conf=conf,
+                            cluster.functions=cluster.functions,
                             backend=type, ...)
 
   future <- run(future)

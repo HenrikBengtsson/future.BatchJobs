@@ -1,12 +1,27 @@
 cluster.functions <- makeClusterFunctionsTorque(R.utils::tmpfile('
+## Job name:
 #PBS -N <%= job.name %>
-## merge standard error and output
+
+## Merge standard error and output:
 #PBS -j oe
-## direct streams to our logfile
+
+## Direct streams to logfile:
 #PBS -o <%= log.file %>
-#PBS -l walltime=<%= resources$walltime %>,nodes=<%= resources$nodes %>,vmem=<%= resources$memory %>M
+
+## Email on abort (a) and termination (e), but not when starting (b)
+#PBS -m ae
+
+## Resources needed:
+<% if (length(resources) > 0) {
+  opts <- unlist(resources, use.names=TRUE)
+  opts <- sprintf("%s=%s", names(opts), opts)
+  opts <- paste(opts, collapse=",") %>
+  #PBS -l <%= opts %>
+<% } %>
 
 ## Run R:
-## we merge R output with stdout from PBS, which gets then logged via -o option
-R CMD BATCH --no-save --no-restore "<%= rscript %>" /dev/stdout
+## we merge R output with stdout from PBS, which gets then logged via the PBS -o option
+echo "Command: Rscript --verbose \"<%= rscript %>\""
+Rscript --verbose "<%= rscript %>"
+echo "Command: Rscript --verbose \"<%= rscript %>\" ... DONE"
 '))
