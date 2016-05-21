@@ -5,7 +5,7 @@
 \title{A BatchJobs future represents a future that is resolved by one of the many BatchJobs backends}
 \usage{
 batchjobs(expr, envir = parent.frame(), substitute = TRUE, backend = NULL,
-  resources = list(), ...)
+  ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -16,9 +16,7 @@ are search from.}
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
 
-\item{backend}{The BatchJobs backend to use, cf. \code{\link{backend}()}.}
-
-\item{resources}{A named list of resources needed by this future.}
+\item{backend}{The BatchJobs backend to use.}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }

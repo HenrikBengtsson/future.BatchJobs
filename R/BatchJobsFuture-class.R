@@ -7,8 +7,6 @@
 #' \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
-#' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
-#' @param resources A named list of resources needed by this future.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
 #' @param \ldots Additional arguments passed to \code{\link[future]{Future}()}.
@@ -19,7 +17,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, backend=NULL, resources=list(), finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.null(conf)) {
@@ -31,9 +29,6 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
     conf$cluster.functions <- cluster.functions
   }
 
-  stopifnot(is.list(resources),
-            length(resources) == 0 || !is.null(names(resources)))
-
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
@@ -41,23 +36,30 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   getGlobalsAndPackages <- importFuture("getGlobalsAndPackages")
   gp <- getGlobalsAndPackages(expr, envir=envir)
 
-  ## 1. Create BatchJobs registry
-  reg <- tempRegistry()
-  if (debug) mprint(reg)
-
-  ## 2. Create BatchJobsFuture object
+  ## Create BatchJobsFuture object
   future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, ...)
+
+  ## LEGACY: /HB 2016-05-20
+  backend <- future$backend
+  future$backend <- NULL
+  resources <- future$resources
+  future$resources <- NULL
+  stopifnot(length(resources) == 0 || is.list(resources) && !is.null(names(resources)))
 
   future$globals <- gp$globals
   future$packages <- gp$packages
   future$conf <- conf
+
+  ## Create BatchJobs registry
+  reg <- tempRegistry()
+  if (debug) mprint(reg)
+
   future$config <- list(reg=reg, id=NA_integer_,
                       cluster.functions=cluster.functions,
                       resources=resources,
                       backend=backend)
 
   future <- structure(future, class=c("BatchJobsFuture", class(future)))
-
 
   ## Register finalizer?
   if (finalize) future <- add_finalizer(future)
@@ -302,8 +304,6 @@ run.BatchJobsFuture <- function(future, ...) {
   reg <- future$config$reg
   stopifnot(inherits(reg, "Registry"))
 
-  resources <- future$config$resources
-
   ## (ii) Attach packages that needs to be attached
   packages <- future$packages
   if (length(packages) > 0) {
@@ -416,8 +416,7 @@ run.BatchJobsFuture <- function(future, ...) {
 
   ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
   ## If/when makeRegistry() attaches BatchJobs, we need
-  ## to prevent it from overriding the configuration
-  ## already set by backend().
+  ## to prevent it from overriding configuration already set.
   oopts <- options(BatchJobs.load.config=FALSE)
   on.exit(options(oopts))
 
@@ -475,6 +474,8 @@ run.BatchJobsFuture <- function(future, ...) {
 
   ## 5. Submit
   future$state <- 'running'
+  resources <- future$config$resources
+  if (is.null(resources)) resources <- list()
   submitJobs(reg, ids=id, resources=resources)
   if (debug) mprintf("Launched future #%d\n", id)
 

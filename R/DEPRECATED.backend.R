@@ -212,7 +212,7 @@ backend <- local({
       last <<- what
       return(what)
     } else if (what == ".BatchJobs.R") {
-      .Deprecated(new=sprintf("plan(batchjobs_conf)", what))
+      .Deprecated(new="plan(batchjobs_conf)")
       if (debug) mprintf("backend(): First available '.BatchJobs.R'\n")
       if (quietly) {
         suppressPackageStartupMessages(readConfs())

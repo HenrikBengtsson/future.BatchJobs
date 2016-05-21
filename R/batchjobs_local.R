@@ -40,8 +40,7 @@ batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, ...) {
   cf <- makeClusterFunctionsLocal()
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            cluster.functions=cf,
-                            backend="local", ...)
+                            cluster.functions=cf, ...)
 
   future <- run(future)
 

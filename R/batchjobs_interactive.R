@@ -6,8 +6,7 @@ batchjobs_interactive <- function(expr, envir=parent.frame(), substitute=TRUE, .
   cf <- makeClusterFunctionsInteractive()
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            cluster.functions=cf,
-                            backend="interactive", ...)
+                            cluster.functions=cf, ...)
 
   future <- run(future)
 

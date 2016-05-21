@@ -66,8 +66,7 @@ batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, wor
   cf <- makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            cluster.functions=cf,
-                            backend="multicore", ...)
+                            cluster.functions=cf, ...)
 
   future <- run(future)
 

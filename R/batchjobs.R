@@ -5,14 +5,13 @@
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
-#' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
-#' @param resources A named list of resources needed by this future.
+#' @param backend The BatchJobs backend to use.
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
 #'
 #' @export
-batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), ...) {
+batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, ...) {
   if (substitute) expr <- substitute(expr)
 
   ## Backend explicitly specified?
@@ -20,31 +19,37 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
     stopifnot(length(backend) == 1L, is.character(backend))
 
     if (identical(backend, "local")) {
+      .Deprecated(new="plan(batchjobs_local)")
       return(batchjobs_local(expr=expr, envir=envir, substitute=FALSE, ...))
     } else if (identical(backend, "interactive")) {
+      .Deprecated(new="plan(batchjobs_interactive)")
       return(batchjobs_interactive(expr=expr, envir=envir, substitute=FALSE, ...))
     } else if (identical(backend, ".BatchJobs.R")) {
+      .Deprecated(new="plan(batchjobs_conf)")
       return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=NULL, ...))
     } else if (grepl("^multicore", backend)) {
-        if (identical(backend, "multicore")) {
+      if (identical(backend, "multicore")) {
         return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, ...))
       } else if (grepl("^multicore=", backend)) {
         workers <- as.integer(gsub("^multicore=", "", backend))
+        .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=%d)", workers))
         return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, workers=workers, ...))
       } else if (grepl("^multicore-", backend)) {
         total <- availableCores(constraints="multicore")
         save <- as.integer(gsub("^multicore-", "", backend))
+        .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=availableCores()-%d)", save))
         workers <- total - save
         return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, workers=workers, ...))
       }
     } else if (file_test("-f", backend)) {
+      .Deprecated(new=sprintf("plan(batchjobs_conf, pathnames='%s')", backend))
       return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=backend, ...))
     }
   }
 
   ## 1. Create
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            backend=backend, resources=resources, ...)
+                            backend=backend, ...)
 
   ## 2. Launch
   future <- run(future)
