@@ -57,7 +57,6 @@ class(batchjobs_torque) <- c("batchjobs_torque", "batchjobs", "multiprocess", "f
 
 
 #' @importFrom BatchJobs makeClusterFunctionsLSF
-#' @importFrom BatchJobs makeClusterFunctionsOpenLava
 #' @importFrom BatchJobs makeClusterFunctionsSGE
 #' @importFrom BatchJobs makeClusterFunctionsSLURM
 #' @importFrom BatchJobs makeClusterFunctionsTorque
@@ -67,7 +66,7 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, p
 
   makeCF <- switch(type,
     lsf      = makeClusterFunctionsLSF,
-    openlava = makeClusterFunctionsOpenLava,
+    openlava = importBatchJobs("makeClusterFunctionsOpenLava"),
     sge      = makeClusterFunctionsSGE,
     slurm    = makeClusterFunctionsSLURM,
     torque   = makeClusterFunctionsTorque
