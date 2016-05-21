@@ -4,7 +4,12 @@
 \alias{nbrOfWorkers.batchjobs}
 \alias{nbrOfWorkers.batchjobs_interactive}
 \alias{nbrOfWorkers.batchjobs_local}
+\alias{nbrOfWorkers.batchjobs_lsf}
 \alias{nbrOfWorkers.batchjobs_multicore}
+\alias{nbrOfWorkers.batchjobs_openlava}
+\alias{nbrOfWorkers.batchjobs_sge}
+\alias{nbrOfWorkers.batchjobs_slurm}
+\alias{nbrOfWorkers.batchjobs_torque}
 \title{Gets the number of BatchJobs workers}
 \usage{
 \method{nbrOfWorkers}{batchjobs}(evaluator)
