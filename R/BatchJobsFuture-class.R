@@ -130,6 +130,16 @@ loggedOutput <- function(...) UseMethod("loggedOutput")
 #' @export loggedOutput
 #' @importFrom BatchJobs getStatus
 status.BatchJobsFuture <- function(future, ...) {
+  ## WORKAROUND: Avoid warnings on partially matched arguments
+  getStatus <- function(...) {
+    oopts <- options(warnPartialMatchArgs=FALSE)
+    keep <- !unlist(lapply(oopts, FUN=function(x) is.null(x) || !x))
+    oopts <- oopts[keep]
+    if (length(oopts) > 0L) on.exit(options(oopts))
+
+    BatchJobs::getStatus(...)
+  } ## getStatus()
+
   config <- future$config
   reg <- config$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
@@ -281,6 +291,18 @@ run <- function(...) UseMethod("run")
 run.BatchJobsFuture <- function(future, ...) {
   mdebug <- importFuture("mdebug")
   assignConf <- importBatchJobs("assignConf")
+
+  ## WORKAROUND: Avoid warnings on partially matched arguments
+  ## and "dollar" field name.
+  submitJobs <- function(...) {
+    oopts <- options(warnPartialMatchArgs=FALSE, warnPartialMatchDollar=FALSE)
+    keep <- !unlist(lapply(oopts, FUN=function(x) is.null(x) || !x))
+    oopts <- oopts[keep]
+    if (length(oopts) > 0L) on.exit(options(oopts))
+
+    BatchJobs::submitJobs(...)
+  }
+
 
   getClusterFunctions <- function() {
     getBatchJobsConf <- importBatchJobs("getBatchJobsConf")
