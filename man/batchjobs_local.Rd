@@ -22,26 +22,27 @@ are search from.}
 An object of class \code{BatchJobsFuture}.
 }
 \description{
-A \emph{local} and an \emph{interactive} BatchJobs future is synchronous
-and uni-process, will be evaluated immediately, and will block until the
-future is resolved.
-The difference between a local and an interactive BatchJobs is that
-the former will be evaluated in a separate background R session whereas
-the latter will be evaluated in the current R session.  Furthermore,
-the interactive one will not be evaluated in a local environment and
-therefore any assignments will be made to calling environment
+A BatchJobs local future is an synchronous uniprocess future that
+will be evaluated in a background R session.
+A BatchJobs interactive future is an synchronous uniprocess future
+that will be evaluated in the current R session (and variables will
+be assigned to the calling environment rather than to a local one).
+Both types of futures will block until the futures are resolved.
 }
-\seealso{
+\details{
+BatchJobs local futures rely on the BatchJobs backend set
+up by \code{\link[BatchJobs]{makeClusterFunctionsLocal}()}
+and BatchJobs interactive futures on the one set up by
+\code{\link[BatchJobs]{makeClusterFunctionsInteractive}()}.
+These are supported by all operating systems.
+
 An alternative to BatchJobs local futures is to use
 \link[future:cluster]{cluster} futures of the \pkg{future}
-with a single local background session, i.e.
+package with a single local background session, i.e.
 \code{plan(cluster, workers="localhost")}.
 
 An alternative to BatchJobs interactive futures is to use
-\link[future:transparent]{transparent} futures of the \pkg{future}.
-
-Internally \code{\link[BatchJobs]{makeClusterFunctionsLocal}()} and
-\code{\link[BatchJobs]{makeClusterFunctionsInteractive}()} are used
-to create the BatchJobs cluster-function backends.
+\link[future:transparent]{transparent} futures of the
+\pkg{future} package.
 }
 

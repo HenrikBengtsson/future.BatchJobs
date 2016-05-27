@@ -16,23 +16,33 @@ are search from.}
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
 
-\item{workers}{The number of multicore processes to be available
-for concurrent BatchJobs multicore futures.}
+\item{workers}{The number of multicore processes to be
+available for concurrent BatchJobs multicore futures.}
 
-\item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
+\item{\ldots}{Additional arguments passed
+to \code{\link{BatchJobsFuture}()}.}
 }
 \value{
 An object of class \code{BatchJobsFuture}.
 }
 \description{
-A multicore BatchJobs future is asynchronous and multiprocess,
-will be evaluated immediately and will not block.
+A BatchJobs multicore future is an asynchronous multiprocess
+future that will be evaluated in a background R session.
 }
-\seealso{
-An alternative to BatchJobs multicore futures is to use
-\link[future:multicore]{multicore} futures of the \pkg{future}.
+\details{
+BatchJobs multicore futures rely on the BatchJobs backend set
+up by \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}.
+The BatchJobs multicore backend only works on operating systems
+supporting the `ps` command-line tool, e.g. Linux and OS X, but
+not Windows.
 
-Internally \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}
-is used to create the BatchJobs cluster-function backend.
+Also, despite the name, BatchJobs multicore futures are in
+function closer related to \link[future:multisession]{multisession}
+futures than \link[future:multicore]{multicore} futures,
+both provided by the \pkg{future} package.  This is because
+BatchJobs spawns off background R sessions rather than forking
+the current R process as the name otherwise might imply (at least
+that is how the term "multicore processing" is typically used
+in the R world).
 }
 
