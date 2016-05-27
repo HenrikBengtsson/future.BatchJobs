@@ -1,21 +1,33 @@
 #' BatchJobs LSF, OpenLava, SGE, Slurm and Torque futures
 #'
-#' LSF, OpenLava, SGE, Slurm and Torque BatchJobs futures are asynchronous
-#' and multiprocess, will not block, and will be evaluated on a compute
-#' cluster via a job scheduler.
+#' LSF, OpenLava, SGE, Slurm and Torque BatchJobs futures are
+#' asynchronous multiprocess futures that will be evaluated on
+#' a compute cluster via a job scheduler.
 #'
 #' @param expr An R expression to be evaluated.
 #' @param envir The environment from which global environment
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
-#' @param pathname A BatchJobs template file (brew formatted).
+#' @param pathname A BatchJobs template file (\pkg{brew} formatted).
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
 #'
-#' @aliases batchjobs_openlava batchjobs_sge batchjobs_slurm batchjobs_torque
+#' @details
+#' These type of BatchJobs futures rely on BatchJobs backends set
+#' up using the following \pkg{BatchJobs} functions:
+#' \itemize{
+#'  \item \code{\link[BatchJobs]{makeClusterFunctionsLSF}()} for \href{https://en.wikipedia.org/wiki/Platform_LSF}{Load Sharing Facility (LSF)}
+#'  \item \code{makeClusterFunctionsOpenLava()} for \href{https://en.wikipedia.org/wiki/OpenLava}{OpenLava} (only BatchJobs (>= 1.7.0))
+#'  \item \code{\link[BatchJobs]{makeClusterFunctionsSGE}()} for \href{https://en.wikipedia.org/wiki/Oracle_Grid_Engine}{Sun/Oracle Grid Engine (SGE)}
+#'  \item \code{\link[BatchJobs]{makeClusterFunctionsSLURM}()} for \href{https://en.wikipedia.org/wiki/Slurm_Workload_Manager}{Slurm}
+#'  \item \code{\link[BatchJobs]{makeClusterFunctionsTorque}()} for \href{https://en.wikipedia.org/wiki/TORQUE}{TORQUE} / PBS
+#' }
+#'
 #' @export
+#' @rdname batchjobs_template
+#' @name batchjobs_template
 batchjobs_lsf <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, ...) {
   if (substitute) expr <- substitute(expr)
 
@@ -24,6 +36,7 @@ batchjobs_lsf <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=
 class(batchjobs_lsf) <- c("batchjobs_lsf", "batchjobs", "multiprocess", "future", "function")
 
 #' @export
+#' @rdname batchjobs_template
 batchjobs_openlava <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, ...) {
   if (substitute) expr <- substitute(expr)
 
@@ -32,6 +45,7 @@ batchjobs_openlava <- function(expr, envir=parent.frame(), substitute=TRUE, path
 class(batchjobs_openlava) <- c("batchjobs_openlava", "batchjobs", "multiprocess", "future", "function")
 
 #' @export
+#' @rdname batchjobs_template
 batchjobs_sge <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, ...) {
   if (substitute) expr <- substitute(expr)
 
@@ -40,6 +54,7 @@ batchjobs_sge <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=
 class(batchjobs_sge) <- c("batchjobs_sge", "batchjobs", "multiprocess", "future", "function")
 
 #' @export
+#' @rdname batchjobs_template
 batchjobs_slurm <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, ...) {
   if (substitute) expr <- substitute(expr)
 
@@ -48,6 +63,7 @@ batchjobs_slurm <- function(expr, envir=parent.frame(), substitute=TRUE, pathnam
 class(batchjobs_slurm) <- c("batchjobs_slurm", "batchjobs", "multiprocess", "future", "function")
 
 #' @export
+#' @rdname batchjobs_template
 batchjobs_torque <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, ...) {
   if (substitute) expr <- substitute(expr)
 
