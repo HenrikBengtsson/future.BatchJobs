@@ -102,6 +102,11 @@ Below are the most common types of BatchJobs backends.
 | _generic:_             |             |                                                                           |
 | `batchjobs_conf`       | all         | Uses BatchJobs configuration script files, e.g. `.BatchJobs.R`            | N/A
 | _predefined:_          |             |                                                                           |
+| `batchjobs_torque`     | all         | Futures are evaluated via a [TORQUE] / PBS job scheduler                      | N/A
+| `batchjobs_slurm`      | all         | Futures are evaluated via a [Slurm] job scheduler                           | N/A
+| `batchjobs_sge`        | all         | Futures are evaluated via a [Sun/Oracle Grid Engine (SGE)] job scheduler    | N/A
+| `batchjobs_lsf`        | all         | Futures are evaluated via a [Load Sharing Facility (LSF)] job scheduler     | N/A
+| `batchjobs_openlava`   | all         | Futures are evaluated via an [OpenLava] job scheduler                       | N/A
 | `batchjobs_interactive`| all         | synchronous evaluation in the calling R environment                       | `plan(transparent)`
 | `batchjobs_local`      | all         | synchronous evaluation in a separate R process (on current machine)       | `plan(cluster, workers="localhost")`
 | `batchjobs_multicore`  | not Windows | asynchronous forked R processes (on current machine)                      | `plan(multicore)`
@@ -128,7 +133,7 @@ cluster.functions <- makeClusterFunctionsTorque(R.utils::tmpfile('
 #PBS -l walltime=<%= resources$walltime %>,nodes=<%= resources$nodes %>,vmem=<%= resources$memory %>M
 ## remove this line if your cluster does not support arrayjobs
 #PBS -t 1-<%= arrayjobs %>
-  
+
 ## Run R:
 ## we merge R output with stdout from PBS, which gets then logged via -o option
 R CMD BATCH --no-save --no-restore "<%= rscript %>" /dev/stdout
@@ -157,6 +162,11 @@ demo("mandelbrot", package="future", ask=FALSE)
 [future]: http://cran.r-project.org/package=future
 [future.BatchJobs]: https://github.com/HenrikBengtsson/future.BatchJobs/
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
+[TORQUE]: https://en.wikipedia.org/wiki/TORQUE
+[Slurm]: https://en.wikipedia.org/wiki/Slurm_Workload_Manager
+[Sun/Oracle Grid Engine (SGE)]: https://en.wikipedia.org/wiki/Oracle_Grid_Engine
+[Load Sharing Facility (LSF)]: https://en.wikipedia.org/wiki/Platform_LSF
+[OpenLava]: https://en.wikipedia.org/wiki/OpenLava
 
 
 ## Installation
