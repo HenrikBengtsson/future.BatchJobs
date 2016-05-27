@@ -27,4 +27,5 @@ Tries to infer the total number of BatchJobs workers.  This is
 done using various ad hoc procedures based on code inspection
 of BatchJobs itself.
 }
+\keyword{internal}
 

@@ -76,4 +76,5 @@ do \code{backend("spare")}.  One predefined alias set exists at startup,
 i.e. \code{backend(default = c(".BatchJobs.R", "multicore-1",
            "multicore", "local"))}.
 }
+\keyword{internal}
 

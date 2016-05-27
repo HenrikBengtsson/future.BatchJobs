@@ -71,6 +71,7 @@
 #' @importFrom tools file_path_as_absolute
 #' @importFrom utils file_test
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
+#' @keywords internal
 backend <- local({
   aliases = list(
     default = c(".BatchJobs.R", "multicore-1", "local")
