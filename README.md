@@ -109,7 +109,7 @@ Below are the most common types of BatchJobs backends.
 | `batchjobs_openlava`   | all         | Futures are evaluated via an [OpenLava] job scheduler                       | N/A
 | `batchjobs_interactive`| all         | synchronous evaluation in the calling R environment                       | `plan(transparent)`
 | `batchjobs_local`      | all         | synchronous evaluation in a separate R process (on current machine)       | `plan(cluster, workers="localhost")`
-| `batchjobs_multicore`  | not Windows | asynchronous forked R processes (on current machine)                      | `plan(multicore)`
+| `batchjobs_multicore`  | not Windows | asynchronous background R sessions (on current machine)                   | `plan(multisession)` (sic!)
 
 
 ### Example: A `.BatchJobs.R` file for TORQUE/PBS
