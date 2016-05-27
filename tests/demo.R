@@ -9,7 +9,7 @@ message("*** Demos ...")
 
 message("*** Mandelbrot demo of the 'future' package ...")
 
-plan(batchjobs, batchjobs="local")
+plan(batchjobs_local)
 demo("mandelbrot", package="future", ask=FALSE)
 
 message("*** Demos ... DONE")

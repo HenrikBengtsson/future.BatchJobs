@@ -2,7 +2,7 @@ source("incl/start.R")
 
 message("*** BatchJobsFuture() and garbage collection ...")
 
-plan(batchjobs, backend="local")
+plan(batchjobs_local)
 
 for (how in c("resolve", "value")) {
   f <- future({ 1 })

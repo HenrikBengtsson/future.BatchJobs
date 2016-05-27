@@ -3,7 +3,7 @@ library("listenv")
 
 ovars <- ls()
 oopts <- options(warn=1)
-plan(batchjobs, backend="local")
+plan(batchjobs_local)
 
 message("*** Tricky use cases related to globals ...")
 

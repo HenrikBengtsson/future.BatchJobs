@@ -2,7 +2,7 @@ source("incl/start.R")
 
 message("*** BatchJobsFutureError() ...")
 
-plan(batchjobs, backend="local")
+plan(batchjobs_local)
 
 for (cleanup in c(FALSE, TRUE)) {
   message(sprintf("*** BatchJobs future error w/ future.delete=%s ...", cleanup))

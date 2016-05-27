@@ -2,23 +2,21 @@ source("incl/start.R")
 
 message("*** plan() ...")
 
-message("*** Set strategy via future::plan(future::batchjobs)")
-oplan <- future::plan(future.BatchJobs::batchjobs)
+message("*** Set strategy via future::plan(future.BatchJobs::batchjobs_local)")
+oplan <- future::plan(future.BatchJobs::batchjobs_local)
 print(future::plan())
 future::plan(oplan)
 print(future::plan())
 
 
 library("future.BatchJobs")
-backend("local")
+plan(batchjobs_local)
 
-for (backend in c("interactive", "local")) {
-  message(sprintf("*** plan(batchjobs, backend='%s') ...", backend))
+for (type in c("batchjobs_interactive", "batchjobs_local")) {
+  message(sprintf("*** plan('%s') ...", type))
 
-  plan(batchjobs, backend=backend)
-  if (exists("tweak", envir=asNamespace("future"))) {
-    stopifnot(inherits(plan(), "batchjobs"))
-  }
+  plan(type)
+  stopifnot(inherits(plan(), "batchjobs"))
 
   a <- 0
   f <- future({
@@ -31,36 +29,24 @@ for (backend in c("interactive", "local")) {
   print(v)
   stopifnot(v == 0)
 
-  message(sprintf("*** plan(batchjobs, backend='%s') ... DONE", backend))
-} # for (backend ...)
+  message(sprintf("*** plan('%s') ... DONE", type))
+} # for (type ...)
 
 
 message("*** Assert that default backend can be overridden ...")
 
-plan(batchjobs)
-backend("local")
-
-## Process ID of main R session
 mpid <- Sys.getpid()
 print(mpid)
 
-## Process ID of background R session
-pid %<-% { Sys.getpid() }
-print(pid)
-stopifnot(pid != mpid)
-
-## Process ID of background R session
-pid %<-% { Sys.getpid() }
-print(pid)
-stopifnot(pid != mpid)
-
-## Use interactive Batchjobs futures
-plan(batchjobs, backend="interactive")
+plan(batchjobs_interactive)
 pid %<-% { Sys.getpid() }
 print(pid)
 stopifnot(pid == mpid)
 
-message("*** Assert that default backend can be overridden ... DONE")
+plan(batchjobs_local)
+pid %<-% { Sys.getpid() }
+print(pid)
+stopifnot(pid != mpid)
 
 
 message("*** plan() ... DONE")
