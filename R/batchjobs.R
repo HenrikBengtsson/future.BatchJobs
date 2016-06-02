@@ -6,12 +6,14 @@
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
 #' @param backend The BatchJobs backend to use.
+#' @param workers (optional) Additional specification for the backend
+#' workers.  If NULL, the default is used.
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
 #'
 #' @export
-batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, ...) {
+batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL, workers=NULL, ...) {
   if (substitute) expr <- substitute(expr)
 
   ## Backend explicitly specified?
@@ -26,10 +28,10 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
       return(batchjobs_interactive(expr=expr, envir=envir, substitute=FALSE, ...))
     } else if (identical(backend, ".BatchJobs.R")) {
       .Deprecated(new="plan(batchjobs_conf)")
-      return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=NULL, ...))
+      return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=NULL, workers=workers, ...))
     } else if (grepl("^multicore", backend)) {
       if (identical(backend, "multicore")) {
-        return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, ...))
+        return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, workers=workers, ...))
       } else if (grepl("^multicore=", backend)) {
         workers <- as.integer(gsub("^multicore=", "", backend))
         .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=%d)", workers))
@@ -43,13 +45,13 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
       }
     } else if (file_test("-f", backend)) {
       .Deprecated(new=sprintf("plan(batchjobs_conf, pathnames='%s')", backend))
-      return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=backend, ...))
+      return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=backend, workers=workers, ...))
     }
   }
 
   ## 1. Create
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            backend=backend, ...)
+                            backend=backend, workers=workers, ...)
 
   ## 2. Launch
   future <- run(future)

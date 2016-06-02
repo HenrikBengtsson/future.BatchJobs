@@ -5,7 +5,7 @@
 \title{BatchJobs conf futures}
 \usage{
 batchjobs_conf(expr, envir = parent.frame(), substitute = TRUE,
-  conf = NULL, pathnames = NULL, ...)
+  conf = NULL, pathnames = NULL, workers = NULL, ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -21,6 +21,9 @@ are search from.}
 \item{pathnames}{(alternative) Pathnames to one or more BatchJobs
 configuration files to be loaded in order.  If NULL, then the
 \pkg{BatchJobs} package will search for such configuration files.}
+
+\item{workers}{(optional) Additional specification for the backend
+workers.  If NULL, the default is used.}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }

@@ -7,6 +7,8 @@
 #' \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
+#' @param workers (optional) Additional specification for
+#' the BatchJobs backend.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
 #' @param \ldots Additional arguments passed to \code{\link[future]{Future}()}.
@@ -17,7 +19,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.null(conf)) {
@@ -29,6 +31,17 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
     conf$cluster.functions <- cluster.functions
   }
 
+  if (!is.null(workers)) {
+    stopifnot(length(workers) >= 1)
+    if (is.numeric(workers)) {
+      stopifnot(all(is.finite(workers)), all(workers >= 1),
+                is.finite(prod(workers)))
+    } else if (is.character(workers)) {
+    } else {
+      stopifnot("Argument 'workers' should be either numeric or character: ", mode(workers))
+    }
+  }
+
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
@@ -37,7 +50,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   gp <- getGlobalsAndPackages(expr, envir=envir)
 
   ## Create BatchJobsFuture object
-  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, ...)
+  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, workers=workers, ...)
 
   ## LEGACY: /HB 2016-05-20
   backend <- future$backend

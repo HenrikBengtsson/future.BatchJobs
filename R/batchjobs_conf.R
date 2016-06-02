@@ -13,6 +13,8 @@
 #' @param pathnames (alternative) Pathnames to one or more BatchJobs
 #' configuration files to be loaded in order.  If NULL, then the
 #' \pkg{BatchJobs} package will search for such configuration files.
+#' @param workers (optional) Additional specification for the backend
+#' workers.  If NULL, the default is used.
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
@@ -30,7 +32,7 @@
 #' }
 #'
 #' @export
-batchjobs_conf <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NULL, pathnames=NULL, ...) {
+batchjobs_conf <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NULL, pathnames=NULL, workers=NULL, ...) {
   findConfigs <- importBatchJobs("findConfigs")
   sourceConfFiles <- importBatchJobs("sourceConfFiles")
 
@@ -53,7 +55,7 @@ batchjobs_conf <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NUL
   }
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            conf=conf, ...)
+                            conf=conf, workers=workers, ...)
   future$pathnames <- pathnames
   future <- run(future)
 

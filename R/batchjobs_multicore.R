@@ -37,6 +37,7 @@
 batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, workers=availableCores(constraints="multicore"), ...) {
   if (substitute) expr <- substitute(expr)
 
+  if (is.null(workers)) workers <- availableCores(constraints="multicore")
   stopifnot(length(workers) == 1L, is.numeric(workers),
             is.finite(workers), workers >= 1L)
 

@@ -5,7 +5,7 @@
 \title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  conf = NULL, cluster.functions = NULL,
+  conf = NULL, cluster.functions = NULL, workers = NULL,
   finalize = getOption("future.finalize", TRUE), ...)
 }
 \arguments{
@@ -20,6 +20,9 @@ should be located.}
 \item{conf}{A BatchJobs configuration environment.}
 
 \item{cluster.functions}{A BatchJobs \link[BatchJobs]{ClusterFunctions} object.}
+
+\item{workers}{(optional) Additional specification for
+the BatchJobs backend.}
 
 \item{finalize}{If TRUE, any underlying registries are
 deleted when this object is garbage collected, otherwise not.}

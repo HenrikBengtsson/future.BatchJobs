@@ -10,7 +10,7 @@
 #'
 #' @return A number in [1,Inf].
 #'
-#' @aliases nbrOfWorkers.batchjobs_local nbrOfWorkers.batchjobs_interactive nbrOfWorkers.batchjobs_multicore nbrOfWorkers.batchjobs_lsf nbrOfWorkers.batchjobs_openlava nbrOfWorkers.batchjobs_sge nbrOfWorkers.batchjobs_slurm nbrOfWorkers.batchjobs_torque
+#' @aliases nbrOfWorkers.batchjobs_local nbrOfWorkers.batchjobs_interactive nbrOfWorkers.batchjobs_multicore nbrOfWorkers.batchjobs_conf nbrOfWorkers.batchjobs_lsf nbrOfWorkers.batchjobs_openlava nbrOfWorkers.batchjobs_sge nbrOfWorkers.batchjobs_slurm nbrOfWorkers.batchjobs_torque
 #' @importFrom future nbrOfWorkers
 #' @export
 #' @keywords internal
@@ -25,6 +25,10 @@ nbrOfWorkers.batchjobs <- function(evaluator) {
   ## 2. If not set, look toward backend()
   if (is.null(backend)) {
     backend <- backend()
+    if (is.null(backend)) {
+      backend("local")
+      backend <- backend()
+    }
     callBackend <- FALSE
   } else {
     callBackend <- TRUE
@@ -76,7 +80,28 @@ nbrOfWorkers.batchjobs <- function(evaluator) {
   }
 
   ## If still not known, fall back to the default of the future package
-  NextMethod("batchjobs")
+  NextMethod("nbrOfWorkers")
+}
+
+
+#' @export
+nbrOfWorkers.batchjobs_conf <- function(evaluator) {
+  ## Local functions
+  getBatchJobsConf <- importBatchJobs("getBatchJobsConf")
+
+  ## Infer from 'workers' argument
+  expr <- formals(evaluator)$workers
+  workers <- eval(expr)
+  if (!is.null(workers)) {
+    stopifnot(length(workers) >= 1)
+    if (is.character(workers)) return(length(workers))
+    if (is.numeric(workers)) return(prod(workers))
+
+    stop("Invalid data type of 'workers': ", mode(workers))
+  }
+
+  ## If still not known, fall back to the default of the future package
+  NextMethod("nbrOfWorkers")
 }
 
 
