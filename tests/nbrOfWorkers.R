@@ -32,12 +32,18 @@ message("*** nbrOfWorkers() - multicore ...")
 
 n <- nbrOfWorkers(batchjobs_multicore)
 message("Number of workers: ", n)
-stopifnot(n == 1L)
+stopifnot(n == ncores)
 
 plan(batchjobs_multicore)
 n <- nbrOfWorkers()
 message("Number of workers: ", n)
-stopifnot(n == 1L)
+stopifnot(n == ncores)
+
+workers <- min(2L, ncores)
+plan(batchjobs_multicore, workers=workers)
+n <- nbrOfWorkers()
+message("Number of workers: ", n)
+stopifnot(n == workers)
 
 message("*** nbrOfWorkers() - multicore ... DONE")
 } ## if (ncores >= 2L)
