@@ -12,10 +12,31 @@
 
 ## Resources needed:
 <% if (length(resources) > 0) {
+  ## Special 'workers'
+  workers <- workers$workers
+  if (!is.null(workers)) {
+    if (is.numeric(workers)) {
+      stopifnot(length(workers) <= 2)
+      if (length(workers) == 1) {
+        opt <- sprintf("ppn=%d", workers)
+      } else {
+        opt <- sprintf("nodes=%d,ppn=%d", workers[1], workers[2])
+      }
+    } else if (is.character(workers)) {
+      opt <- sprintf("nodes=%s", paste(workers, collapse="+"))
+    } else {
+      stop("Unknown data type of 'workers': ", mode(workers)
+    }
+    resources <- c(resources, list(opt))
+  }
+
   opts <- unlist(resources, use.names=TRUE)
   opts <- sprintf("%s=%s", names(opts), opts)
-  opts <- paste(opts, collapse=",") %>
-  #PBS -l <%= opts %>
+  opts <- paste("-l", opts, sep=" ")
+  if (isTRUE(getOption("future.debug"))) {
+    R.utils::mprint(opts)
+  }
+  #PBS <%= opts %>
 <% } %>
 
 ## Run R:

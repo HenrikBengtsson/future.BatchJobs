@@ -507,10 +507,12 @@ run.BatchJobsFuture <- function(future, ...) {
     }, error = function(ex) list())
   }
 
+
   ## 5. Submit
   future$state <- 'running'
   resources <- future$config$resources
   if (is.null(resources)) resources <- list()
+  resources$workers <- future$workers
   submitJobs(reg, ids=id, resources=resources)
   if (debug) mprintf("Launched future #%d\n", id)
 
