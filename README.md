@@ -176,6 +176,7 @@ source('http://callr.org/install#HenrikBengtsson/future.BatchJobs')
 ```
 
 ### Pre-release version
+
 To install the pre-release version that is available in branch `develop`, use:
 ```r
 source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@develop')
@@ -186,8 +187,8 @@ This will install the package from source.
 
 ## Software status
 
-| Resource:     | GitHub        | Travis CI     | Appveyor         |
-| ------------- | ------------------- | ------------- | ---------------- |
-| _Platforms:_  | _Multiple_          | _Linux_       | _Windows_        |
-| R CMD check   |  | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a> | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
-| Test coverage |                     | <a href="https://coveralls.io/r/HenrikBengtsson/future.BatchJobs"><img src="https://coveralls.io/repos/HenrikBengtsson/future.BatchJobs/badge.svg?branch=develop" alt="Coverage Status"/></a>   |                  |
+| Resource:     | GitHub        | Travis CI      | Appveyor         |
+| ------------- | ------------------- | -------------- | ---------------- |
+| _Platforms:_  | _Multiple_          | _Linux & OS X_ | _Windows_        |
+| R CMD check   |  | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>  | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
+| Test coverage |                     | <a href="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs"><img src="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs/branch/develop/graph/badge.svg" alt="Coverage Status"/></a>    |                  |

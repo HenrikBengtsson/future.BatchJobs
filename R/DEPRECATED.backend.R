@@ -201,7 +201,8 @@ backend <- local({
 
     ## Load specific or global BatchJobs config file?
     if (file_test("-f", what)) {
-      .Deprecated(new=sprintf("plan(batchjobs_conf, pathnames='%s')", what))
+      .Deprecated(new=sprintf("plan(batchjobs_conf, pathnames='%s')", what),
+                  old=sprintf("backend('%s')", what))
       if (debug) mprintf("backend(): file='%s'\n", what)
       conf <- sourceConfFiles(what)
       if (debug) {
@@ -213,7 +214,8 @@ backend <- local({
       last <<- what
       return(what)
     } else if (what == ".BatchJobs.R") {
-      .Deprecated(new="plan(batchjobs_conf)")
+      .Deprecated(new="plan(batchjobs_conf)",
+                  old=sprintf("backend('%s')", what))
       if (debug) mprintf("backend(): First available '.BatchJobs.R'\n")
       if (quietly) {
         suppressPackageStartupMessages(readConfs())
@@ -237,7 +239,8 @@ backend <- local({
         if (!is.finite(ncpus) || ncpus < 1L) {
           stop("Invalid number of cores specified: ", sQuote(what))
         }
-        .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=%d)", ncpus))
+        .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=%d)", ncpus),
+                    old=sprintf("backend('%s')", what))
 
         if (ncpus > ncpus0) {
           warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available according to availableCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
@@ -248,10 +251,12 @@ backend <- local({
         ## Leave some cores for other things?
         if (grepl("^multicore-", what)) {
           save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
-          .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=availableCores()-%d)", ncpus))
+          .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=availableCores()-%d)", ncpus),
+                      old=sprintf("backend('%s')", what))
           ncpus <- ncpus - save
         } else {
-          .Deprecated(new="plan(batchjobs_multicore)")
+          .Deprecated(new="plan(batchjobs_multicore)",
+                      old=sprintf("backend('%s')", what))
         }
       }
 
@@ -303,10 +308,12 @@ backend <- local({
       if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d, max.jobs=%d, max.load=%g)\n", ncpus, ncpus, max.load)
       cluster.functions <- makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
     } else if (what == "local") {
-      .Deprecated(new="plan(batchjobs_local)")
+      .Deprecated(new="plan(batchjobs_local)",
+                  old=sprintf("backend('%s')", what))
       cluster.functions <- makeClusterFunctionsLocal()
     } else if (what == "interactive") {
-      .Deprecated(new="plan(batchjobs_interactive)")
+      .Deprecated(new="plan(batchjobs_interactive)",
+                  old=sprintf("backend('%s')", what))
       cluster.functions <- makeClusterFunctionsInteractive()
     } else {
       stop("Unknown backend: ", sQuote(what))
