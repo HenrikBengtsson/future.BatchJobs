@@ -26,9 +26,6 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
     } else if (identical(backend, "interactive")) {
       .Deprecated(new="plan(batchjobs_interactive)")
       return(batchjobs_interactive(expr=expr, envir=envir, substitute=FALSE, ...))
-    } else if (identical(backend, ".BatchJobs.R")) {
-      .Deprecated(new="plan(batchjobs_conf)")
-      return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=NULL, workers=workers, ...))
     } else if (grepl("^multicore", backend)) {
       if (identical(backend, "multicore")) {
         return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, workers=workers, ...))
@@ -43,6 +40,9 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
         workers <- total - save
         return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, workers=workers, ...))
       }
+    } else if (identical(backend, ".BatchJobs.R")) {
+      .Deprecated(new="plan(batchjobs_conf)")
+      return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=NULL, workers=workers, ...))
     } else if (file_test("-f", backend)) {
       .Deprecated(new=sprintf("plan(batchjobs_conf, pathnames='%s')", backend))
       return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=backend, workers=workers, ...))
