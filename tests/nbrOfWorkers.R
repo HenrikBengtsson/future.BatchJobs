@@ -99,9 +99,9 @@ message("Number of workers: ", n)
 stopifnot(n == 1)
 
 backend(".BatchJobs.R")
-n <- nbrOfWorkers(tweak(batchjobs))
+n <- nbrOfWorkers(batchjobs)
 message("Number of workers: ", n)
-stopifnot(n == 2)
+stopifnot(n == 1)
 
 n <- nbrOfWorkers(tweak(batchjobs, backend="local"))
 message("Number of workers: ", n)
