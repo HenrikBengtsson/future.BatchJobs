@@ -73,6 +73,16 @@ for (pathname in pathnames) {
 
 message("*** batchjobs_conf() w/ pathnames ... DONE")
 
+
+message("*** batchjobs_conf() - exceptions ...")
+
+res <- try(f <- batchjobs_conf(42L, conf=TRUE), silent=TRUE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+message("*** batchjobs_conf() - exceptions ... DONE")
+
+
 message("*** batchjobs_conf() ... DONE")
 
 source("incl/end.R")
