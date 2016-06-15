@@ -84,6 +84,10 @@ n <- nbrOfWorkers(tweak(batchjobs_conf, workers=2L))
 message("Number of workers: ", n)
 stopifnot(n == 2)
 
+res <- try(n <- nbrOfWorkers(tweak(batchjobs_conf, workers=FALSE)), silent=TRUE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
 message("*** nbrOfWorkers() - conf ... DONE")
 
 
@@ -93,6 +97,11 @@ backend("interactive")
 n <- nbrOfWorkers(batchjobs)
 message("Number of workers: ", n)
 stopifnot(n == 1)
+
+backend(".BatchJobs.R")
+n <- nbrOfWorkers(tweak(batchjobs))
+message("Number of workers: ", n)
+stopifnot(n == 2)
 
 n <- nbrOfWorkers(tweak(batchjobs, backend="local"))
 message("Number of workers: ", n)
