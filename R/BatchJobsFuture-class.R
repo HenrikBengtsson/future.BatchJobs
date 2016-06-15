@@ -115,9 +115,6 @@ print.BatchJobsFuture <- function(x, ...) {
 
 status <- function(...) UseMethod("status")
 finished <- function(...) UseMethod("finished")
-completed <- function(...) UseMethod("completed")
-failed <- function(...) UseMethod("failed")
-expired <- function(...) UseMethod("expired")
 loggedError <- function(...) UseMethod("loggedError")
 loggedOutput <- function(...) UseMethod("loggedOutput")
 
@@ -128,16 +125,13 @@ loggedOutput <- function(...) UseMethod("loggedOutput")
 #'
 #' @return A character vector or a logical scalar.
 #'
-#' @aliases status finished completed failed expired value
+#' @aliases status finished value
 #'          loggedError loggedOutput
 #' @keywords internal
 #'
 #' @export
 #' @export status
 #' @export finished
-#' @export completed
-#' @export failed
-#' @export expired
 #' @export value
 #' @export loggedError
 #' @export loggedOutput
@@ -177,31 +171,6 @@ finished.BatchJobsFuture <- function(future, ...) {
   status <- status(future)
   if (isNA(status)) return(NA)
   any(c("done", "error", "expired") %in% status)
-}
-
-
-#' @export
-#' @keywords internal
-completed.BatchJobsFuture <- function(future, ...) {
-  status <- status(future)
-  if (isNA(status)) return(NA)
-  ("done" %in% status) && !any(c("error", "expired") %in% status)
-}
-
-#' @export
-#' @keywords internal
-failed.BatchJobsFuture <- function(future, ...) {
-  status <- status(future)
-  if (isNA(status)) return(NA)
-  any("error" %in% status)
-}
-
-#' @export
-#' @keywords internal
-expired.BatchJobsFuture <- function(future, ...) {
-  status <- status(future)
-  if (isNA(status)) return(NA)
-  any("expired" %in% status)
 }
 
 #' @export

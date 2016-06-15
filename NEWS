@@ -1,11 +1,13 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.11.0-9000 [2016-05-21]
+Version: 0.11.0-9000 [2016-06-15]
 o Added predefined batchjobs_local(), batchjobs_interactive(),
   batchjobs_multicore(), batchjobs_lsf(), batchjobs_openlava(),
   batchjobs_sge(), batchjobs_slurm() and batchjobs_torque() futures.
 o Added nbrOfWorkers() for BatchJobs futures.
+o CLEANUP: Removed non-used completed(), failed() and expired() for
+  BatchJobs objects.
 o CLEANUP: Now "Loading required package: BatchJobs [...]", which is
   outputted when the first BatchJobs future is created, is suppressed.
 o CLEANUP: Deprecated backend().

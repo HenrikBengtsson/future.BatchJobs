@@ -2,7 +2,7 @@ Package: future.BatchJobs
 Version: 0.11.0-9000
 Depends:
     R (>= 3.2.0),
-    future (>= 0.14.0)
+    future (>= 0.15.0)
 Imports:
     BatchJobs (>= 1.6),
     R.utils
