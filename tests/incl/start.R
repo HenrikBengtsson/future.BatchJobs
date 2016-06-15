@@ -33,3 +33,5 @@ mcat <- future.BatchJobs:::mcat
 mprintf <- future.BatchJobs:::mprintf
 mprint <- future.BatchJobs:::mprint
 mstr <- future.BatchJobs:::mstr
+importFuture <- future.BatchJobs:::importFuture
+importBatchJobs <- future.BatchJobs:::importBatchJobs

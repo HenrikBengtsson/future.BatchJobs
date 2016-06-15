@@ -65,6 +65,38 @@ message("- trim() ...")
 mprint(trim(" hello "))
 stopifnot(trim(" hello ") == "hello")
 
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# importFuture() and importBatchJobs()
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+message("*** importFuture() ...")
+
+future <- importFuture("future")
+stopifnot(identical(future, future::future))
+
+future <- importFuture("<unknown function>", default=future::future)
+stopifnot(identical(future, future::future))
+
+res <- try(importFuture("<unknown function>"), silent=TRUE)
+stopifnot(inherits(res, "try-error"))
+
+message("*** importFuture() ... DONE")
+
+
+message("*** importBatchJobs() ...")
+
+batchMap <- importBatchJobs("batchMap")
+stopifnot(identical(batchMap, BatchJobs::batchMap))
+
+batchMap <- importBatchJobs("<unknown function>", default=BatchJobs::batchMap)
+stopifnot(identical(batchMap, BatchJobs::batchMap))
+
+res <- try(importBatchJobs("<unknown function>"), silent=TRUE)
+stopifnot(inherits(res, "try-error"))
+
+message("*** importBatchJobs() ... DONE")
+
+
 message("*** Utility functions ... DONE")
 
 source("incl/end.R")
