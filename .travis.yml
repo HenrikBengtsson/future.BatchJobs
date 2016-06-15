@@ -29,7 +29,7 @@ r_github_packages:
 #  - jimhester/covr
   - HenrikBengtsson/covr
 
-before_script:
+before_install:
   - R -e "install.packages('future', type='source')"
 
 after_success:
