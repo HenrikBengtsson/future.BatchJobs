@@ -26,11 +26,12 @@ matrix:
       r: devel
 
 r_github_packages:
-  - jimhester/covr
+#  - jimhester/covr
+  - HenrikBengtsson/covr
   - HenrikBengtsson/future
 
 after_success:
-  - Rscript -e 'covr::codecov(quiet=FALSE)'
+  - Rscript -e 'covr::codecov(quiet=FALSE)
 
 notifications:
   email:
