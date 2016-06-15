@@ -48,6 +48,59 @@ stopifnot(n == workers)
 message("*** nbrOfWorkers() - multicore ... DONE")
 } ## if (ncores >= 2L)
 
+
+message("*** nbrOfWorkers() - templates ...")
+
+n <- nbrOfWorkers(batchjobs_lsf)
+message("Number of workers: ", n)
+stopifnot(is.infinite(n))
+
+n <- nbrOfWorkers(batchjobs_openlava)
+message("Number of workers: ", n)
+stopifnot(is.infinite(n))
+
+n <- nbrOfWorkers(batchjobs_sge)
+message("Number of workers: ", n)
+stopifnot(is.infinite(n))
+
+n <- nbrOfWorkers(batchjobs_slurm)
+message("Number of workers: ", n)
+stopifnot(is.infinite(n))
+
+n <- nbrOfWorkers(batchjobs_torque)
+message("Number of workers: ", n)
+stopifnot(is.infinite(n))
+
+message("*** nbrOfWorkers() - templates ... DONE")
+
+
+message("*** nbrOfWorkers() - conf ...")
+
+n <- nbrOfWorkers(batchjobs_conf)
+message("Number of workers: ", n)
+stopifnot(n == 1)
+
+n <- nbrOfWorkers(tweak(batchjobs_conf, workers=2L))
+message("Number of workers: ", n)
+stopifnot(n == 2)
+
+message("*** nbrOfWorkers() - conf ... DONE")
+
+
+message("*** nbrOfWorkers() - backend() ...")
+
+backend("interactive")
+n <- nbrOfWorkers(batchjobs)
+message("Number of workers: ", n)
+stopifnot(n == 1)
+
+n <- nbrOfWorkers(tweak(batchjobs, backend="local"))
+message("Number of workers: ", n)
+stopifnot(n == 1)
+
+message("*** nbrOfWorkers() - backend() ... DONE")
+
+
 message("*** nbrOfWorkers() ... DONE")
 
 source("incl/end.R")
