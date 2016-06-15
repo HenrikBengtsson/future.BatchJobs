@@ -24,10 +24,10 @@ matrix:
   exclude:
     - os: osx
       r: devel
-      r: oldrel
 
 r_github_packages:
   - jimhester/covr
+  - HenrikBengtsson/future
 
 after_success:
   - Rscript -e 'covr::codecov(quiet=FALSE)'
