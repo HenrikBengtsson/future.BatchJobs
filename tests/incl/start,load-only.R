@@ -6,7 +6,7 @@ oplan <- future::plan()
 obackend <- future.BatchJobs::backend()
 
 ## Use BatchJobs futures by default
-future::plan("batchjobs")
+future::plan(future.BatchJobs:::batchjobs)
 
 ## Important: If 'interactive' is used, the current evaluation
 ## environment is contaminated by the jobs, which will assign values,
