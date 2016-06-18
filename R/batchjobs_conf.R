@@ -40,7 +40,7 @@ batchjobs_conf <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NUL
 
   if (is.null(conf)) {
     if (is.null(pathnames)) {
-      ## This is now BatchJobs searches, cf. BatchJobs:::readConfs()
+      ## This is how BatchJobs searches, cf. BatchJobs:::readConfs()
       path <- find.package("BatchJobs")
       pathnames  <- findConfigs(path)
     }
