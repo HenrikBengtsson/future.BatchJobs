@@ -1,7 +1,4 @@
-library("future.BatchJobs")
-
-ovars <- ls()
-oopts <- options(warn=1L)
+source("incl/start.R")
 
 options("R_FUTURE_DEMO_MANDELBROT_PLANES"=4L)
 
@@ -14,6 +11,4 @@ demo("mandelbrot", package="future", ask=FALSE)
 
 message("*** Demos ... DONE")
 
-plan(eager)
-options(oopts)
-rm(list=setdiff(ls(), ovars))
+source("incl/end.R")

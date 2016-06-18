@@ -1,4 +1,4 @@
-source("incl/start.R")
+source("incl/start,load-only.R")
 
 message("*** plan() ...")
 

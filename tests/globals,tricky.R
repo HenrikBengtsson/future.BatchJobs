@@ -1,8 +1,6 @@
-library("future.BatchJobs")
+source("incl/start.R")
 library("listenv")
 
-ovars <- ls()
-oopts <- options(warn=1)
 plan(batchjobs_local)
 
 message("*** Tricky use cases related to globals ...")
@@ -81,8 +79,4 @@ stopifnot(identical(y, y0))
 
 message("*** Tricky use cases related to globals ... DONE")
 
-
-## Cleanup
-plan(eager)
-options(oopts)
-rm(list=setdiff(ls(), ovars))
+source("incl/end.R")
