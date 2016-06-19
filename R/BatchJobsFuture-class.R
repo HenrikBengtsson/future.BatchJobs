@@ -496,7 +496,7 @@ await <- function(...) UseMethod("await")
 #' @param future The future.
 #' @param cleanup If TRUE, the registry is completely removed upon
 #' success, otherwise not.
-#' @param maxTries The number of tries before giving up.
+#' @param times The number of tries before giving up.
 #' @param delta The number of seconds to wait the first time.
 #' @param alpha A factor to scale up the waiting time in each iteration
 #' such that the waiting time in the k:th iteration is \code{alpha^k*delta}.
@@ -514,8 +514,8 @@ await <- function(...) UseMethod("await")
 #' @export
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("future.maxTries", Sys.getenv("R_FUTURE_MAXTRIES", 1000)), delta=getOption("future.interval", 1.0), alpha=getOption("future.alpha", 1.01), ...) {
-  maxTries <- as.integer(maxTries)
+await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.wait.times", 1000L), delta=getOption("future.wait.interval", 1.0), alpha=getOption("future.wait.alpha", 1.01), ...) {
+  times <- as.integer(times)
 
   debug <- getOption("future.debug", FALSE)
   if (debug) mprintf("Polling...\n")
@@ -538,7 +538,7 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("futu
   tries <- 1L
   interval <- delta
   finished <- FALSE
-  while (tries <= maxTries) {
+  while (tries <= times) {
     stat <- status(future)
     if (debug) mprintf(" Status %d: %s\n", tries, paste(stat, collapse=", "))
     if (isNA(stat)) {
@@ -556,7 +556,7 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("futu
           final_state_prev <- final_state
     	  final_countdown <- 5L
           interval <- delta
-  	  maxTries <- maxTries + final_countdown
+  	  times <- times + final_countdown
         } else {
           final_countdown <- final_countdown - 1L
           if (debug) mprintf(" 'expired' status countdown: %d\n", final_countdown)
@@ -616,7 +616,7 @@ delete <- function(...) UseMethod("delete")
 #' @param onRunning Action if future is running or appears to run.
 #' @param onFailure Action if failing to delete future.
 #' @param onMissing Action if future does not exist.
-#' @param maxTries The number of tries before giving up.
+#' @param times The number of tries before giving up.
 #' @param delta The delay interval (in seconds) between retries.
 #' @param alpha A multiplicative penalty increasing the delay
 #' for each failed try.
@@ -627,7 +627,7 @@ delete <- function(...) UseMethod("delete")
 #' @export
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("future.interval", 1.0), alpha=1.01, ...) {
+delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), times=10L, delta=getOption("future.wait.interval", 1.0), alpha=getOption("future.wait.alpha", 1.01), ...) {
   onRunning <- match.arg(onRunning)
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
@@ -699,7 +699,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
 
   ## Try to delete registry
   interval <- delta
-  for (kk in seq_len(maxTries)) {
+  for (kk in seq_len(times)) {
     try(removeRegistry(reg, ask="no"), silent=TRUE)
     if (!file_test("-d", path)) break
     Sys.sleep(interval)
