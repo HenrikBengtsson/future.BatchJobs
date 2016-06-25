@@ -27,6 +27,28 @@ print(f)
 message("*** BatchJobsFuture() - deleting exceptions ... DONE")
 
 
+message("*** BatchJobsFuture() - value exceptions ...")
+
+## Non-existing BatchJobs registry
+f <- BatchJobsFuture({ x <- 1 })
+print(f)
+
+## Hack to emulate where BatchJobs registry is deleted or fails
+f$config$reg <- NULL
+
+res <- value(f, onMissing="default")
+print(res)
+stopifnot(is.null(res))
+
+res <- tryCatch({
+  value(f, onMissing="error")
+}, error = function(ex) ex)
+print(res)
+stopifnot(inherits(res, "error"))
+
+message("*** BatchJobsFuture() - value exceptions ... DONE")
+
+
 message("*** BatchJobsFuture() - exceptions ...")
 
 f <- BatchJobsFuture({ 42L })
