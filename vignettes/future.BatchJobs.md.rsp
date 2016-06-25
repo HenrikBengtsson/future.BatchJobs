@@ -42,7 +42,7 @@ expressions for futures `x` and `y` will be processed on two different
 compute nodes:
 ```r
 > library("future.BatchJobs")
-> plan(batchjobs)
+> plan(batchjobs_custom)
 >
 > x %<-% { Sys.sleep(5); 3.14 }
 > y %<-% { Sys.sleep(5); 2.71 }
@@ -69,7 +69,7 @@ library("listenv")
 ## should be using multiprocessing, where the number of
 ## parallel processes is automatically decided based on
 ## what the cluster allots to each compute node.
-plan(list(batchjobs, multiprocess))
+plan(list(batchjobs_custom, multiprocess))
 
 ## Find all samples (one FASTQ file per sample)
 fqs <- dir(pattern="[.]fastq$")
@@ -133,7 +133,7 @@ Below are the most common types of BatchJobs backends.
 | `batchjobs_multicore`  | not Windows | asynchronous background R sessions (on current machine)                   | `plan(multisession)` (sic!)
 
 
-### Example: A `.BatchJobs.R` file for TORQUE/PBS
+### Example: A .BatchJobs.R file for TORQUE/PBS
 The most powerful and most common usage of BatchJobs futures is via a
 backend configured by a `.BatchJobs.R` file.  For example, to use
 futures that are distributed on a compute cluster via a TORQUE/PBS job
