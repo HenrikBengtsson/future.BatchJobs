@@ -89,8 +89,39 @@ print(backend("reset"))
 
 ## Undo everything
 backend(obackend)
+
 mprintf("Backend was reset to: %s\n", backend(NULL))
 
+message("*** backend() - exceptions ...")
+
+
+
+message("*** backend() - exceptions ... DONE")
+
+res <- try(backend("list", 1), silent=FALSE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+res <- try(backend("list", a=1), silent=FALSE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+res <- try(backend("multicore=0"), silent=FALSE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+res <- try(backend("multicore--1"), silent=FALSE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+## Configuration file without cluster function
+pathname <- ".BatchJobs.R"
+cat("message('.BatchJobs.R here!')", file=pathname)
+res <- backend(".BatchJobs.R")
+print(res)
+file.remove(pathname)
+
 message("*** backend() ... DONE")
+
 
 source("incl/end.R")
