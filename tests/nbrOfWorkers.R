@@ -76,15 +76,15 @@ message("*** nbrOfWorkers() - templates ... DONE")
 
 message("*** nbrOfWorkers() - conf ...")
 
-n <- nbrOfWorkers(batchjobs_conf)
+n <- nbrOfWorkers(batchjobs_custom)
 message("Number of workers: ", n)
 stopifnot(n == 1)
 
-n <- nbrOfWorkers(tweak(batchjobs_conf, workers=2L))
+n <- nbrOfWorkers(tweak(batchjobs_custom, workers=2L))
 message("Number of workers: ", n)
 stopifnot(n == 2)
 
-res <- try(n <- nbrOfWorkers(tweak(batchjobs_conf, workers=FALSE)), silent=TRUE)
+res <- try(n <- nbrOfWorkers(tweak(batchjobs_custom, workers=FALSE)), silent=TRUE)
 print(res)
 stopifnot(inherits(res, "try-error"))
 

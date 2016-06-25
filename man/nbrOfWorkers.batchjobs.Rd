@@ -2,7 +2,7 @@
 % Please edit documentation in R/nbrOfWorkers.R
 \name{nbrOfWorkers.batchjobs}
 \alias{nbrOfWorkers.batchjobs}
-\alias{nbrOfWorkers.batchjobs_conf}
+\alias{nbrOfWorkers.batchjobs_custom}
 \alias{nbrOfWorkers.batchjobs_interactive}
 \alias{nbrOfWorkers.batchjobs_local}
 \alias{nbrOfWorkers.batchjobs_lsf}

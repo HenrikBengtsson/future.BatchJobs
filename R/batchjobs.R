@@ -45,12 +45,12 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
         return(batchjobs_multicore(expr=expr, envir=envir, substitute=FALSE, workers=workers, ...))
       }
     } else if (identical(backend, ".BatchJobs.R")) {
-      .Deprecated(new="plan(batchjobs_conf)")
-      return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=NULL, workers=workers, ...))
+      .Deprecated(new="plan(batchjobs_custom)")
+      return(batchjobs_custom(expr=expr, envir=envir, substitute=FALSE, pathnames=NULL, workers=workers, ...))
     } else if (file_test("-f", backend)) {
-      .Deprecated(new=sprintf("plan(batchjobs_conf, pathnames='%s')", backend),
+      .Deprecated(new=sprintf("plan(batchjobs_custom, pathnames='%s')", backend),
                   old=sprintf("plan(batchjobs, backend='%s')", backend))
-      return(batchjobs_conf(expr=expr, envir=envir, substitute=FALSE, pathnames=backend, workers=workers, ...))
+      return(batchjobs_custom(expr=expr, envir=envir, substitute=FALSE, pathnames=backend, workers=workers, ...))
     }
   }
 

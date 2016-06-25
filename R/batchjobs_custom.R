@@ -32,7 +32,7 @@
 #' }
 #'
 #' @export
-batchjobs_conf <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NULL, pathnames=NULL, workers=NULL, ...) {
+batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NULL, pathnames=NULL, workers=NULL, ...) {
   findConfigs <- importBatchJobs("findConfigs")
   sourceConfFiles <- importBatchJobs("sourceConfFiles")
 
@@ -61,4 +61,4 @@ batchjobs_conf <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NUL
 
   future
 }
-class(batchjobs_conf) <- c("batchjobs_conf", "batchjobs", "multiprocess", "future", "function")
+class(batchjobs_custom) <- c("batchjobs_custom", "batchjobs", "multiprocess", "future", "function")

@@ -100,7 +100,7 @@ Below are the most common types of BatchJobs backends.
 | Backend                | OSes        | Description                                                               | Alternative in future package
 |:-----------------------|:------------|:--------------------------------------------------------------------------|:------------------------------------
 | _generic:_             |             |                                                                           |
-| `batchjobs_conf`       | all         | Uses BatchJobs configuration script files, e.g. `.BatchJobs.R`            | N/A
+| `batchjobs_custom`       | all         | Uses custom BatchJobs configuration script files, e.g. `.BatchJobs.R`            | N/A
 | _predefined:_          |             |                                                                           |
 | `batchjobs_torque`     | all         | Futures are evaluated via a [TORQUE] / PBS job scheduler                      | N/A
 | `batchjobs_slurm`      | all         | Futures are evaluated via a [Slurm] job scheduler                           | N/A
@@ -119,7 +119,7 @@ futures that are distributed on a compute cluster via a TORQUE/PBS job
 scheduler, use:
 ```r
 library("future.BatchJobs")
-plan(batchjobs_conf)
+plan(batchjobs_custom)
 ```
 and then use a `.BatchJobs.R` file (in the working directory or in
 your home directory) with the following content:

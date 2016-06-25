@@ -10,7 +10,7 @@
 #'
 #' @return A number in [1,Inf].
 #'
-#' @aliases nbrOfWorkers.batchjobs_local nbrOfWorkers.batchjobs_interactive nbrOfWorkers.batchjobs_multicore nbrOfWorkers.batchjobs_conf nbrOfWorkers.batchjobs_lsf nbrOfWorkers.batchjobs_openlava nbrOfWorkers.batchjobs_sge nbrOfWorkers.batchjobs_slurm nbrOfWorkers.batchjobs_torque
+#' @aliases nbrOfWorkers.batchjobs_local nbrOfWorkers.batchjobs_interactive nbrOfWorkers.batchjobs_multicore nbrOfWorkers.batchjobs_custom nbrOfWorkers.batchjobs_lsf nbrOfWorkers.batchjobs_openlava nbrOfWorkers.batchjobs_sge nbrOfWorkers.batchjobs_slurm nbrOfWorkers.batchjobs_torque
 #' @importFrom future nbrOfWorkers
 #' @export
 #' @keywords internal
@@ -85,7 +85,7 @@ nbrOfWorkers.batchjobs <- function(evaluator) {
 
 
 #' @export
-nbrOfWorkers.batchjobs_conf <- function(evaluator) {
+nbrOfWorkers.batchjobs_custom <- function(evaluator) {
   ## Local functions
   getBatchJobsConf <- importBatchJobs("getBatchJobsConf")
 
