@@ -6,7 +6,7 @@ oplan <- future::plan()
 obackend <- future.BatchJobs::backend()
 
 ## Use BatchJobs futures by default
-future::plan(future.BatchJobs:::batchjobs)
+future::plan(future.BatchJobs:::batchjobs_local)
 
 fullTest <- (Sys.getenv("_R_CHECK_FULL_") != "")
 

@@ -11,6 +11,26 @@ message("- Globals with the same name as 'base' objects ...")
 
 col <- 3
 x %<-% { stopifnot(is.numeric(col)); col }
+print(x)
+stopifnot(x == col)
+
+
+message("- Globals that needs to be encoded ...")
+.a <- 42L
+x %<-% { .a }
+print(x)
+stopifnot(x == .a)
+
+`$foo` <- 42L
+x %<-% { `$foo` }
+print(x)
+stopifnot(x == `$foo`)
+
+
+## 'col' is masked by 'base::col' (Issue #55)
+
+col <- 3
+x %<-% { stopifnot(is.numeric(col)); col }
 stopifnot(x == col)
 
 
