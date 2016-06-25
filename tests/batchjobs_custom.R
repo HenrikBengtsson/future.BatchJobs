@@ -6,7 +6,7 @@ message("*** batchjobs_custom() ...")
 
 ## Technically this could give an error if there is a
 ## malfunctioning ~/.BatchJobs.R on the test system.
-message("*** batchjobs_custom() w/out pathnames (default) ...")
+message("*** batchjobs_custom() w/out pathname (default) ...")
 plan(batchjobs_custom)
 
 f <- future({
@@ -31,10 +31,10 @@ v <- value(f)
 print(v)
 stopifnot(v == 0)
 
-message("*** batchjobs_custom() w/out pathnames (default) ... DONE")
+message("*** batchjobs_custom() w/out pathname (default) ... DONE")
 
 
-message("*** batchjobs_custom() w/ pathnames ...")
+message("*** batchjobs_custom() w/ pathname ...")
 
 ## BatchJobs configuration R scripts to be tested
 path <- system.file("conf", package="future.BatchJobs")
@@ -43,8 +43,8 @@ filenames <- c("local.R", "interactive.R")
 pathnames <- file.path(path, filenames)
 
 for (pathname in pathnames) {
-  message(sprintf("- plan(batchjobs_custom, pathnames='%s') ...", pathname))
-  plan(batchjobs_custom, pathnames=pathname)
+  message(sprintf("- plan(batchjobs_custom, pathname='%s') ...", pathname))
+  plan(batchjobs_custom, pathname=pathname)
 
   f <- future({
     42L
@@ -68,10 +68,10 @@ for (pathname in pathnames) {
   print(v)
   stopifnot(v == 0)
 
-  message(sprintf("- plan(batchjobs_custom, pathnames='%s') ... DONE", pathname))
+  message(sprintf("- plan(batchjobs_custom, pathname='%s') ... DONE", pathname))
 } ## for (pathname ...)
 
-message("*** batchjobs_custom() w/ pathnames ... DONE")
+message("*** batchjobs_custom() w/ pathname ... DONE")
 
 
 message("*** batchjobs_custom() - exceptions ...")

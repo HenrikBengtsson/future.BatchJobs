@@ -90,9 +90,16 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, p
 
   ## Search for a default template file?
   if (is.null(pathname)) {
-    paths <- c(".", "~", system.file("conf", package="future.BatchJobs"))
-    filename <- sprintf("%s.brew", type)
+    paths <- c(".", "~")
+    filename <- sprintf(".BatchJobs.%s.brew", type)
     pathnames <- file.path(paths, filename)
+
+    ## Because R CMD check complains about periods in package files
+    path <- system.file("conf", package="future.BatchJobs")
+    filename <- sprintf("BatchJobs.%s.brew", type)
+    pathname <- file.path(path, filename)
+    
+    pathnames <- c(pathnames, pathname)
     pathnames <- pathnames[file_test("-f", pathnames)]
     if (length(pathnames) == 0L) {
       stop(sprintf("Failed to locate a %s template file", sQuote(filename)))

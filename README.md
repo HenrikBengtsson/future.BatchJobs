@@ -38,7 +38,7 @@ interpretation of these data is to align the reads in each sample
 (one FASTQ file) toward the human genome.  In order to speed this up,
 we can have each file be processed by a separate compute node and each
 node we can use 24 parallel processes such that each process aligns a
-separate chromosomes.  Here is an outline of how this nested parallelism
+separate chromosome.  Here is an outline of how this nested parallelism
 could be implemented using futures.
 ```r
 library("future")
@@ -90,11 +90,9 @@ please consult the package vignettes of the [future] package.
 
 
 ## Choosing BatchJobs backend
-The future.BatchJobs package implements a generic future wrapper for all
-BatchJobs backends and by default it looks for a `.BatchJobs.R`
-configuration file and if not found it falls back to multicore
-processing if supported, otherwise single-core processing.
-Below are the most common types of BatchJobs backends.
+The future.BatchJobs package implements a generic future wrapper
+for all BatchJobs backends.  Below are the most common types of
+BatchJobs backends.
 
 
 | Backend                | OSes        | Description                                                               | Alternative in future package
@@ -119,50 +117,64 @@ Below are two examples illustrating how to use `batchjobs_custom` and `batchjobs
 ### Example: A .BatchJobs.R file using local BatchJobs
 The most general way of configuring BatchJobs via a `.BatchJobs.R` file.
 This file should be located in the current directory or in the user's
-home directory.  For example, as alternative to `batchjobs_local` we
-can manually configure local BatchJobs futures a `.BatchJobs.R` file
+home directory.  For example, as an alternative to `batchjobs_local`,
+we can manually configure local BatchJobs futures a `.BatchJobs.R` file
 that contains
 ```r
 cluster.functions <- makeClusterFunctionsLocal()
 ```
-
-
-### Example: A .BatchJobs.R file for TORQUE/PBS
-The most powerful and most common usage of BatchJobs futures is via a
-backend configured by a `.BatchJobs.R` file.  For example, to use
-futures that are distributed on a compute cluster via a TORQUE/PBS job
-scheduler, use:
+This will then be found and used when specifying
 ```r
-library("future.BatchJobs")
-plan(batchjobs_custom)
+> plan(batchjobs_custom)
 ```
-and then use a `.BatchJobs.R` file (in the working directory or in
-your home directory) with the following content:
+To specify this BatchJobs configuration file explicitly, one can use
 ```r
-cluster.functions <- makeClusterFunctionsTorque(R.utils::tmpfile('
+> plan(batchjobs_custom, pathname="./.BatchJobs.R")
+```
+
+This follow the naming convention set up by the BatchJobs package.
+
+
+
+### Example: A .BatchJobs.*.brew template file for TORQUE / PBS
+To configure BatchJobs for job schedulers we need to setup a template
+file that is used to generate the script used by the scheduler.
+This is what a template file for TORQUE / PBS may look like:
+```sh
 #PBS -N <%= job.name %>
+
 ## merge standard error and output
 #PBS -j oe
-## direct streams to our logfile
-#PBS -o <%= log.file %>
-#PBS -l walltime=<%= resources$walltime %>,nodes=<%= resources$nodes %>,vmem=<%= resources$memory %>M
-## remove this line if your cluster does not support arrayjobs
-#PBS -t 1-<%= arrayjobs %>
 
 ## Run R:
-## we merge R output with stdout from PBS, which gets then logged via -o option
 R CMD BATCH --no-save --no-restore "<%= rscript %>" /dev/stdout
-'))
 ```
-For further details and examples on how to configure BatchJobs, see
-the [BatchJobs configuration] wiki page.
+If this template is saved to file `.BatchJobs.torque.brew` in the
+working directory or the user's home directory, then it will be
+automatically located and loaded when doing:
+```r
+> plan(batchjobs_torque)
+```
+To specify this template file explicitly, one can use
+```r
+> plan(batchjobs_torque, pathname="./.BatchJobs.torque.brew")
+```
+
+A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be `.BatchJobs.slurm.brew` in order for
+```r
+> plan(batchjobs_slurm)
+```
+to locate the file automatically.
+
+
+Note that it is still possible to use a `.BatchJobs.R` and load the template file using a standard BatchJobs approach for maximum control.  For further details and examples on how to configure BatchJobs per se, see the [BatchJobs configuration] wiki page.
 
 
 
 ## Demos
 The [future] package provides a demo using futures for calculating a
-set of Mandelbrot planes.  Except from using futures, the demo does
-not assume anything about what type of futures are used.
+set of Mandelbrot planes.  The demo does not assume anything about
+what type of futures are used.
 _The user has full control of how futures are evaluated_.
 For instance, to use `local` BatchJobs futures, run the demo as:
 ```r

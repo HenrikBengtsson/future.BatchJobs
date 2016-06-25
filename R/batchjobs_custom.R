@@ -10,7 +10,7 @@
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
-#' @param pathnames (alternative) Pathnames to one or more BatchJobs
+#' @param pathname (alternative) Pathname to one or more BatchJobs
 #' configuration files to be loaded in order.  If NULL, then the
 #' \pkg{BatchJobs} package will search for such configuration files.
 #' @param workers (optional) Additional specification for the backend
@@ -22,7 +22,7 @@
 #' @details
 #' If \code{conf} is NULL (default), then the BatchJobs configuration will
 #' be created from a set of BatchJobs configuration files (R script files)
-#' as given by argument \code{pathnames}.  If none are specified (default),
+#' as given by argument \code{pathname}.  If none are specified (default),
 #' then \pkg{BatchJobs} is designed to use (in order) all of following
 #' configuration files (if they exist):
 #' \itemize{
@@ -32,31 +32,31 @@
 #' }
 #'
 #' @export
-batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NULL, pathnames=NULL, workers=NULL, ...) {
+batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NULL, pathname=NULL, workers=NULL, ...) {
   findConfigs <- importBatchJobs("findConfigs")
   sourceConfFiles <- importBatchJobs("sourceConfFiles")
 
   if (substitute) expr <- substitute(expr)
 
   if (is.null(conf)) {
-    if (is.null(pathnames)) {
+    if (is.null(pathname)) {
       ## This is how BatchJobs searches, cf. BatchJobs:::readConfs()
       path <- find.package("BatchJobs")
-      pathnames  <- findConfigs(path)
+      pathname  <- findConfigs(path)
     }
 
-    stopifnot(length(pathnames) >= 1L, is.character(pathnames))
-    for (pathname in pathnames) {
-      if (!file_test("-f", pathname)) stop("File not found: ", sQuote(pathname))
+    stopifnot(length(pathname) >= 1L, is.character(pathname))
+    for (pn in pathname) {
+      if (!file_test("-f", pn)) stop("File not found: ", sQuote(pn))
     }
-    conf <- sourceConfFiles(pathnames)
+    conf <- sourceConfFiles(pathname)
   } else {
     stopifnot(is.environment(conf))
   }
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
                             conf=conf, workers=workers, ...)
-  future$pathnames <- pathnames
+  future$pathname <- pathname
   future <- run(future)
 
   future

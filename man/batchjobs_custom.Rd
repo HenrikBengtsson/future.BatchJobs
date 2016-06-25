@@ -5,7 +5,7 @@
 \title{BatchJobs conf futures}
 \usage{
 batchjobs_custom(expr, envir = parent.frame(), substitute = TRUE,
-  conf = NULL, pathnames = NULL, workers = NULL, ...)
+  conf = NULL, pathname = NULL, workers = NULL, ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -18,7 +18,7 @@ are search from.}
 
 \item{conf}{A BatchJobs configuration environment.}
 
-\item{pathnames}{(alternative) Pathnames to one or more BatchJobs
+\item{pathname}{(alternative) Pathname to one or more BatchJobs
 configuration files to be loaded in order.  If NULL, then the
 \pkg{BatchJobs} package will search for such configuration files.}
 
@@ -38,7 +38,7 @@ environment, e.g. \file{.BatchJobs.R}.
 \details{
 If \code{conf} is NULL (default), then the BatchJobs configuration will
 be created from a set of BatchJobs configuration files (R script files)
-as given by argument \code{pathnames}.  If none are specified (default),
+as given by argument \code{pathname}.  If none are specified (default),
 then \pkg{BatchJobs} is designed to use (in order) all of following
 configuration files (if they exist):
 \itemize{
