@@ -25,6 +25,8 @@ matrix:
     - os: osx
       r: devel
 
+env: _R_CHECK_FULL_=true
+
 r_github_packages:
 #  - jimhester/covr
   - HenrikBengtsson/covr
