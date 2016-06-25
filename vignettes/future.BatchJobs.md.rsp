@@ -181,7 +181,7 @@ To specify this template file explicitly, one can use
 > plan(batchjobs_torque, pathname="./.BatchJobs.torque.brew")
 ```
 
-A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be `.BatchJobs.slurm.brew` in order for
+A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be named `.BatchJobs.slurm.brew` in order for
 ```r
 > plan(batchjobs_slurm)
 ```
