@@ -8,6 +8,8 @@ obackend <- future.BatchJobs::backend()
 ## Use BatchJobs futures by default
 future::plan(future.BatchJobs:::batchjobs)
 
+fullTest <- (Sys.getenv("_R_CHECK_FULL_") != "")
+
 ## Important: If 'interactive' is used, the current evaluation
 ## environment is contaminated by the jobs, which will assign values,
 ## including the exported globals, to the current evaluation environment.

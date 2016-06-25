@@ -1,9 +1,13 @@
 source("incl/start.R")
 library("listenv")
 
+
 message("*** batchjobs_multicore() ...")
 
 for (cores in 1:min(3L, availableCores("multicore"))) {
+  ## FIXME: 
+  if (!fullTest && cores > 1) next
+  
   message(sprintf("Testing with %d cores ...", cores))
   options(mc.cores=cores-1L)
 
@@ -18,7 +22,7 @@ for (cores in 1:min(3L, availableCores("multicore"))) {
   f <- batchjobs_multicore({
     42L
   }, globals=globals)
-  stopifnot(inherits(f, "BatchJobsFuture") || ((cores ==1 || !supportsMulticore()) && inherits(f, "EagerFuture")))
+  stopifnot(inherits(f, "BatchJobsFuture") || ((cores == 1 || !supportsMulticore()) && inherits(f, "EagerFuture")))
 
   print(resolved(f))
   y <- value(f)

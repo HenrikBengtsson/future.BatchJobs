@@ -16,7 +16,11 @@ mprintf("x=%g\n", x)
 stopifnot(x == a)
 
 ## Use 'multicore', if available, otherwise 'local'
-backend(c("multicore", "local"))
+if (fullTest) {
+  backend(c("multicore", "local"))
+} else {
+  backend("local")
+}
 mprintf("Current backend: %s\n", backend(NULL))
 
 y %<-% { 2*a }
@@ -36,7 +40,11 @@ stopifnot(z == x)
 
 
 ## Create a backend aliases
-backend("spare"=c("multicore-2", "local"))
+if (fullTest) {
+  backend(spare=c("multicore-2", "local"))
+} else {
+  backend(spare="local")
+}
 mprintf("Current backend: %s\n", backend(NULL))
 
 x %<-% { y / 2 } %plan% batchjobs(backend="interactive")
