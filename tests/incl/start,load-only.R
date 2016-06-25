@@ -21,6 +21,7 @@ if (FALSE && Sys.getenv("_R_CHECK_FULL_") != "") {
   future.BatchJobs::backend("local")
 }
 
+await <- future.BatchJobs:::await
 delete <- future.BatchJobs:::delete
 attachedPackages <- future.BatchJobs:::attachedPackages
 tempRegistry <- future.BatchJobs:::tempRegistry
