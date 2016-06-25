@@ -94,9 +94,12 @@ mprintf("Backend was reset to: %s\n", backend(NULL))
 
 message("*** backend() - exceptions ...")
 
-
-
-message("*** backend() - exceptions ... DONE")
+options(future.backend.onUnknown="warn")
+res <- tryCatch({
+  backend("multicore=1")
+}, warning = function(w) w)
+stopifnot(inherits(res, "warning"))
+options(future.backend.onUnknown=NULL)
 
 res <- try(backend("list", 1), silent=FALSE)
 print(res)
@@ -120,6 +123,8 @@ cat("message('.BatchJobs.R here!')", file=pathname)
 res <- backend(".BatchJobs.R")
 print(res)
 file.remove(pathname)
+
+message("*** backend() - exceptions ... DONE")
 
 message("*** backend() ... DONE")
 
