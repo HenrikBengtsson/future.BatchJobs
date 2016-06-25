@@ -32,6 +32,8 @@
 #' \link[future:transparent]{transparent} futures of the
 #' \pkg{future} package.
 #'
+#' @example incl/batchjobs_local.R
+#'
 #' @importFrom BatchJobs makeClusterFunctionsLocal
 #' @aliases batchjobs_interactive
 #' @export

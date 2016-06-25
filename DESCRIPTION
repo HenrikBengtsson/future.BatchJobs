@@ -17,7 +17,6 @@ Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
 Description: Simple parallel and distributed processing using futures
     that utilizes the 'BatchJobs' framework, e.g. 'fit %<-% { glm.fit(x, y) }'.
     This package implements the Future API of the 'future' package.
-    To use BatchJobs futures, just specify 'plan(batchjobs)'.
 License: LGPL (>= 2.1)
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/future.BatchJobs
