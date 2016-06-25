@@ -112,6 +112,21 @@ Below are the most common types of BatchJobs backends.
 | `batchjobs_multicore`  | not Windows | asynchronous background R sessions (on current machine)                   | `plan(multisession)` (sic!)
 
 
+### Examples
+
+Below are two examples illustrating how to use `batchjobs_custom` and `batchjobs_torque` to configure the BatchJobs backend.  For further details and examples on how to configure BatchJobs, see the [BatchJobs configuration] wiki page.
+
+### Example: A .BatchJobs.R file using local BatchJobs
+The most general way of configuring BatchJobs via a `.BatchJobs.R` file.
+This file should be located in the current directory or in the user's
+home directory.  For example, as alternative to `batchjobs_local` we
+can manually configure local BatchJobs futures a `.BatchJobs.R` file
+that contains
+```r
+cluster.functions <- makeClusterFunctionsLocal()
+```
+
+
 ### Example: A .BatchJobs.R file for TORQUE/PBS
 The most powerful and most common usage of BatchJobs futures is via a
 backend configured by a `.BatchJobs.R` file.  For example, to use
