@@ -672,20 +672,6 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     }
   }
 
-  ## Does the future still run?  If so, then...
-  if (FALSE && future$state == 'running') {
-    if (onRunning == "skip") return(invisible(TRUE))
-
-    msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running future: %s", sQuote(path))
-    mdebug("delete(): %s", msg)
-    if (onRunning == "warning") {
-      warning(msg)
-      return(invisible(TRUE))
-    } else if (onRunning == "error") {
-      stop(BatchJobsFutureError(msg, future=future))
-    }
-  }
-
 
   ## To simplify post mortem troubleshooting in non-interactive sessions,
   ## should the BatchJobs registry files be removed or not?
