@@ -123,7 +123,7 @@ geval <- local(function(expr, substitute=FALSE, envir=.GlobalEnv, ...) {
 ## Tests if the current OS is of a certain type
 isOS <- function(name) {
   if (name == "windows") {
-    if (.Platform$OS.type == "windows") return(TRUE)
+    return(.Platform$OS.type == "windows")
   } else {
     grepl(paste0("^", name), R.version$os)
   }
