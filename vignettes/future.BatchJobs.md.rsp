@@ -128,7 +128,9 @@ BatchJobs backends.
 | `batchjobs_openlava`   | all         | Futures are evaluated via an [OpenLava] job scheduler                       | N/A
 | `batchjobs_interactive`| all         | synchronous evaluation in the calling R environment                       | `plan(transparent)`
 | `batchjobs_local`      | all         | synchronous evaluation in a separate R process (on current machine)       | `plan(cluster, workers="localhost")`
-| `batchjobs_multicore`  | not Windows | asynchronous background R sessions (on current machine)                   | `plan(multisession)` (sic!)
+
+
+In addition the the above, there is also `batchjobs_multicore` (which on Windows falls back to `batchjobs_local`), which runs BatchJobs tasks asynchronously in background R sessions (sic!) on the current machine.  We \emph{advice not to use} this and instead use `multisession` of the [future] package.  For details, see `help("batchjobs_multicore")`.
 
 
 ### Examples
