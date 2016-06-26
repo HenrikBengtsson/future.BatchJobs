@@ -86,8 +86,6 @@ trim <- function(x, ...) {
 }
 
 
-## We are currently importing the following non-exported functions:
-## * future:::getGlobalsAndPackages()
 importFuture <- function(name, default=NULL) {
   ns <- getNamespace("future")
   if (exists(name, mode="function", envir=ns, inherits=FALSE)) {
@@ -99,6 +97,17 @@ importFuture <- function(name, default=NULL) {
   }
 }
 
+
+importBatchJobs <- function(name, default=NULL) {
+  ns <- getNamespace("BatchJobs")
+  if (exists(name, mode="function", envir=ns, inherits=FALSE)) {
+    get(name, mode="function", envir=ns, inherits=FALSE)
+  } else if (!is.null(default)) {
+    default
+  } else {
+    stop(sprintf("No such 'BatchJobs' function: %s()", name))
+  }
+}
 
 ## Evaluates an expression in global environment.
 ## Because geval() is exported, we want to keep its environment()

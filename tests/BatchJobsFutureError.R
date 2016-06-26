@@ -2,7 +2,7 @@ source("incl/start.R")
 
 message("*** BatchJobsFutureError() ...")
 
-plan(batchjobs, backend="local")
+plan(batchjobs_local)
 
 for (cleanup in c(FALSE, TRUE)) {
   message(sprintf("*** BatchJobs future error w/ future.delete=%s ...", cleanup))
@@ -63,6 +63,38 @@ for (cleanup in c(FALSE, TRUE)) {
 
   message(sprintf("*** BatchJobs future error w/ future.delete=%s ... DONE", cleanup))
 } ## for (cleanup ...)
+
+
+message("*** BatchJobsFuture - deleting running ...")
+
+plan(batchjobs_multicore)
+
+f <- future({
+  Sys.sleep(5)
+  42L
+})
+
+if (!resolved(f)) {
+  res <- delete(f, onRunning="skip")
+  stopifnot(isTRUE(res))
+}
+
+if (!resolved(f)) {
+  res <- tryCatch({
+    delete(f, onRunning="warning")
+  }, warning = function(w) w)
+  stopifnot(inherits(res, "warning"))
+}
+
+if (!resolved(f)) {
+  res <- tryCatch({
+    delete(f, onRunning="error")
+  }, error = function(ex) ex)
+  stopifnot(inherits(res, "error"))
+}
+
+
+message("*** BatchJobsFuture - deleting running ... DONE")
 
 
 message("*** BatchJobsFutureError() ... DONE")

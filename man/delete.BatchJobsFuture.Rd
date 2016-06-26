@@ -6,8 +6,9 @@
 \usage{
 \method{delete}{BatchJobsFuture}(future, onRunning = c("warning", "error",
   "skip"), onFailure = c("error", "warning", "ignore"),
-  onMissing = c("ignore", "warning", "error"), maxTries = 10L,
-  delta = getOption("future.interval", 1), alpha = 1.01, ...)
+  onMissing = c("ignore", "warning", "error"), times = 10L,
+  delta = getOption("future.wait.interval", 1),
+  alpha = getOption("future.wait.alpha", 1.01), ...)
 }
 \arguments{
 \item{future}{The future.}
@@ -18,7 +19,7 @@
 
 \item{onMissing}{Action if future does not exist.}
 
-\item{maxTries}{The number of tries before giving up.}
+\item{times}{The number of tries before giving up.}
 
 \item{delta}{The delay interval (in seconds) between retries.}
 

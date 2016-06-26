@@ -5,11 +5,13 @@
 #' should be located.
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
-#' @param backend The BatchJobs backend to use, cf. \code{\link{backend}()}.
-#' @param resources A named list of resources needed by this future.
+#' @param conf A BatchJobs configuration environment.
+#' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
+#' @param workers (optional) Additional specification for
+#' the BatchJobs backend.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
-#' @param \ldots Additional arguments pass to \code{\link[future]{Future}()}.
+#' @param \ldots Additional arguments passed to \code{\link[future]{Future}()}.
 #'
 #' @return A BatchJobsFuture object
 #'
@@ -17,10 +19,28 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, backend=NULL, resources=list(), finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
-  stopifnot(is.list(resources),
-            length(resources) == 0 || !is.null(names(resources)))
+
+  if (!is.null(conf)) {
+    stopifnot(is.environment(conf))
+  }
+
+  if (!is.null(cluster.functions)) {
+    stopifnot(is.list(cluster.functions))
+    conf$cluster.functions <- cluster.functions
+  }
+
+  if (!is.null(workers)) {
+    stopifnot(length(workers) >= 1)
+    if (is.numeric(workers)) {
+      stopifnot(all(is.finite(workers)), all(workers >= 1),
+                is.finite(prod(workers)))
+    } else if (is.character(workers)) {
+    } else {
+      stopifnot("Argument 'workers' should be either numeric or character: ", mode(workers))
+    }
+  }
 
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
@@ -29,22 +49,30 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, ba
   getGlobalsAndPackages <- importFuture("getGlobalsAndPackages")
   gp <- getGlobalsAndPackages(expr, envir=envir)
 
-  ## 1. Create BatchJobs registry
-  reg <- tempRegistry()
-  if (debug) mprint(reg)
+  ## Create BatchJobsFuture object
+  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, workers=workers, ...)
 
-  ## 2. Create BatchJobsFuture object
-  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, ...)
+  ## LEGACY: /HB 2016-05-20
+  backend <- future$backend
+  future$backend <- NULL
+  resources <- future$resources
+  future$resources <- NULL
+  stopifnot(length(resources) == 0 || is.list(resources) && !is.null(names(resources)))
 
   future$globals <- gp$globals
   future$packages <- gp$packages
+  future$conf <- conf
+
+  ## Create BatchJobs registry
+  reg <- tempRegistry()
+  if (debug) mprint(reg)
+
   future$config <- list(reg=reg, id=NA_integer_,
-                      cluster.functions=NULL,
+                      cluster.functions=cluster.functions,
                       resources=resources,
                       backend=backend)
 
   future <- structure(future, class=c("BatchJobsFuture", class(future)))
-
 
   ## Register finalizer?
   if (finalize) future <- add_finalizer(future)
@@ -87,9 +115,6 @@ print.BatchJobsFuture <- function(x, ...) {
 
 status <- function(...) UseMethod("status")
 finished <- function(...) UseMethod("finished")
-completed <- function(...) UseMethod("completed")
-failed <- function(...) UseMethod("failed")
-expired <- function(...) UseMethod("expired")
 loggedError <- function(...) UseMethod("loggedError")
 loggedOutput <- function(...) UseMethod("loggedOutput")
 
@@ -100,21 +125,28 @@ loggedOutput <- function(...) UseMethod("loggedOutput")
 #'
 #' @return A character vector or a logical scalar.
 #'
-#' @aliases status finished completed failed expired value
+#' @aliases status finished value
 #'          loggedError loggedOutput
 #' @keywords internal
 #'
 #' @export
 #' @export status
 #' @export finished
-#' @export completed
-#' @export failed
-#' @export expired
 #' @export value
 #' @export loggedError
 #' @export loggedOutput
 #' @importFrom BatchJobs getStatus
 status.BatchJobsFuture <- function(future, ...) {
+  ## WORKAROUND: Avoid warnings on partially matched arguments
+  getStatus <- function(...) {
+    oopts <- options(warnPartialMatchArgs=FALSE)
+    keep <- !unlist(lapply(oopts, FUN=function(x) is.null(x) || !x))
+    oopts <- oopts[keep]
+    if (length(oopts) > 0L) on.exit(options(oopts))
+
+    BatchJobs::getStatus(...)
+  } ## getStatus()
+
   config <- future$config
   reg <- config$reg
   if (!inherits(reg, "Registry")) return(NA_character_)
@@ -139,31 +171,6 @@ finished.BatchJobsFuture <- function(future, ...) {
   status <- status(future)
   if (isNA(status)) return(NA)
   any(c("done", "error", "expired") %in% status)
-}
-
-
-#' @export
-#' @keywords internal
-completed.BatchJobsFuture <- function(future, ...) {
-  status <- status(future)
-  if (isNA(status)) return(NA)
-  ("done" %in% status) && !any(c("error", "expired") %in% status)
-}
-
-#' @export
-#' @keywords internal
-failed.BatchJobsFuture <- function(future, ...) {
-  status <- status(future)
-  if (isNA(status)) return(NA)
-  any("error" %in% status)
-}
-
-#' @export
-#' @keywords internal
-expired.BatchJobsFuture <- function(future, ...) {
-  status <- status(future)
-  if (isNA(status)) return(NA)
-  any("expired" %in% status)
 }
 
 #' @export
@@ -265,11 +272,23 @@ run <- function(...) UseMethod("run")
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
 run.BatchJobsFuture <- function(future, ...) {
   mdebug <- importFuture("mdebug")
+  assignConf <- importBatchJobs("assignConf")
+
+  ## WORKAROUND: Avoid warnings on partially matched arguments
+  ## and "dollar" field name.
+  submitJobs <- function(...) {
+    oopts <- options(warnPartialMatchArgs=FALSE, warnPartialMatchDollar=FALSE)
+    keep <- !unlist(lapply(oopts, FUN=function(x) is.null(x) || !x))
+    oopts <- oopts[keep]
+    if (length(oopts) > 0L) on.exit(options(oopts))
+
+    BatchJobs::submitJobs(...)
+  }
+
 
   getClusterFunctions <- function() {
-    ns <- getNamespace("BatchJobs")
-    getBatchJobsConf <- get("getBatchJobsConf", envir=ns, mode="function")
-    getClusterFunctions <- get("getClusterFunctions", envir=ns, mode="function")
+    getBatchJobsConf <- importBatchJobs("getBatchJobsConf")
+    getClusterFunctions <- importBatchJobs("getClusterFunctions")
     getClusterFunctions(getBatchJobsConf())
   }
 
@@ -288,8 +307,6 @@ run.BatchJobsFuture <- function(future, ...) {
 
   reg <- future$config$reg
   stopifnot(inherits(reg, "Registry"))
-
-  resources <- future$config$resources
 
   ## (ii) Attach packages that needs to be attached
   packages <- future$packages
@@ -331,7 +348,7 @@ run.BatchJobsFuture <- function(future, ...) {
       names <- names(globals)[!keep]
       globalsToEncode <- c(globalsToEncode, names)
       msg <- sprintf("WORKAROUND: BatchJobs does not support exporting of variables with names that does not match pattern '[a-zA-Z0-9._-]+' (see https://github.com/tudo-r/BatchJobs/issues/93). Encoding/decoding the following global variables: %s", hpaste(sQuote(names)))
-      if (debug) mcat(msg)
+      mdebug(msg)
     }
 
     ## COMMENTS:
@@ -347,7 +364,7 @@ run.BatchJobsFuture <- function(future, ...) {
       names <- names(globals)[bad]
       globalsToEncode <- c(globalsToEncode, names)
       msg <- sprintf("WORKAROUND: BatchJobs does not support exported variables that start with a period (see https://github.com/tudo-r/BatchJobs/issues/103). Encoding/decoding the following global variables: %s", hpaste(sQuote(names)))
-      if (debug) mcat(msg)
+      mdebug(msg)
     }
 
     ## Does any globals need to be encoded/decoded to workaround
@@ -398,34 +415,78 @@ run.BatchJobsFuture <- function(future, ...) {
 
   ## 2. Update
   future$config$id <- id
-  if (debug) mprintf("Created %s future #%d\n", class(future)[1], id)
+  mdebug("Created %s future #%d", class(future)[1], id)
 
-  ## 3. Set backend here
-  ## Use a non-default backend?
-  backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
-  if (!is.null(backend)) {
-    obackend <- backend()
-    on.exit(backend(obackend))
-    backend(backend)
 
-    ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
-    ## If/when makeRegistry() attaches BatchJobs, we need
-    ## to prevent it from overriding the configuration
-    ## already set by backend().
-    oopts <- options(BatchJobs.load.config=FALSE)
-    on.exit(options(oopts), add=TRUE)
+  ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
+  ## If/when makeRegistry() attaches BatchJobs, we need
+  ## to prevent it from overriding configuration already set.
+  oopts <- options(BatchJobs.load.config=FALSE)
+  on.exit(options(oopts))
+
+  ## 3. Create BatchJobs configuration backend?
+  conf <- future$conf
+  if (is.null(conf)) {
+    ## 3. Create BatchJobs backend configuration
+    cluster.functions <- future$config$cluster.functions
+    if (is.null(cluster.functions)) {
+      ## Set backend here? (legacy code)
+      ## Use a non-default backend?
+      backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
+      if (!is.null(backend)) {
+        obackend <- backend()
+        on.exit(backend(obackend), add=TRUE)
+        backend(backend)
+      }
+
+      ## Record
+      cluster.functions <- getClusterFunctions()
+      future$config$cluster.functions <- cluster.functions
+    }
+
+    conf <- makeBatchJobsConf(cluster.functions)
   }
 
-  ## 4. Record
-  future$config$cluster.functions <- getClusterFunctions()
+  ## 4. Use BatchJobs configuration backend
+  if (debug) {
+    mprintf("Setting BatchJobs configuration:\n")
+    mstr(as.list(conf))
+  }
+  assignConf(conf)
+
+  ## WORKAROUND: (For multicore and OS X only)
+  if (conf$cluster.functions$name == "Multicore") {
+    ## On some OS X systems, a system call to 'ps' may output an error message
+    ## "dyld: DYLD_ environment variables being ignored because main executable
+    ##  (/bin/ps) is setuid or setgid" to standard error that is picked up by
+    ## BatchJobs which incorrectly tries to parse it.  By unsetting all DYLD_*
+    ## environment variables, we avoid this message.  For more info, see:
+    ## * https://github.com/tudo-r/BatchJobs/issues/117
+    ## * https://github.com/HenrikBengtsson/future.BatchJobs/issues/59
+    ## /HB 2016-05-07
+    dyld_envs <- tryCatch({
+      envs <- list()
+      res <- system2("ps", stdout=TRUE, stderr=TRUE)
+      if (any(grepl("DYLD_", res))) {
+        envs <- Sys.getenv()
+        envs <- envs[grepl("^DYLD_", names(envs))]
+        if (length(envs) > 0L) lapply(names(envs), FUN=Sys.unsetenv)
+      }
+      envs
+    }, error = function(ex) list())
+  }
+
 
   ## 5. Submit
   future$state <- 'running'
+  resources <- future$config$resources
+  if (is.null(resources)) resources <- list()
+  resources$workers <- future$workers
   submitJobs(reg, ids=id, resources=resources)
-  if (debug) mprintf("Launched future #%d\n", id)
+  mdebug("Launched future #%d", id)
 
   invisible(future)
-}
+} ## run()
 
 
 await <- function(...) UseMethod("await")
@@ -435,7 +496,7 @@ await <- function(...) UseMethod("await")
 #' @param future The future.
 #' @param cleanup If TRUE, the registry is completely removed upon
 #' success, otherwise not.
-#' @param maxTries The number of tries before giving up.
+#' @param times The number of tries before giving up.
 #' @param delta The number of seconds to wait the first time.
 #' @param alpha A factor to scale up the waiting time in each iteration
 #' such that the waiting time in the k:th iteration is \code{alpha^k*delta}.
@@ -453,11 +514,13 @@ await <- function(...) UseMethod("await")
 #' @export
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("future.maxTries", Sys.getenv("R_FUTURE_MAXTRIES", 1000)), delta=getOption("future.interval", 1.0), alpha=getOption("future.alpha", 1.01), ...) {
-  maxTries <- as.integer(maxTries)
+await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.wait.times", 1000L), delta=getOption("future.wait.interval", 1.0), alpha=getOption("future.wait.alpha", 1.01), ...) {
+  mdebug <- importFuture("mdebug")
+  
+  times <- as.integer(times)
 
   debug <- getOption("future.debug", FALSE)
-  if (debug) mprintf("Polling...\n")
+  mdebug("Polling...")
 
   expr <- future$expr
   config <- future$config
@@ -477,9 +540,9 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("futu
   tries <- 1L
   interval <- delta
   finished <- FALSE
-  while (tries <= maxTries) {
+  while (tries <= times) {
     stat <- status(future)
-    if (debug) mprintf(" Status %d: %s\n", tries, paste(stat, collapse=", "))
+    mdebug(" Status %d: %s\n", tries, paste(stat, collapse=", "))
     if (isNA(stat)) {
       finished <- TRUE
       break
@@ -495,10 +558,10 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("futu
           final_state_prev <- final_state
     	  final_countdown <- 5L
           interval <- delta
-  	  maxTries <- maxTries + final_countdown
+  	  times <- times + final_countdown
         } else {
           final_countdown <- final_countdown - 1L
-          if (debug) mprintf(" 'expired' status countdown: %d\n", final_countdown)
+          mdebug(" 'expired' status countdown: %d", final_countdown)
           if (final_countdown == 0L) {
             finished <- TRUE
             break
@@ -516,7 +579,7 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, maxTries=getOption("futu
 
   res <- NULL
   if (finished) {
-    if (debug) { mprint("Results:") }
+    mdebug("Results:")
     if ("done" %in% stat) {
       res <- loadResult(reg, id=id)
     } else if ("error" %in% stat) {
@@ -555,7 +618,7 @@ delete <- function(...) UseMethod("delete")
 #' @param onRunning Action if future is running or appears to run.
 #' @param onFailure Action if failing to delete future.
 #' @param onMissing Action if future does not exist.
-#' @param maxTries The number of tries before giving up.
+#' @param times The number of tries before giving up.
 #' @param delta The delay interval (in seconds) between retries.
 #' @param alpha A multiplicative penalty increasing the delay
 #' for each failed try.
@@ -566,7 +629,9 @@ delete <- function(...) UseMethod("delete")
 #' @export
 #' @importFrom BatchJobs removeRegistry
 #' @keywords internal
-delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), maxTries=10L, delta=getOption("future.interval", 1.0), alpha=1.01, ...) {
+delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), times=10L, delta=getOption("future.wait.interval", 1.0), alpha=getOption("future.wait.alpha", 1.01), ...) {
+  mdebug <- importFuture("mdebug")
+  
   onRunning <- match.arg(onRunning)
   onMissing <- match.arg(onMissing)
   onFailure <- match.arg(onFailure)
@@ -582,7 +647,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
   if (is.null(path) || !file_test("-d", path)) {
     if (onMissing %in% c("warning", "error")) {
       msg <- sprintf("Cannot remove BatchJob registry, because directory does not exist: %s", sQuote(path))
-      if (debug) mprintf("delete(): %s\n", msg)
+      mdebug("delete(): %s", msg)
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
@@ -598,21 +663,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     if (onRunning == "skip") return(invisible(TRUE))
     status <- status(future)
     msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a non-resolved future (state=%s; BatchJobs status=%s): %s", sQuote(future$state), paste(sQuote(status), collapse=", "), sQuote(path))
-    if (debug) mprintf("delete(): %s\n", msg)
-    if (onRunning == "warning") {
-      warning(msg)
-      return(invisible(TRUE))
-    } else if (onRunning == "error") {
-      stop(BatchJobsFutureError(msg, future=future))
-    }
-  }
-
-  ## Does the future still run?  If so, then...
-  if (FALSE && future$state == 'running') {
-    if (onRunning == "skip") return(invisible(TRUE))
-
-    msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a running future: %s", sQuote(path))
-    if (debug) mprintf("delete(): %s\n", msg)
+    mdebug("delete(): %s", msg)
     if (onRunning == "warning") {
       warning(msg)
       return(invisible(TRUE))
@@ -624,12 +675,12 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
 
   ## To simplify post mortem troubleshooting in non-interactive sessions,
   ## should the BatchJobs registry files be removed or not?
-  if (debug) mprintf("delete(): Option 'future.delete=%s\n", sQuote(getOption("future.delete", "<NULL>")))
+  mdebug("delete(): Option 'future.delete=%s", sQuote(getOption("future.delete", "<NULL>")))
   if (!getOption("future.delete", interactive())) {
     status <- status(future)
     if (any(c("error", "expired") %in% status)) {
-      msg <- sprintf("Will not remove BatchJob registry, because the status of the BatchJobs was %s and option 'future.delete' is not set to FALSE: %s", paste(sQuote(status), collapse=", "), sQuote(path))
-      if (debug) mprintf("delete(): %s\n", msg)
+      msg <- sprintf("Will not remove BatchJob registry, because the status of the BatchJobs was %s and option 'future.delete' is FALSE or running in an interactive session: %s", paste(sQuote(status), collapse=", "), sQuote(path))
+      mdebug("delete(): %s", msg)
       warning(msg)
       return(invisible(FALSE))
     }
@@ -638,7 +689,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
 
   ## Try to delete registry
   interval <- delta
-  for (kk in seq_len(maxTries)) {
+  for (kk in seq_len(times)) {
     try(removeRegistry(reg, ask="no"), silent=TRUE)
     if (!file_test("-d", path)) break
     Sys.sleep(interval)
@@ -650,7 +701,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
   if (file_test("-d", path)) {
     if (onFailure %in% c("warning", "error")) {
       msg <- sprintf("Failed to remove BatchJob registry: %s", sQuote(path))
-      if (debug) mprintf("delete(): %s\n", msg)
+      mdebug("delete(): %s", msg)
       if (onMissing == "warning") {
         warning(msg)
       } else if (onMissing == "error") {
@@ -660,7 +711,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     return(invisible(FALSE))
   }
 
-  if (debug) mprintf("delete(): BatchJobs registry deleted: %s\n", sQuote(path))
+  mdebug("delete(): BatchJobs registry deleted: %s", sQuote(path))
 
   invisible(TRUE)
 } # delete()

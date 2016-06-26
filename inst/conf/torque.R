@@ -1,0 +1,48 @@
+cluster.functions <- makeClusterFunctionsTorque(R.utils::tmpfile('
+## Job name:
+#PBS -N <%= job.name %>
+
+## Merge standard error and output:
+#PBS -j oe
+
+## Direct streams to logfile:
+#PBS -o <%= log.file %>
+
+## Email on abort (a) and termination (e), but not when starting (b)
+#PBS -m ae
+
+## Resources needed:
+<% if (length(resources) > 0) {
+  workers <- resources$workers
+  if (!is.null(workers)) {
+    if (is.numeric(workers)) {
+      stopifnot(length(workers) <= 2)
+      if (length(workers) == 1) workers <- c(1L, workers)
+      opt <- sprintf("%d:ppn=%d", workers[1], workers[2])
+    } else if (is.character(workers)) {
+      opt <- paste(workers, collapse="+")
+    } else {
+      stop("Unknown data type of \'workers\': ", mode(workers))
+    }
+    resources$workers <- NULL
+    resources <- c(resources, list(nodes=opt))
+  }
+
+  opts <- unlist(resources, use.names=TRUE)
+  opts <- sprintf("%s=%s", names(opts), opts)
+  opts <- paste("-l", opts, sep=" ")
+  R.utils::mcat("opts:")
+  R.utils::mstr(opts)
+  if (isTRUE(getOption("future.debug"))) {
+    R.utils::mprint(opts)
+  }
+
+  cat(sprintf("#PBS %s\n", opts))
+} %>
+
+## Run R:
+## we merge R output with stdout from PBS, which gets then logged via the PBS -o option
+echo "Command: Rscript --verbose \"<%= rscript %>\""
+Rscript --verbose "<%= rscript %>"
+echo "Command: Rscript --verbose \"<%= rscript %>\" ... DONE"
+'))

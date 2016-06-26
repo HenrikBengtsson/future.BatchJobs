@@ -75,7 +75,30 @@ res <- try(print(v), silent=TRUE)
 print(res)
 stopifnot(inherits(res, "try-error"))
 
-
 message("*** batchjobs() ... OK")
 
-#source("incl/end.R")
+
+message("*** batchjobs() w/ backend='.BatchJobs.R' ...")
+
+## Predefined
+f <- batchjobs(42L, backend=".BatchJobs.R")
+print(f)
+v <- value(f)
+print(v)
+stopifnot(v == 42L)
+
+
+## User specified
+pathname <- system.file(package="BatchJobs", "etc", "BatchJobs_global_config.R", mustWork=TRUE)
+f <- batchjobs(42L, backend=pathname)
+print(f)
+v <- value(f)
+print(v)
+stopifnot(v == 42L)
+
+message("*** batchjobs() w/ backend='.BatchJobs.R' ... DONE")
+
+
+message("*** batchjobs() ... DONE")
+
+source("incl/end.R")

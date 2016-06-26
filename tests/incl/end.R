@@ -1,6 +1,5 @@
 ## Restore original state
 options(oopts)
-backend(obackend)
-plan(oplan)
+future.BatchJobs::backend(obackend)
+future::plan(oplan)
 rm(list=c(setdiff(ls(), ovars)))
-

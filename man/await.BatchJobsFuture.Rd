@@ -5,9 +5,9 @@
 \title{Awaits the value of a BatchJobs future}
 \usage{
 \method{await}{BatchJobsFuture}(future, cleanup = TRUE,
-  maxTries = getOption("future.maxTries", Sys.getenv("R_FUTURE_MAXTRIES",
-  1000)), delta = getOption("future.interval", 1),
-  alpha = getOption("future.alpha", 1.01), ...)
+  times = getOption("future.wait.times", 1000L),
+  delta = getOption("future.wait.interval", 1),
+  alpha = getOption("future.wait.alpha", 1.01), ...)
 }
 \arguments{
 \item{future}{The future.}
@@ -15,7 +15,7 @@
 \item{cleanup}{If TRUE, the registry is completely removed upon
 success, otherwise not.}
 
-\item{maxTries}{The number of tries before giving up.}
+\item{times}{The number of tries before giving up.}
 
 \item{delta}{The number of seconds to wait the first time.}
 

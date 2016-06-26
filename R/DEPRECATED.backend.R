@@ -1,5 +1,7 @@
 #' Switch backend to be used for asynchronous processing
 #'
+#' \emph{This function is deprecated.}
+#'
 #' @param what
 #'   A \code{character} \code{vector} of preferred backends to be used.
 #'   See Section Details below for supported backends.
@@ -62,17 +64,17 @@
 #' \emph{defines} the \code{"spare"} backend \emph{set}.  To use this set,
 #' do \code{backend("spare")}.  One predefined alias set exists at startup,
 #' i.e. \code{backend(default = c(".BatchJobs.R", "multicore-1",
-#'            "multicore", "local", "interactive"))}.
+#'            "multicore", "local"))}.
 #'
 #' @export
 #' @importFrom future availableCores
 #' @importFrom tools file_path_as_absolute
 #' @importFrom utils file_test
 #' @importFrom BatchJobs makeClusterFunctionsMulticore makeClusterFunctionsLocal makeClusterFunctionsInteractive
+#' @keywords internal
 backend <- local({
   aliases = list(
-    default = c(".BatchJobs.R", "multicore-1", "multicore",
-                "local", "interactive")
+    default = c(".BatchJobs.R", "multicore-1", "local")
   )
   last = NULL
 
@@ -80,12 +82,10 @@ backend <- local({
   dyld_envs <- list()
 
   function(what=NULL, ..., quietly=TRUE) {
-    ## Imported private functions from BatchJobs
-    ns <- getNamespace("BatchJobs")
-    getBatchJobsConf <- get("getBatchJobsConf", mode="function", envir=ns)
-    sourceConfFiles <- get("sourceConfFiles", mode="function", envir=ns)
-    assignConf <- get("assignConf", mode="function", envir=ns)
-    readConfs <- get("readConfs", mode="function", envir=ns)
+    ## Import private functions from BatchJobs
+    sourceConfFiles <- importBatchJobs("sourceConfFiles")
+    assignConf <- importBatchJobs("assignConf")
+    readConfs <- importBatchJobs("readConfs")
 
     debug <- getOption("future.debug", FALSE)
 
@@ -195,12 +195,14 @@ backend <- local({
     if (debug) mprintf("backend(): what='%s'\n", what)
 
     ## Inform about dropped requests?
-    if (length(dropped) > 0L && explicit_what && getOption("future.on_unkown_backend", "ignore") == "warn") {
+    if (length(dropped) > 0L && explicit_what && getOption("future.backend.onUnknown", "ignore") == "warn") {
       warning(sprintf("Some of the preferred backends (%s) are either not available, pointless (e.g. multicore=1), or not supported on your operating system ('%s'). Will use the following backend instead: %s", paste(sQuote(dropped), collapse=", "), .Platform$OS.type, sQuote(what)))
     }
 
     ## Load specific or global BatchJobs config file?
     if (file_test("-f", what)) {
+      .Deprecated(new=sprintf("plan(batchjobs_custom, pathname='%s')", what),
+                  old=sprintf("backend('%s')", what))
       if (debug) mprintf("backend(): file='%s'\n", what)
       conf <- sourceConfFiles(what)
       if (debug) {
@@ -212,6 +214,8 @@ backend <- local({
       last <<- what
       return(what)
     } else if (what == ".BatchJobs.R") {
+      .Deprecated(new="plan(batchjobs_custom)",
+                  old=sprintf("backend('%s')", what))
       if (debug) mprintf("backend(): First available '.BatchJobs.R'\n")
       if (quietly) {
         suppressPackageStartupMessages(readConfs())
@@ -225,8 +229,7 @@ backend <- local({
 
     if (debug) mprintf("backend(): Finding action for what='%s'\n", what)
 
-    conf <- getBatchJobsConf()
-
+    cluster.functions <- NULL
     if (grepl("^multicore", what)) {
       ## Sanity check (see above)
       stopifnot(ncpus0 >= 2L)
@@ -236,6 +239,9 @@ backend <- local({
         if (!is.finite(ncpus) || ncpus < 1L) {
           stop("Invalid number of cores specified: ", sQuote(what))
         }
+        .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=%d)", ncpus),
+                    old=sprintf("backend('%s')", what))
+
         if (ncpus > ncpus0) {
           warning(sprintf("The number of specific cores (%d) is greater than (%d) what is available according to availableCores(). Will still try to use this requested backend: %s", ncpus, ncpus0, sQuote(what)))
         }
@@ -245,7 +251,12 @@ backend <- local({
         ## Leave some cores for other things?
         if (grepl("^multicore-", what)) {
           save <- suppressWarnings(as.integer(gsub("^multicore-", "", what)))
+          .Deprecated(new=sprintf("plan(batchjobs_multicore, workers=availableCores()-%d)", ncpus),
+                      old=sprintf("backend('%s')", what))
           ncpus <- ncpus - save
+        } else {
+          .Deprecated(new="plan(batchjobs_multicore)",
+                      old=sprintf("backend('%s')", what))
         }
       }
 
@@ -295,12 +306,15 @@ backend <- local({
       ## /HB 2016-05-16
       max.load <- +Inf
       if (debug) mprintf("backend(): makeClusterFunctionsMulticore(ncpus=%d, max.jobs=%d, max.load=%g)\n", ncpus, ncpus, max.load)
-      conf$cluster.functions = makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
+      cluster.functions <- makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
     } else if (what == "local") {
-      if (debug) mprintf("backend(): makeClusterFunctionsLocal()\n")
-      conf$cluster.functions = makeClusterFunctionsLocal()
+      .Deprecated(new="plan(batchjobs_local)",
+                  old=sprintf("backend('%s')", what))
+      cluster.functions <- makeClusterFunctionsLocal()
     } else if (what == "interactive") {
-      conf$cluster.functions = makeClusterFunctionsInteractive()
+      .Deprecated(new="plan(batchjobs_interactive)",
+                  old=sprintf("backend('%s')", what))
+      cluster.functions <- makeClusterFunctionsInteractive()
     } else {
       stop("Unknown backend: ", sQuote(what))
     }
@@ -311,25 +325,13 @@ backend <- local({
       do.call(Sys.setenv, args=as.list(dyld_envs))
     }
 
+    conf <- makeBatchJobsConf(cluster.functions)
 
-    conf$mail.start = "none"
-    conf$mail.done = "none"
-    conf$mail.error = "none"
-    conf$db.driver = "SQLite"
-    conf$db.options = list()
-    conf$default.resources = list()
-    conf$debug = FALSE
-    conf$raise.warnings = FALSE
-    conf$staged.queries = TRUE
-    conf$max.concurrent.jobs = Inf
-    conf$fs.timeout = NA_real_
-
+    ## Use it!
     if (debug) {
       mprintf("Setting BatchJobs configuration:\n")
       mstr(as.list(conf))
     }
-
-    ## Use it!
     assignConf(conf)
 
     ## Record last used
@@ -360,3 +362,28 @@ hasUserClusterFunctions <- function(pathnames=NULL, debug=FALSE) {
 
   exists("cluster.functions", mode="list", envir=config)
 }
+
+
+makeBatchJobsConf <- function(cluster.functions, ...) {
+  getBatchJobsConf <- importBatchJobs("getBatchJobsConf")
+
+  conf <- getBatchJobsConf()
+
+  conf$cluster.functions <- cluster.functions
+  conf$mail.start <- "none"
+  conf$mail.done <- "none"
+  conf$mail.error <- "none"
+  conf$db.driver <- "SQLite"
+  conf$db.options <- list()
+  conf$default.resources <- list()
+  conf$debug <- FALSE
+  conf$raise.warnings <- FALSE
+  conf$staged.queries <- TRUE
+  conf$max.concurrent.jobs <- Inf
+  conf$fs.timeout <- NA_real_
+
+  ## Sanity check
+  stopifnot(is.environment(conf))
+
+  conf
+} ## makeBatchJobsConf()

@@ -16,7 +16,11 @@ mprintf("x=%g\n", x)
 stopifnot(x == a)
 
 ## Use 'multicore', if available, otherwise 'local'
-backend(c("multicore", "local"))
+if (fullTest) {
+  backend(c("multicore", "local"))
+} else {
+  backend("local")
+}
 mprintf("Current backend: %s\n", backend(NULL))
 
 y %<-% { 2*a }
@@ -36,7 +40,11 @@ stopifnot(z == x)
 
 
 ## Create a backend aliases
-backend("spare"=c("multicore-2", "local"))
+if (fullTest) {
+  backend(spare=c("multicore-2", "local"))
+} else {
+  backend(spare="local")
+}
 mprintf("Current backend: %s\n", backend(NULL))
 
 x %<-% { y / 2 } %plan% batchjobs(backend="interactive")
@@ -81,8 +89,44 @@ print(backend("reset"))
 
 ## Undo everything
 backend(obackend)
+
 mprintf("Backend was reset to: %s\n", backend(NULL))
 
+message("*** backend() - exceptions ...")
+
+options(future.backend.onUnknown="warn")
+res <- tryCatch({
+  backend("multicore=1")
+}, warning = function(w) w)
+stopifnot(inherits(res, "warning"))
+options(future.backend.onUnknown=NULL)
+
+res <- try(backend("list", 1), silent=FALSE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+res <- try(backend("list", a=1), silent=FALSE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+res <- try(backend("multicore=0"), silent=FALSE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+res <- try(backend("multicore--1"), silent=FALSE)
+print(res)
+stopifnot(inherits(res, "try-error"))
+
+## Configuration file without cluster function
+pathname <- ".BatchJobs.R"
+cat("message('.BatchJobs.R here!')", file=pathname)
+res <- backend(".BatchJobs.R")
+print(res)
+file.remove(pathname)
+
+message("*** backend() - exceptions ... DONE")
+
 message("*** backend() ... DONE")
+
 
 source("incl/end.R")

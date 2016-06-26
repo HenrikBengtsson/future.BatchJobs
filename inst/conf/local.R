@@ -1,0 +1,2 @@
+cluster.functions <- makeClusterFunctionsLocal()
+

@@ -10,6 +10,7 @@
 #'
 #' @export
 #' @importFrom future plan tweak
+#' @keywords internal
 `%resources%` <- function(fassignment, tweaks) {
   fassignment <- substitute(fassignment)
   envir <- parent.frame(1)

@@ -3,21 +3,31 @@
 tempRegistry <- local({
   regs <- new.env()
 
-  function(backend=NULL, prefix="BatchJobs_", path=NULL, file.dir=NULL, ...) {
+  makeRegistry <- function(...) {
+    ## PROBLEM:
+    ## Calling makeRegistry() causes BatchJobs to be attached and
+    ## therefore outputs:
+    ##   Loading required package: BatchJobs
+    ##   Loading required package: BBmisc
+    ## as soon as the first BatchJobs future is created.
+    ## See also: https://github.com/tudo-r/BatchJobs/issues/68
+    ##
+    ## WORKAROUND:
+    ## In order to avoid the above output message (sent to stderr)
+    ## we will attach BatchJobs already here and suppress output.
+    suppressPackageStartupMessages(require("BatchJobs"))
+
+    BatchJobs::makeRegistry(...)
+  } ## makeRegistry()
+
+  function(prefix="BatchJobs_", path=NULL, file.dir=NULL, ...) {
     id <- tempvar(prefix=prefix, value=NA, envir=regs)
     if (is.null(path)) path <- futureCachePath()
     if (is.null(file.dir)) file.dir <- file.path(path, paste0(id, "-files"))
 
-    ## Use a non-default backend?
-    if (!is.null(backend)) {
-      obackend <- backend()
-      on.exit(backend(obackend))
-      backend(backend)
-    }
-
     ## If/when makeRegistry() attaches BatchJobs, we need
     ## to prevent it from overriding the configuration
-    ## already set by backend().
+    ## already set.
     oopts <- options(BatchJobs.load.config=FALSE)
     on.exit(options(oopts), add=TRUE)
 

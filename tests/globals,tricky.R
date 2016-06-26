@@ -1,13 +1,31 @@
-library("future.BatchJobs")
+source("incl/start.R")
 library("listenv")
 
-ovars <- ls()
-oopts <- options(warn=1)
-plan(batchjobs, backend="local")
+plan(batchjobs_local)
 
 message("*** Tricky use cases related to globals ...")
 
 message("- Globals with the same name as 'base' objects ...")
+
+## 'col' is masked by 'base::col' (Issue #55)
+
+col <- 3
+x %<-% { stopifnot(is.numeric(col)); col }
+print(x)
+stopifnot(x == col)
+
+
+message("- Globals that needs to be encoded ...")
+.a <- 42L
+x %<-% { .a }
+print(x)
+stopifnot(x == .a)
+
+`$foo` <- 42L
+x %<-% { `$foo` }
+print(x)
+stopifnot(x == `$foo`)
+
 
 ## 'col' is masked by 'base::col' (Issue #55)
 
@@ -81,8 +99,4 @@ stopifnot(identical(y, y0))
 
 message("*** Tricky use cases related to globals ... DONE")
 
-
-## Cleanup
-plan(eager)
-options(oopts)
-rm(list=setdiff(ls(), ovars))
+source("incl/end.R")
