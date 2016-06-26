@@ -38,7 +38,8 @@ BatchJobs multicore futures rely on the BatchJobs backend set
 up by \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}.
 The BatchJobs multicore backend only works on operating systems
 supporting the `ps` command-line tool, e.g. Linux and OS X, but
-not Windows.
+neither Windows nor Solaris Unix (because
+`ps -o ucomm=` is not supported).
 
 \emph{Warning: For multicore BatchJobs, the \pkg{BatchJobs}
 package uses a built-in algorithm for load balancing based on
