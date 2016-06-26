@@ -1,6 +1,12 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.12.0-9000 [2016-06-26]
+o Advicing against _multicore_ BatchJobs futures, because there is a
+  risk for long waiting times due to starvation, which happens because
+  of an internal work-load algorithm of the BatchJobs package.
+
+
 Version: 0.12.0 [2016-06-25]
 o Added predefined batchjobs_local(), batchjobs_interactive(),
   batchjobs_multicore(), batchjobs_lsf(), batchjobs_openlava(),
