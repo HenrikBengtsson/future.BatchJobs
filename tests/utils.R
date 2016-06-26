@@ -67,6 +67,15 @@ stopifnot(trim(" hello ") == "hello")
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# isOS()
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+message("- isOS() ...")
+for (os in c("darwin", "freebsd", "irix", "linux", "openbsd", "solaris", "windows")) {
+  message(sprintf("isOS('%s') = %s", os, isOS(os)))
+}
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # importFuture() and importBatchJobs()
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 message("*** importFuture() ...")
