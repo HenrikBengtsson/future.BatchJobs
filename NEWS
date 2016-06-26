@@ -2,10 +2,11 @@ Package: future.BatchJobs
 =========================
 
 Version: 0.12.0-9000 [2016-06-26]
-o Advicing against _multicore_ BatchJobs futures, because there is a
-  risk for long waiting times due to starvation, which happens because
-  of an internal work-load algorithm of the BatchJobs package.
-o Multicore BatchJobs futures are not supported on Solaris Unix.
+o Advicing against _multicore BatchJobs_ futures, because there
+  is a risk for long waiting times due to starvation.
+  This is a limitation of the BatchJobs package.
+o BUG FIX: Multicore BatchJobs futures are not supported on Solaris
+  Unix and falls back to local BatchJobs futures (as on Windows).
   This is a limitation of the BatchJobs package.
 
 

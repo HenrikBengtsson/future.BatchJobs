@@ -95,21 +95,20 @@ for all BatchJobs backends.  Below are the most common types of
 BatchJobs backends.
 
 
-| Backend                | OSes        | Description                                                               | Alternative in future package
-|:-----------------------|:------------|:--------------------------------------------------------------------------|:------------------------------------
-| _generic:_             |             |                                                                           |
-| `batchjobs_custom`       | all         | Uses custom BatchJobs configuration script files, e.g. `.BatchJobs.R`            | N/A
-| _predefined:_          |             |                                                                           |
-| `batchjobs_torque`     | all         | Futures are evaluated via a [TORQUE] / PBS job scheduler                      | N/A
-| `batchjobs_slurm`      | all         | Futures are evaluated via a [Slurm] job scheduler                           | N/A
-| `batchjobs_sge`        | all         | Futures are evaluated via a [Sun/Oracle Grid Engine (SGE)] job scheduler    | N/A
-| `batchjobs_lsf`        | all         | Futures are evaluated via a [Load Sharing Facility (LSF)] job scheduler     | N/A
-| `batchjobs_openlava`   | all         | Futures are evaluated via an [OpenLava] job scheduler                       | N/A
-| `batchjobs_interactive`| all         | synchronous evaluation in the calling R environment                       | `plan(transparent)`
-| `batchjobs_local`      | all         | synchronous evaluation in a separate R process (on current machine)       | `plan(cluster, workers="localhost")`
+| Backend                 | Description                                                              | Alternative in future package
+|:------------------------|:-------------------------------------------------------------------------|:------------------------------------
+| _generic:_              |                                                                          |
+| `batchjobs_custom`      | Uses custom BatchJobs configuration script files, e.g. `.BatchJobs.R`    | N/A
+| _predefined:_           |                                                                          |
+| `batchjobs_torque`      | Futures are evaluated via a [TORQUE] / PBS job scheduler                 | N/A
+| `batchjobs_slurm`       | Futures are evaluated via a [Slurm] job scheduler                        | N/A
+| `batchjobs_sge`         | Futures are evaluated via a [Sun/Oracle Grid Engine (SGE)] job scheduler | N/A
+| `batchjobs_lsf`         | Futures are evaluated via a [Load Sharing Facility (LSF)] job scheduler  | N/A
+| `batchjobs_openlava`    | Futures are evaluated via an [OpenLava] job scheduler                    | N/A
+| `batchjobs_interactive` | synchronous evaluation in the calling R environment                      | `plan(transparent)`
+| `batchjobs_local`       | synchronous evaluation in a separate R process (on current machine)      | `plan(cluster, workers="localhost")`
 
-
-In addition the the above, there is also `batchjobs_multicore` (which on Windows falls back to `batchjobs_local`), which runs BatchJobs tasks asynchronously in background R sessions (sic!) on the current machine.  We \emph{advice not to use} this and instead use `multisession` of the [future] package.  For details, see `help("batchjobs_multicore")`.
+In addition the the above, there is also `batchjobs_multicore` (which on Windows and Solaris falls back to `batchjobs_local`), which runs BatchJobs tasks asynchronously in background R sessions (sic!) on the current machine.  We \emph{advice not to use} this and instead use `multisession` of the [future] package.  For details, see `help("batchjobs_multicore")`.
 
 
 ### Examples

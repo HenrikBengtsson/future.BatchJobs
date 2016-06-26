@@ -23,9 +23,10 @@
 #' BatchJobs multicore futures rely on the BatchJobs backend set
 #' up by \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}.
 #' The BatchJobs multicore backend only works on operating systems
-#' supporting the `ps` command-line tool, e.g. Linux and OS X, but
-#' neither Windows nor Solaris Unix (because
-#' `ps -o ucomm=` is not supported).
+#' supporting the `ps` command-line tool, e.g. Linux and OS X.
+#' However, they are not supported on neither Windows nor Solaris
+#' Unix (because `ps -o ucomm=` is not supported).  When not
+#' supported, it falls back to \code{\link{batchjobs_local}}.
 #'
 #' \emph{Warning: For multicore BatchJobs, the \pkg{BatchJobs}
 #' package uses a built-in algorithm for load balancing based on
@@ -61,7 +62,8 @@ batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, wor
   stopifnot(length(workers) == 1L, is.numeric(workers),
             is.finite(workers), workers >= 1L)
 
-  if (workers == 1L || availableCores(constraints="multicore") == 1L) {
+  ## Fall back to batchjobs_local if multicore processing is not supported
+  if (workers == 1L || isOS("windows") || isOS("solaris") || availableCores(constraints="multicore") == 1L) {
     ## covr: skip=1
     return(batchjobs_local(expr, envir=envir, substitute=FALSE, ...))
   }
