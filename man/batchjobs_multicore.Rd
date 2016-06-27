@@ -27,14 +27,34 @@ An object of class \code{BatchJobsFuture}.
 }
 \description{
 A BatchJobs multicore future is an asynchronous multiprocess
-future that will be evaluated in a background R session.
+future that will be evaluated in a background R session.\cr
+\cr
+\emph{We highly recommend using \code{\link[future]{multisession}}
+(sic!) futures of the \pkg{future} package instead of
+multicore BatchJobs futures.}
 }
 \details{
 BatchJobs multicore futures rely on the BatchJobs backend set
 up by \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}.
 The BatchJobs multicore backend only works on operating systems
-supporting the `ps` command-line tool, e.g. Linux and OS X, but
-not Windows.
+supporting the `ps` command-line tool, e.g. Linux and OS X.
+However, they are not supported on neither Windows nor Solaris
+Unix (because `ps -o ucomm=` is not supported).  When not
+supported, it falls back to \code{\link{batchjobs_local}}.
+
+\emph{Warning: For multicore BatchJobs, the \pkg{BatchJobs}
+package uses a built-in algorithm for load balancing based on
+other processes running on the same machine.  This is done
+in order to prevent the machine's CPU load to blow up.
+Unfortunately, the BatchJobs criteria for handling this often
+results in starvation, that is, long waiting times before
+launching jobs.  The risk for this is particularly high if
+there are other R processes running on the same machine
+including those by other users.
+See also \url{https://github.com/tudo-r/BatchJobs/issues/99}.
+\bold{Conclusion:} We highly recommend using
+\code{\link[future]{multisession}} futures of the
+\pkg{future} package instead of multicore BatchJobs futures.}
 
 Also, despite the name, BatchJobs multicore futures are in
 function closer related to \link[future:multisession]{multisession}
@@ -45,4 +65,5 @@ the current R process as the name otherwise might imply (at least
 that is how the term "multicore processing" is typically used
 in the R world).
 }
+\keyword{internal}
 

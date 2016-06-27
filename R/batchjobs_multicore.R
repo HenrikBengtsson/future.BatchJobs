@@ -1,7 +1,11 @@
 #' BatchJobs multicore futures
 #'
 #' A BatchJobs multicore future is an asynchronous multiprocess
-#' future that will be evaluated in a background R session.
+#' future that will be evaluated in a background R session.\cr
+#' \cr
+#' \emph{We highly recommend using \code{\link[future]{multisession}}
+#' (sic!) futures of the \pkg{future} package instead of
+#' multicore BatchJobs futures.}
 #'
 #' @param expr An R expression to be evaluated.
 #' @param envir The environment from which global environment
@@ -19,8 +23,24 @@
 #' BatchJobs multicore futures rely on the BatchJobs backend set
 #' up by \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}.
 #' The BatchJobs multicore backend only works on operating systems
-#' supporting the `ps` command-line tool, e.g. Linux and OS X, but
-#' not Windows.
+#' supporting the `ps` command-line tool, e.g. Linux and OS X.
+#' However, they are not supported on neither Windows nor Solaris
+#' Unix (because `ps -o ucomm=` is not supported).  When not
+#' supported, it falls back to \code{\link{batchjobs_local}}.
+#'
+#' \emph{Warning: For multicore BatchJobs, the \pkg{BatchJobs}
+#' package uses a built-in algorithm for load balancing based on
+#' other processes running on the same machine.  This is done
+#' in order to prevent the machine's CPU load to blow up.
+#' Unfortunately, the BatchJobs criteria for handling this often
+#' results in starvation, that is, long waiting times before
+#' launching jobs.  The risk for this is particularly high if
+#' there are other R processes running on the same machine
+#' including those by other users.
+#' See also \url{https://github.com/tudo-r/BatchJobs/issues/99}.
+#' \bold{Conclusion:} We highly recommend using
+#' \code{\link[future]{multisession}} futures of the
+#' \pkg{future} package instead of multicore BatchJobs futures.}
 #'
 #' Also, despite the name, BatchJobs multicore futures are in
 #' function closer related to \link[future:multisession]{multisession}
@@ -34,6 +54,7 @@
 #' @importFrom BatchJobs makeClusterFunctionsMulticore
 #' @importFrom future availableCores
 #' @export
+#' @keywords internal
 batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, workers=availableCores(constraints="multicore"), ...) {
   if (substitute) expr <- substitute(expr)
 
@@ -41,7 +62,8 @@ batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, wor
   stopifnot(length(workers) == 1L, is.numeric(workers),
             is.finite(workers), workers >= 1L)
 
-  if (workers == 1L || availableCores(constraints="multicore") == 1L) {
+  ## Fall back to batchjobs_local if multicore processing is not supported
+  if (workers == 1L || isOS("windows") || isOS("solaris") || availableCores(constraints="multicore") == 1L) {
     ## covr: skip=1
     return(batchjobs_local(expr, envir=envir, substitute=FALSE, ...))
   }

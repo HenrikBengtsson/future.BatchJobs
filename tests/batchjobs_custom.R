@@ -39,7 +39,6 @@ message("*** batchjobs_custom() w/ pathname ...")
 ## BatchJobs configuration R scripts to be tested
 path <- system.file("conf", package="future.BatchJobs")
 filenames <- c("local.R", "interactive.R")
-##if (availableCores("multicore") > 1L) filenames <- c(filenames, "multicore.R")
 pathnames <- file.path(path, filenames)
 
 for (pathname in pathnames) {

@@ -4,6 +4,13 @@ library("listenv")
 message("*** Assert backends ...")
 
 mcat("Backends to be tested:\n")
+if (FALSE && fullTest) {
+  TEST_BACKENDS <- c("interactive", "local", "multicore=2")
+  future.BatchJobs::backend(c("multicore=2", "local"))
+} else {
+  TEST_BACKENDS <- c("interactive", "local")
+  future.BatchJobs::backend("local")
+}
 mprint(TEST_BACKENDS)
 
 env <- new.env()

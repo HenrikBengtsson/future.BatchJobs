@@ -95,19 +95,20 @@ for all BatchJobs backends.  Below are the most common types of
 BatchJobs backends.
 
 
-| Backend                | OSes        | Description                                                               | Alternative in future package
-|:-----------------------|:------------|:--------------------------------------------------------------------------|:------------------------------------
-| _generic:_             |             |                                                                           |
-| `batchjobs_custom`       | all         | Uses custom BatchJobs configuration script files, e.g. `.BatchJobs.R`            | N/A
-| _predefined:_          |             |                                                                           |
-| `batchjobs_torque`     | all         | Futures are evaluated via a [TORQUE] / PBS job scheduler                      | N/A
-| `batchjobs_slurm`      | all         | Futures are evaluated via a [Slurm] job scheduler                           | N/A
-| `batchjobs_sge`        | all         | Futures are evaluated via a [Sun/Oracle Grid Engine (SGE)] job scheduler    | N/A
-| `batchjobs_lsf`        | all         | Futures are evaluated via a [Load Sharing Facility (LSF)] job scheduler     | N/A
-| `batchjobs_openlava`   | all         | Futures are evaluated via an [OpenLava] job scheduler                       | N/A
-| `batchjobs_interactive`| all         | synchronous evaluation in the calling R environment                       | `plan(transparent)`
-| `batchjobs_local`      | all         | synchronous evaluation in a separate R process (on current machine)       | `plan(cluster, workers="localhost")`
-| `batchjobs_multicore`  | not Windows | asynchronous background R sessions (on current machine)                   | `plan(multisession)` (sic!)
+| Backend                 | Description                                                              | Alternative in future package
+|:------------------------|:-------------------------------------------------------------------------|:------------------------------------
+| _generic:_              |                                                                          |
+| `batchjobs_custom`      | Uses custom BatchJobs configuration script files, e.g. `.BatchJobs.R`    | N/A
+| _predefined:_           |                                                                          |
+| `batchjobs_torque`      | Futures are evaluated via a [TORQUE] / PBS job scheduler                 | N/A
+| `batchjobs_slurm`       | Futures are evaluated via a [Slurm] job scheduler                        | N/A
+| `batchjobs_sge`         | Futures are evaluated via a [Sun/Oracle Grid Engine (SGE)] job scheduler | N/A
+| `batchjobs_lsf`         | Futures are evaluated via a [Load Sharing Facility (LSF)] job scheduler  | N/A
+| `batchjobs_openlava`    | Futures are evaluated via an [OpenLava] job scheduler                    | N/A
+| `batchjobs_interactive` | synchronous evaluation in the calling R environment                      | `plan(transparent)`
+| `batchjobs_local`       | synchronous evaluation in a separate R process (on current machine)      | `plan(cluster, workers="localhost")`
+
+In addition the the above, there is also `batchjobs_multicore` (which on Windows and Solaris falls back to `batchjobs_local`), which runs BatchJobs tasks asynchronously in background R sessions (sic!) on the current machine.  We \emph{advice not to use} this and instead use `multisession` of the [future] package.  For details, see `help("batchjobs_multicore")`.
 
 
 ### Examples
@@ -176,7 +177,7 @@ The [future] package provides a demo using futures for calculating a
 set of Mandelbrot planes.  The demo does not assume anything about
 what type of futures are used.
 _The user has full control of how futures are evaluated_.
-For instance, to use `local` BatchJobs futures, run the demo as:
+For instance, to use local BatchJobs futures, run the demo as:
 ```r
 library("future.BatchJobs")
 plan(batchjobs_local)
@@ -197,18 +198,25 @@ demo("mandelbrot", package="future", ask=FALSE)
 
 
 ## Installation
-R package future.BatchJobs is only available via [GitHub](https://github.com/HenrikBengtsson/future.BatchJobs) and can be installed in R as:
+R package future.BatchJobs is available on [CRAN](http://cran.r-project.org/package=future.BatchJobs) and can be installed in R as:
 ```r
-source('http://callr.org/install#HenrikBengtsson/future.BatchJobs')
+install.packages('future.BatchJobs')
 ```
 
+### Pre-release version
+
+To install the pre-release version that is available in branch `develop`, use:
+```r
+source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@develop')
+```
+This will install the package from source.  
 
 
 
 ## Software status
 
-| Resource:     | GitHub        | Travis CI      | Appveyor         |
+| Resource:     | CRAN        | Travis CI      | Appveyor         |
 | ------------- | ------------------- | -------------- | ---------------- |
 | _Platforms:_  | _Multiple_          | _Linux & OS X_ | _Windows_        |
-| R CMD check   |  | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>  | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
+| R CMD check   | <a href="http://cran.r-project.org/web/checks/check_results_future.BatchJobs.html"><img border="0" src="http://www.r-pkg.org/badges/version/future.BatchJobs" alt="CRAN version"></a> | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>  | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
 | Test coverage |                     | <a href="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs"><img src="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs/branch/develop/graph/badge.svg" alt="Coverage Status"/></a>    |                  |
