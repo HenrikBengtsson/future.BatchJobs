@@ -7,6 +7,7 @@
 #' \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
+#' @param args Additional arguments passed to the BatchJobs brew template.
 #' @param workers (optional) Additional specification for
 #' the BatchJobs backend.
 #' @param finalize If TRUE, any underlying registries are
@@ -19,7 +20,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, args=NULL, workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.null(conf)) {
@@ -67,11 +68,22 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   reg <- tempRegistry()
   if (debug) mprint(reg)
 
-  future$config <- list(reg=reg, id=NA_integer_,
-                      cluster.functions=cluster.functions,
-                      resources=resources,
-                      backend=backend)
+  ## BatchJobs configuration
+  config <- list(reg=reg, id=NA_integer_,
+                 cluster.functions=cluster.functions,
+                 resources=resources,
+                 backend=backend)
 
+  ## Additional arguments to be available for the BatchJobs template?
+  if (length(args) > 0) {
+    names <- names(args)
+    for (name in names) {
+      config[[name]] <- args[[name]]
+    }
+  }
+  
+  future$config <- config
+ 
   future <- structure(future, class=c("BatchJobsFuture", class(future)))
 
   ## Register finalizer?

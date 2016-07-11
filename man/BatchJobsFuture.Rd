@@ -5,7 +5,7 @@
 \title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  conf = NULL, cluster.functions = NULL, workers = NULL,
+  conf = NULL, cluster.functions = NULL, args = NULL, workers = NULL,
   finalize = getOption("future.finalize", TRUE), ...)
 }
 \arguments{
@@ -20,6 +20,8 @@ should be located.}
 \item{conf}{A BatchJobs configuration environment.}
 
 \item{cluster.functions}{A BatchJobs \link[BatchJobs]{ClusterFunctions} object.}
+
+\item{args}{Additional arguments passed to the BatchJobs brew template.}
 
 \item{workers}{(optional) Additional specification for
 the BatchJobs backend.}
