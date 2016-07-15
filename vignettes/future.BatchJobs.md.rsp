@@ -137,7 +137,7 @@ In addition the the above, there is also `batchjobs_multicore` (which on Windows
 Below are two examples illustrating how to use `batchjobs_custom` and `batchjobs_torque` to configure the BatchJobs backend.  For further details and examples on how to configure BatchJobs, see the [BatchJobs configuration] wiki page.
 
 ### Example: A .BatchJobs.R file using local BatchJobs
-The most general way of configuring BatchJobs via a `.BatchJobs.R` file.
+The most general way of configuring BatchJobs is via a `.BatchJobs.R` file.
 This file should be located in the current directory or in the user's
 home directory.  For example, as an alternative to `batchjobs_local`,
 we can manually configure local BatchJobs futures a `.BatchJobs.R` file
