@@ -7,7 +7,7 @@
 #' \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
-#' @param args Named list of additional arguments passed to the BatchJobs brew template, which will be available to the template as variables with the same name.  BatchJobs supports only \code{resources}, so any attempts to pass other variables will result in an immediate error.
+#' @param resources A named list passed to the BatchJobs template (available as variable `resources`).
 #' @param workers (optional) Additional specification for
 #' the BatchJobs backend.
 #' @param finalize If TRUE, any underlying registries are
@@ -20,7 +20,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, args=NULL, workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.null(conf)) {
@@ -43,7 +43,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
     }
   }
 
-  stopifnot(is.null(args) || is.list(args))
+  stopifnot(is.list(resources))
   
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
@@ -58,9 +58,6 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   ## LEGACY: /HB 2016-05-20
   backend <- future$backend
   future$backend <- NULL
-  resources <- future$resources
-  future$resources <- NULL
-  stopifnot(length(resources) == 0 || is.list(resources) && !is.null(names(resources)))
 
   future$globals <- gp$globals
   future$packages <- gp$packages
@@ -76,15 +73,23 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
                  resources=resources,
                  backend=backend)
 
+
   ## Additional arguments to be available for the BatchJobs template?
-  if (length(args) > 0) {
-    names <- names(args)
-    unknown <- setdiff(names, "resources")
-    if (length(unknown) > 0) {
-      stop("Detected non-supported field name in argument 'args'. The BatchJobs backend only supports 'resources': ", paste(sQuote(unknown), collapse=", "))
-    }
-    for (name in names) {
-      config[[name]] <- args[[name]]
+  ## NOTE: Support for 'args' will be removed soon. /HB 2016-07-15
+  if (is.element("args", names(future))) {
+    args <- future$args
+    future$args <- NULL ## Cleanup
+    
+    stopifnot(is.list(args))
+    if (length(args) > 0) {
+      names <- names(args)
+      unknown <- setdiff(names, "resources")
+      if (length(unknown) > 0) {
+        stop("Detected non-supported field name in argument 'args'. The BatchJobs backend only supports 'resources': ", paste(sQuote(unknown), collapse=", "))
+      }
+      for (name in names) {
+        config[[name]] <- args[[name]]
+      }
     }
   }
   

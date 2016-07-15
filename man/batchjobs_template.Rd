@@ -10,19 +10,19 @@
 \title{BatchJobs LSF, OpenLava, SGE, Slurm and Torque futures}
 \usage{
 batchjobs_lsf(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, args = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 
 batchjobs_openlava(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, args = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 
 batchjobs_sge(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, args = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 
 batchjobs_slurm(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, args = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 
 batchjobs_torque(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, args = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -35,7 +35,7 @@ are search from.}
 
 \item{pathname}{A BatchJobs template file (\pkg{brew} formatted).}
 
-\item{args}{Named list of additional arguments passed to the BatchJobs brew template, which will be available to the template as variables with the same name.  BatchJobs supports only \code{resources}, so any attempts to pass other variables will result in an immediate error.}
+\item{resources}{A named list passed to the BatchJobs template (available as variable `resources`).}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }
