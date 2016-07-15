@@ -10,7 +10,7 @@
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
 #' @param pathname A BatchJobs template file (\pkg{brew} formatted).
-#' @param args Additional arguments passed to the BatchJobs brew template.
+#' @param args Named list of additional arguments passed to the BatchJobs brew template, which will be available to the template as variables with the same name.  BatchJobs supports only \code{resources}, so any attempts to pass other variables will result in an immediate error.
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.

@@ -7,7 +7,7 @@
 #' \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
-#' @param args Additional arguments passed to the BatchJobs brew template.
+#' @param args Named list of additional arguments passed to the BatchJobs brew template, which will be available to the template as variables with the same name.  BatchJobs supports only \code{resources}, so any attempts to pass other variables will result in an immediate error.
 #' @param workers (optional) Additional specification for
 #' the BatchJobs backend.
 #' @param finalize If TRUE, any underlying registries are
@@ -43,6 +43,8 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
     }
   }
 
+  stopifnot(is.null(args) || is.list(args))
+  
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
@@ -77,6 +79,10 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   ## Additional arguments to be available for the BatchJobs template?
   if (length(args) > 0) {
     names <- names(args)
+    unknown <- setdiff(names, "resources")
+    if (length(unknown) > 0) {
+      stop("Detected non-supported field name in argument 'args'. The BatchJobs backend only supports 'resources': ", paste(sQuote(unknown), collapse=", "))
+    }
     for (name in names) {
       config[[name]] <- args[[name]]
     }

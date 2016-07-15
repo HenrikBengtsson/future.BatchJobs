@@ -21,7 +21,7 @@ should be located.}
 
 \item{cluster.functions}{A BatchJobs \link[BatchJobs]{ClusterFunctions} object.}
 
-\item{args}{Additional arguments passed to the BatchJobs brew template.}
+\item{args}{Named list of additional arguments passed to the BatchJobs brew template, which will be available to the template as variables with the same name.  BatchJobs supports only \code{resources}, so any attempts to pass other variables will result in an immediate error.}
 
 \item{workers}{(optional) Additional specification for
 the BatchJobs backend.}

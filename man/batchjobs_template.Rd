@@ -35,7 +35,7 @@ are search from.}
 
 \item{pathname}{A BatchJobs template file (\pkg{brew} formatted).}
 
-\item{args}{Additional arguments passed to the BatchJobs brew template.}
+\item{args}{Named list of additional arguments passed to the BatchJobs brew template, which will be available to the template as variables with the same name.  BatchJobs supports only \code{resources}, so any attempts to pass other variables will result in an immediate error.}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }
