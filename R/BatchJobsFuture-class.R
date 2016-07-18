@@ -263,10 +263,9 @@ value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "e
     return(NextMethod("value"))
   }
 
-## FIXME: Should run() be called before or after status()?!?
-#  if (future$state == 'created') {
-#    future <- run(future)
-#  }
+  if (future$state == 'created') {
+    future <- run(future)
+  }
 
   stat <- status(future)
   if (isNA(stat)) {
