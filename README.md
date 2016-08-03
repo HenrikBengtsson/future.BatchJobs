@@ -162,19 +162,19 @@ automatically located and loaded when doing:
 ```r
 > plan(batchjobs_torque)
 ```
-Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 4 cores (one a single machine) and up to  5 GiB of RAM, use:
+Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 12 cores (one a single machine) and up to  5 GiB of RAM, use:
 ```r
-> plan(batchjobs_torque, resources=list(nodes="1:ppn=4", vmem="5gb"))
+> plan(batchjobs_torque, resources=list(nodes="1:ppn=12", vmem="5gb"))
 ```
 
 To specify the `resources` argument at the same time as using nested future strategies, one can use `tweak()` to tweak the default arguments.  For instance,
 ```r
 plan(list(
-  tweak(batchjobs_torque, resources=list(nodes="1:ppn=4", vmem="5gb")),
+  tweak(batchjobs_torque, resources=list(nodes="1:ppn=12", vmem="5gb")),
   multiprocess
   ))
 ```
-will cause the first level of futures to be submitted via the TORQUE job scheduler requesting 4 cores and 5 GiB of RAM per job.  The second level of futures will be evaluated using multiprocessing using the 4 cores given to each job by the scheduler.
+will cause the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of RAM per job.  The second level of futures will be evaluated using multiprocessing using the 12 cores given to each job by the scheduler.
 
 A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be named `.BatchJobs.slurm.tmpl` in order for
 ```r
