@@ -68,7 +68,7 @@ library("listenv")
 ## cluster using BatchJobs.  The second level of futures
 ## should be using multiprocessing, where the number of
 ## parallel processes is automatically decided based on
-## what the cluster allots to each compute node.
+## what the cluster grants to each compute node.
 plan(list(batchjobs_custom, multiprocess))
 
 ## Find all samples (one FASTQ file per sample)
@@ -129,7 +129,7 @@ BatchJobs backends.
 | `batchjobs_interactive` | synchronous evaluation in the calling R environment                      | `plan(transparent)`
 | `batchjobs_local`       | synchronous evaluation in a separate R process (on current machine)      | `plan(cluster, workers="localhost")`
 
-In addition the the above, there is also `batchjobs_multicore` (which on Windows and Solaris falls back to `batchjobs_local`), which runs BatchJobs tasks asynchronously in background R sessions (sic!) on the current machine.  We _advice not to use_ this and instead use `multisession` of the [future] package.  For details, see `help("batchjobs_multicore")`.
+In addition to the above, there is also `batchjobs_multicore` (which on Windows and Solaris falls back to `batchjobs_local`), which runs BatchJobs tasks asynchronously in background R sessions (sic!) on the current machine.  We _advise to not use_ this and instead use `multisession` of the [future] package.  For details, see `help("batchjobs_multicore")`.
 
 
 ### Examples

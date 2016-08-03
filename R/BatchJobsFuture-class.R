@@ -90,6 +90,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
       for (name in names) {
         config[[name]] <- args[[name]]
       }
+      .Deprecated(msg="Argument 'args' is deprecated in future.BatchJobs (>= 0.13.0). Please use argument 'resources' instead.")
     }
   }
   
