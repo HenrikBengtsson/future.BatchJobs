@@ -170,7 +170,7 @@ This is what a template file for TORQUE / PBS may look like:
 #PBS -j oe
 
 ## Resource parameters:
-<%% for (name in names(resources)) {
+<%% for (name in names(resources)) { %%>
 #PBS -l <%%= name %%>=<%%= resources[[name]] %%>
 <%% } %%>
 
