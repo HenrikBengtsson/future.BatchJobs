@@ -101,7 +101,7 @@ stopifnot(n == 1)
 backend(".BatchJobs.R")
 n <- nbrOfWorkers(batchjobs)
 message("Number of workers: ", n)
-stopifnot(n == 1)
+stopifnot(is.infinite(n) || n == 1)
 
 n <- nbrOfWorkers(tweak(batchjobs, backend="local"))
 message("Number of workers: ", n)
