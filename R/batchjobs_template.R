@@ -91,13 +91,19 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, p
 
   ## Search for a default template file?
   if (is.null(pathname)) {
+    pathnames <- NULL
+    
     paths <- c(".", "~")
+    filename <- sprintf(".BatchJobs.%s.tmpl", type)
+    pathnames <- c(pathnames, file.path(paths, filename))
+
+    ## BACKWARD COMPATIBILITY with future.BatchJobs (<= 0.12.1)
     filename <- sprintf(".BatchJobs.%s.brew", type)
-    pathnames <- file.path(paths, filename)
+    pathnames <- c(pathnames, file.path(paths, filename))
 
     ## Because R CMD check complains about periods in package files
     path <- system.file("conf", package="future.BatchJobs")
-    filename <- sprintf("BatchJobs.%s.brew", type)
+    filename <- sprintf("BatchJobs.%s.tmpl", type)
     pathname <- file.path(path, filename)
     
     pathnames <- c(pathnames, pathname)

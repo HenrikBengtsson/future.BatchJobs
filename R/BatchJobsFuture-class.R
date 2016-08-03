@@ -268,6 +268,10 @@ value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "e
     return(NextMethod("value"))
   }
 
+  if (future$state == 'created') {
+    future <- run(future)
+  }
+
   stat <- status(future)
   if (isNA(stat)) {
     onMissing <- match.arg(onMissing)
@@ -294,6 +298,10 @@ run <- function(...) UseMethod("run")
 #' @importFrom future getExpression
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
 run.BatchJobsFuture <- function(future, ...) {
+  if (future$state != 'created') {
+    stop("A future can only be launched once.")
+  }
+  
   mdebug <- importFuture("mdebug")
   assignConf <- importBatchJobs("assignConf")
 
