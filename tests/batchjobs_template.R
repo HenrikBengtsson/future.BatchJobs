@@ -33,24 +33,24 @@ stopifnot(inherits(res, "try-error"))
 ## NOTE: Some of them will give an earlier error because
 ## no default template file was found.
 
+resources <- list(walltime=3600)
 args <- list(
-  resources=list(walltime=3600),
   non_supported="Gives error because BatchJobs only supports 'resources'"
 )
   
-res <- try(batchjobs_lsf({ 42L }, args=args))
+res <- try(batchjobs_lsf({ 42L }, resources=resources, args=args))
 stopifnot(inherits(res, "try-error"))
 
-res <- try(batchjobs_openlava({ 42L }, args=args))
+res <- try(batchjobs_openlava({ 42L }, resources=resources, args=args))
 stopifnot(inherits(res, "try-error"))
 
-res <- try(batchjobs_sge({ 42L }, args=args))
+res <- try(batchjobs_sge({ 42L }, resources=resources, args=args))
 stopifnot(inherits(res, "try-error"))
 
-res <- try(batchjobs_slurm({ 42L }, args=args))
+res <- try(batchjobs_slurm({ 42L }, resources=resources, args=args))
 stopifnot(inherits(res, "try-error"))
 
-res <- try(batchjobs_torque({ 42L }, args=args))
+res <- try(batchjobs_torque({ 42L }, resources=resources, args=args))
 stopifnot(inherits(res, "try-error"))
 
 message("*** batchjobs_template() ... DONE")
