@@ -163,9 +163,10 @@ To configure BatchJobs for job schedulers we need to setup a template
 file that is used to generate the script used by the scheduler.
 This is what a template file for TORQUE / PBS may look like:
 ```sh
+## Job name:
 #PBS -N <%%= job.name %%>
 
-## merge standard error and output
+## Merge standard error and output:
 #PBS -j oe
 
 ## Run R:
