@@ -75,7 +75,7 @@ nbrOfWorkers.batchjobs <- function(evaluator) {
   })
 
   if (is.numeric(workers)) {
-    stopifnot(length(workers) == 1, is.finite(workers), workers >= 1)
+    stopifnot(length(workers) == 1, !is.na(workers), workers >= 1)
     return(workers)
   }
 
@@ -115,7 +115,7 @@ nbrOfWorkers.batchjobs_interactive <- function(evaluator) 1L
 nbrOfWorkers.batchjobs_multicore <- function(evaluator) {
   expr <- formals(evaluator)$workers
   workers <- eval(expr)
-  stopifnot(length(workers) == 1, is.finite(workers), workers >= 1)
+  stopifnot(length(workers) == 1, !is.na(workers), workers >= 1, is.finite(workers))
   workers
 }
 

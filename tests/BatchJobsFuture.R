@@ -45,6 +45,7 @@ f <- BatchJobsFuture({ x <- 1 })
 print(f)
 
 ## Hack to emulate where BatchJobs registry is deleted or fails
+f$state <- "running"
 path <- f$config$reg$file.dir
 unlink(path, recursive=TRUE)
 

@@ -5,8 +5,8 @@
 \title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  conf = NULL, cluster.functions = NULL, workers = NULL,
-  finalize = getOption("future.finalize", TRUE), ...)
+  conf = NULL, cluster.functions = NULL, resources = list(),
+  workers = NULL, finalize = getOption("future.finalize", TRUE), ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
@@ -20,6 +20,8 @@ should be located.}
 \item{conf}{A BatchJobs configuration environment.}
 
 \item{cluster.functions}{A BatchJobs \link[BatchJobs]{ClusterFunctions} object.}
+
+\item{resources}{A named list passed to the BatchJobs template (available as variable `resources`).}
 
 \item{workers}{(optional) Additional specification for
 the BatchJobs backend.}

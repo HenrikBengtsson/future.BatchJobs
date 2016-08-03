@@ -10,19 +10,19 @@
 \title{BatchJobs LSF, OpenLava, SGE, Slurm and Torque futures}
 \usage{
 batchjobs_lsf(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 
 batchjobs_openlava(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 
 batchjobs_sge(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 
 batchjobs_slurm(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 
 batchjobs_torque(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, ...)
+  pathname = NULL, resources = list(), ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -34,6 +34,8 @@ are search from.}
 \code{substitute()}:d or not.}
 
 \item{pathname}{A BatchJobs template file (\pkg{brew} formatted).}
+
+\item{resources}{A named list passed to the BatchJobs template (available as variable `resources`).}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }

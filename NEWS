@@ -1,6 +1,13 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.13.0 [2016-08-02]
+o Added argument 'resources' to batchjobs_*() functions for passing
+  it to the BatchJobs template (as variable 'resources').
+o ROBUSTNESS: value() now launches the future iff not already done.
+  Added protection from launching a future more than once.
+
+
 Version: 0.12.1 [2016-06-26]
 o Advicing against _multicore BatchJobs_ futures, because there
   is a risk for long waiting times due to starvation.

@@ -7,6 +7,7 @@
 #' \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
+#' @param resources A named list passed to the BatchJobs template (available as variable `resources`).
 #' @param workers (optional) Additional specification for
 #' the BatchJobs backend.
 #' @param finalize If TRUE, any underlying registries are
@@ -19,7 +20,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.null(conf)) {
@@ -42,6 +43,8 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
     }
   }
 
+  stopifnot(is.list(resources))
+  
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
@@ -55,9 +58,6 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   ## LEGACY: /HB 2016-05-20
   backend <- future$backend
   future$backend <- NULL
-  resources <- future$resources
-  future$resources <- NULL
-  stopifnot(length(resources) == 0 || is.list(resources) && !is.null(names(resources)))
 
   future$globals <- gp$globals
   future$packages <- gp$packages
@@ -67,11 +67,35 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   reg <- tempRegistry()
   if (debug) mprint(reg)
 
-  future$config <- list(reg=reg, id=NA_integer_,
-                      cluster.functions=cluster.functions,
-                      resources=resources,
-                      backend=backend)
+  ## BatchJobs configuration
+  config <- list(reg=reg, id=NA_integer_,
+                 cluster.functions=cluster.functions,
+                 resources=resources,
+                 backend=backend)
 
+
+  ## Additional arguments to be available for the BatchJobs template?
+  ## NOTE: Support for 'args' will be removed soon. /HB 2016-07-15
+  if (is.element("args", names(future))) {
+    args <- future$args
+    future$args <- NULL ## Cleanup
+    
+    stopifnot(is.list(args))
+    if (length(args) > 0) {
+      names <- names(args)
+      unknown <- setdiff(names, "resources")
+      if (length(unknown) > 0) {
+        stop("Detected non-supported field name in argument 'args'. The BatchJobs backend only supports 'resources': ", paste(sQuote(unknown), collapse=", "))
+      }
+      for (name in names) {
+        config[[name]] <- args[[name]]
+      }
+      .Deprecated(msg="Argument 'args' is deprecated in future.BatchJobs (>= 0.13.0). Please use argument 'resources' instead.")
+    }
+  }
+  
+  future$config <- config
+ 
   future <- structure(future, class=c("BatchJobsFuture", class(future)))
 
   ## Register finalizer?
@@ -245,6 +269,10 @@ value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "e
     return(NextMethod("value"))
   }
 
+  if (future$state == 'created') {
+    future <- run(future)
+  }
+
   stat <- status(future)
   if (isNA(stat)) {
     onMissing <- match.arg(onMissing)
@@ -271,6 +299,10 @@ run <- function(...) UseMethod("run")
 #' @importFrom future getExpression
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
 run.BatchJobsFuture <- function(future, ...) {
+  if (future$state != 'created') {
+    stop("A future can only be launched once.")
+  }
+  
   mdebug <- importFuture("mdebug")
   assignConf <- importBatchJobs("assignConf")
 
