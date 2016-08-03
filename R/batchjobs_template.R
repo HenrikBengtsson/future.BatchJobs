@@ -10,7 +10,7 @@
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
 #' @param pathname A BatchJobs template file (\pkg{brew} formatted).
-#' @param args Named list of additional arguments passed to the BatchJobs brew template, which will be available to the template as variables with the same name.  BatchJobs supports only \code{resources}, so any attempts to pass other variables will result in an immediate error.
+#' @param args Named list of additional arguments passed to the BatchJobs template, which will be available to the template as variables with the same name.  BatchJobs supports only \code{resources}, so any attempts to pass other variables will result in an immediate error.
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
@@ -91,13 +91,19 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, p
 
   ## Search for a default template file?
   if (is.null(pathname)) {
+    pathnames <- NULL
+    
     paths <- c(".", "~")
+    filename <- sprintf(".BatchJobs.%s.tmpl", type)
+    pathnames <- c(pathnames, file.path(paths, filename))
+
+    ## BACKWARD COMPATIBILITY with future.BatchJobs (<= 0.12.1)
     filename <- sprintf(".BatchJobs.%s.brew", type)
-    pathnames <- file.path(paths, filename)
+    pathnames <- c(pathnames, file.path(paths, filename))
 
     ## Because R CMD check complains about periods in package files
     path <- system.file("conf", package="future.BatchJobs")
-    filename <- sprintf("BatchJobs.%s.brew", type)
+    filename <- sprintf("BatchJobs.%s.tmpl", type)
     pathname <- file.path(path, filename)
     
     pathnames <- c(pathnames, pathname)

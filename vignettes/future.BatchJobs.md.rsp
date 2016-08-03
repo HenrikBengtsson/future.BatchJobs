@@ -158,7 +158,7 @@ This follow the naming convention set up by the BatchJobs package.
 
 
 
-### Example: A .BatchJobs.*.brew template file for TORQUE / PBS
+### Example: A .BatchJobs.*.tmpl template file for TORQUE / PBS
 To configure BatchJobs for job schedulers we need to setup a template
 file that is used to generate the script used by the scheduler.
 This is what a template file for TORQUE / PBS may look like:
@@ -171,7 +171,7 @@ This is what a template file for TORQUE / PBS may look like:
 ## Run R:
 R CMD BATCH --no-save --no-restore "<%%= rscript %%>" /dev/stdout
 ```
-If this template is saved to file `.BatchJobs.torque.brew` in the
+If this template is saved to file `.BatchJobs.torque.tmpl` in the
 working directory or the user's home directory, then it will be
 automatically located and loaded when doing:
 ```r
@@ -179,10 +179,10 @@ automatically located and loaded when doing:
 ```
 To specify this template file explicitly, one can use
 ```r
-> plan(batchjobs_torque, pathname="./.BatchJobs.torque.brew")
+> plan(batchjobs_torque, pathname="./.BatchJobs.torque.tmpl")
 ```
 
-A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be named `.BatchJobs.slurm.brew` in order for
+A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be named `.BatchJobs.slurm.tmpl` in order for
 ```r
 > plan(batchjobs_slurm)
 ```
