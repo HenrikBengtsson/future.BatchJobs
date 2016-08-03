@@ -188,7 +188,7 @@ Resource parameters can be specified via argument `resources` which should be a 
 > plan(batchjobs_torque, resources=list(nodes="1:ppn=4", vmem="5gb"))
 ```
 
-To specify the `resource` argument at the same time as using nested future strategies, one can use `tweak()` to tweak the default arguments.  For instance,
+To specify the `resources` argument at the same time as using nested future strategies, one can use `tweak()` to tweak the default arguments.  For instance,
 ```r
 plan(list(
   tweak(batchjobs_torque, resources=list(nodes="1:ppn=4", vmem="5gb")),
