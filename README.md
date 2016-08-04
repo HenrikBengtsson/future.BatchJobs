@@ -174,7 +174,7 @@ plan(list(
   multiprocess
 ))
 ```
-will cause the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of RAM per job.  The second level of futures will be evaluated using multiprocessing using the 12 cores given to each job by the scheduler.
+causes the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of RAM per job.  The second level of futures will be evaluated using multiprocessing using the 12 cores given to each job by the scheduler.
 
 A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be named `.BatchJobs.slurm.tmpl` in order for
 ```r
