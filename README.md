@@ -172,7 +172,7 @@ To specify the `resources` argument at the same time as using nested future stra
 plan(list(
   tweak(batchjobs_torque, resources=list(nodes="1:ppn=12", vmem="5gb")),
   multiprocess
-  ))
+))
 ```
 will cause the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of RAM per job.  The second level of futures will be evaluated using multiprocessing using the 12 cores given to each job by the scheduler.
 
