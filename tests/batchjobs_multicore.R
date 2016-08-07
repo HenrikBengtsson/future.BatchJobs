@@ -12,7 +12,7 @@ for (cores in 1:min(3L, availableCores("multicore"))) {
   options(mc.cores=cores-1L)
 
   if (!supportsMulticore()) {
-    message(sprintf("BatchJobs multicore futures are not supporting on '%s'. Falling back to use synchroneous BatchJobs local futures", .Platform$OS))
+    message(sprintf("BatchJobs multicore futures are not supporting on '%s'. Falling back to use synchroneous BatchJobs local futures", .Platform$OS.type))
   }
 
   for (globals in c(FALSE, TRUE)) {
