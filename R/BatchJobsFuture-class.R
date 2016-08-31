@@ -514,7 +514,33 @@ run.BatchJobsFuture <- function(future, ...) {
   resources <- future$config$resources
   if (is.null(resources)) resources <- list()
   resources$workers <- future$workers
-  submitJobs(reg, ids=id, resources=resources)
+
+  ## Arguments to pass to BatchJobs::submitJobs():
+  ## (a) Explicitly specify the default ones ...
+  ##      - max.retries = 10L
+  ##      - chunks.as.arrayjobs = FALSE
+  ##      - job.delay = FALSE
+  ##      - progressbar = TRUE
+  args <- formals(BatchJobs::submitJobs)
+  
+  ## (b) ... except 'wait', because it's a "missing(wait)" argument.
+  args$wait <- NULL
+  
+  ## (c) Specify the ones we want to use
+  args$reg <- reg
+  args$ids <- id
+  args$resources <- resources
+
+  ## (d) Make sure it's a list and not a pairlist, cf. do.call()
+  args <- as.list(args)
+  
+  if (getOption("future.debug", FALSE)) {
+    mdebug("Calling BatchJobs::submitJobs():")
+    mstr(args)
+  }
+  
+  do.call(submitJobs, args=args)
+  
   mdebug("Launched future #%d", id)
 
   invisible(future)
