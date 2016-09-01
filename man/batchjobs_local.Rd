@@ -5,7 +5,8 @@
 \alias{batchjobs_local}
 \title{BatchJobs local and interactive futures}
 \usage{
-batchjobs_local(expr, envir = parent.frame(), substitute = TRUE, ...)
+batchjobs_local(expr, envir = parent.frame(), substitute = TRUE,
+  job.delay = FALSE, ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -15,6 +16,8 @@ are search from.}
 
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
+
+\item{job.delay}{(optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }

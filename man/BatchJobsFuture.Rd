@@ -6,7 +6,8 @@
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
   conf = NULL, cluster.functions = NULL, resources = list(),
-  workers = NULL, finalize = getOption("future.finalize", TRUE), ...)
+  workers = NULL, job.delay = FALSE,
+  finalize = getOption("future.finalize", TRUE), ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
@@ -21,10 +22,12 @@ should be located.}
 
 \item{cluster.functions}{A BatchJobs \link[BatchJobs]{ClusterFunctions} object.}
 
-\item{resources}{A named list passed to the BatchJobs template (available as variable `resources`).}
+\item{resources}{A named list passed to the BatchJobs template (available as variable \code{resources}).}
 
 \item{workers}{(optional) Additional specification for
 the BatchJobs backend.}
+
+\item{job.delay}{(optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.}
 
 \item{finalize}{If TRUE, any underlying registries are
 deleted when this object is garbage collected, otherwise not.}

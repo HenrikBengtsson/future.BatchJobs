@@ -10,19 +10,19 @@
 \title{BatchJobs LSF, OpenLava, SGE, Slurm and Torque futures}
 \usage{
 batchjobs_lsf(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  pathname = NULL, resources = list(), job.delay = FALSE, ...)
 
 batchjobs_openlava(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  pathname = NULL, resources = list(), job.delay = FALSE, ...)
 
 batchjobs_sge(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  pathname = NULL, resources = list(), job.delay = FALSE, ...)
 
 batchjobs_slurm(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  pathname = NULL, resources = list(), job.delay = FALSE, ...)
 
 batchjobs_torque(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  pathname = NULL, resources = list(), job.delay = FALSE, ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -35,7 +35,9 @@ are search from.}
 
 \item{pathname}{A BatchJobs template file (\pkg{brew} formatted).}
 
-\item{resources}{A named list passed to the BatchJobs template (available as variable `resources`).}
+\item{resources}{A named list passed to the BatchJobs template (available as variable \code{resources}).}
+
+\item{job.delay}{(optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }

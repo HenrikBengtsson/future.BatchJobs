@@ -5,7 +5,8 @@
 \title{BatchJobs conf futures}
 \usage{
 batchjobs_custom(expr, envir = parent.frame(), substitute = TRUE,
-  conf = NULL, pathname = NULL, workers = NULL, resources = list(), ...)
+  conf = NULL, pathname = NULL, workers = NULL, resources = list(),
+  job.delay = FALSE, ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -25,7 +26,9 @@ configuration files to be loaded in order.  If NULL, then the
 \item{workers}{(optional) Additional specification for the backend
 workers.  If NULL, the default is used.}
 
-\item{resources}{A named list passed to the BatchJobs template (available as variable `resources`).}
+\item{resources}{A named list passed to the BatchJobs template (available as variable \code{resources}).}
+
+\item{job.delay}{(optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }

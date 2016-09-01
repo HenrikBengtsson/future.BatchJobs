@@ -7,9 +7,10 @@
 #' \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
-#' @param resources A named list passed to the BatchJobs template (available as variable `resources`).
+#' @param resources A named list passed to the BatchJobs template (available as variable \code{resources}).
 #' @param workers (optional) Additional specification for
 #' the BatchJobs backend.
+#' @param job.delay (optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
 #' @param \ldots Additional arguments passed to \code{\link[future]{Future}()}.
@@ -20,7 +21,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.null(conf)) {
@@ -44,7 +45,9 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   }
 
   stopifnot(is.list(resources))
-  
+
+  stopifnot(is.logical(job.delay) || is.function(job.delay))
+
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
@@ -71,6 +74,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   config <- list(reg=reg, id=NA_integer_,
                  cluster.functions=cluster.functions,
                  resources=resources,
+                 job.delay=job.delay,
                  backend=backend)
 
 
@@ -514,7 +518,10 @@ run.BatchJobsFuture <- function(future, ...) {
   resources <- future$config$resources
   if (is.null(resources)) resources <- list()
   resources$workers <- future$workers
-  submitJobs(reg, ids=id, resources=resources)
+  job.delay <- future$config$job.delay
+
+  submitJobs(reg, ids=id, resources=resources, job.delay=job.delay)
+  
   mdebug("Launched future #%d", id)
 
   invisible(future)
