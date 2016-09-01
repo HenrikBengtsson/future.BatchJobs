@@ -3,8 +3,7 @@ Package: future.BatchJobs
 
 Version: 0.13.0-9000 [2016-09-01]
 o Added argument 'job.delay' to batchjobs_*() functions for passing
-  it as it to BatchJobs' submitJobs() function used when launching
-  futures.
+  it as is to BatchJobs::submitJobs() used when launching futures.
 
 
 Version: 0.13.0 [2016-08-02]
