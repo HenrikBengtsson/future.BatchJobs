@@ -14,6 +14,7 @@
 #'                   \code{substitute()}:d or not.
 #' @param workers The number of multicore processes to be
 #' available for concurrent BatchJobs multicore futures.
+#' @param job.delay (optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.
 #' @param \ldots Additional arguments passed
 #' to \code{\link{BatchJobsFuture}()}.
 #'
@@ -23,9 +24,9 @@
 #' BatchJobs multicore futures rely on the BatchJobs backend set
 #' up by \code{\link[BatchJobs]{makeClusterFunctionsMulticore}()}.
 #' The BatchJobs multicore backend only works on operating systems
-#' supporting the `ps` command-line tool, e.g. Linux and OS X.
+#' supporting the \code{ps} command-line tool, e.g. Linux and OS X.
 #' However, they are not supported on neither Windows nor Solaris
-#' Unix (because `ps -o ucomm=` is not supported).  When not
+#' Unix (because \code{ps -o ucomm=} is not supported).  When not
 #' supported, it falls back to \code{\link{batchjobs_local}}.
 #'
 #' \emph{Warning: For multicore BatchJobs, the \pkg{BatchJobs}
@@ -55,7 +56,7 @@
 #' @importFrom future availableCores
 #' @export
 #' @keywords internal
-batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, workers=availableCores(constraints="multicore"), ...) {
+batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, workers=availableCores(constraints="multicore"), job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
   if (is.null(workers)) workers <- availableCores(constraints="multicore")
@@ -65,7 +66,7 @@ batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, wor
   ## Fall back to batchjobs_local if multicore processing is not supported
   if (workers == 1L || isOS("windows") || isOS("solaris") || availableCores(constraints="multicore") == 1L) {
     ## covr: skip=1
-    return(batchjobs_local(expr, envir=envir, substitute=FALSE, ...))
+    return(batchjobs_local(expr, envir=envir, substitute=FALSE, job.delay=job.delay, ...))
   }
 
   oopts <- options(mc.cores=workers)
@@ -99,7 +100,8 @@ batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, wor
   cf <- makeClusterFunctionsMulticore(ncpus=ncpus, max.jobs=ncpus, max.load=max.load)
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            cluster.functions=cf, ...)
+                            cluster.functions=cf,
+			    job.delay=job.delay, ...)
 
   future <- run(future)
 

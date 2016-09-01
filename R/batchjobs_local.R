@@ -12,6 +12,7 @@
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
+#' @param job.delay (optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
@@ -37,13 +38,14 @@
 #' @importFrom BatchJobs makeClusterFunctionsLocal
 #' @aliases batchjobs_interactive
 #' @export
-batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, ...) {
+batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
   cf <- makeClusterFunctionsLocal()
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            cluster.functions=cf, ...)
+                            cluster.functions=cf,
+			    job.delay=job.delay, ...)
 
   future <- run(future)
 

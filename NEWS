@@ -1,6 +1,12 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.13.0-9000 [2016-09-01]
+o Added argument 'job.delay' to batchjobs_*() functions for passing
+  it as it to BatchJobs' submitJobs() function used when launching
+  futures.
+
+
 Version: 0.13.0 [2016-08-02]
 o Added argument 'resources' to batchjobs_*() functions for passing
   it to the BatchJobs template (as variable 'resources').

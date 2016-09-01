@@ -7,9 +7,10 @@
 #' \code{substitute()}:d or not.
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
-#' @param resources A named list passed to the BatchJobs template (available as variable `resources`).
+#' @param resources A named list passed to the BatchJobs template (available as variable \code{resources}).
 #' @param workers (optional) Additional specification for
 #' the BatchJobs backend.
+#' @param job.delay (optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.
 #' @param finalize If TRUE, any underlying registries are
 #' deleted when this object is garbage collected, otherwise not.
 #' @param \ldots Additional arguments passed to \code{\link[future]{Future}()}.
@@ -20,7 +21,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.null(conf)) {
@@ -44,7 +45,9 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   }
 
   stopifnot(is.list(resources))
-  
+
+  stopifnot(is.logical(job.delay) || is.function(job.delay))
+
   debug <- getOption("future.debug", FALSE)
   if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
 
@@ -71,6 +74,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, co
   config <- list(reg=reg, id=NA_integer_,
                  cluster.functions=cluster.functions,
                  resources=resources,
+                 job.delay=job.delay,
                  backend=backend)
 
 
@@ -514,32 +518,9 @@ run.BatchJobsFuture <- function(future, ...) {
   resources <- future$config$resources
   if (is.null(resources)) resources <- list()
   resources$workers <- future$workers
+  job.delay <- future$config$job.delay
 
-  ## Arguments to pass to BatchJobs::submitJobs():
-  ## (a) Explicitly specify the default ones ...
-  ##      - max.retries = 10L
-  ##      - chunks.as.arrayjobs = FALSE
-  ##      - job.delay = FALSE
-  ##      - progressbar = TRUE
-  args <- formals(BatchJobs::submitJobs)
-  
-  ## (b) ... except 'wait', because it's a "missing(wait)" argument.
-  args$wait <- NULL
-  
-  ## (c) Specify the ones we want to use
-  args$reg <- reg
-  args$ids <- id
-  args$resources <- resources
-
-  ## (d) Make sure it's a list and not a pairlist, cf. do.call()
-  args <- as.list(args)
-  
-  if (getOption("future.debug", FALSE)) {
-    mdebug("Calling BatchJobs::submitJobs():")
-    mstr(args)
-  }
-  
-  do.call(submitJobs, args=args)
+  submitJobs(reg, ids=id, resources=resources, job.delay=job.delay)
   
   mdebug("Launched future #%d", id)
 
