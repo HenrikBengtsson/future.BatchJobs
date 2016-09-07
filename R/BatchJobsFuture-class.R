@@ -420,8 +420,8 @@ run.BatchJobsFuture <- function(future, ...) {
       names[idxs] <- globalsToDecode
       names(globals) <- names
 
-      ## (d) Record variables which to be rename by the future
-      globals <- append(globals, list(R_ASYNC_GLOBALS_TO_RENAME=globalsToDecode))
+      ## (d) Record variables which to be renamed by the future
+      globals <- c(globals, list(R_ASYNC_GLOBALS_TO_RENAME=globalsToDecode))
 
       ## (e) Tweak future expression to decode encoded globals
       expr <- substitute({
