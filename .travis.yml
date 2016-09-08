@@ -27,7 +27,7 @@ matrix:
       r_github_packages:
         - HenrikBengtsson/globals@develop
         - HenrikBengtsson/future@develop
-        - jimhester/covr
+        - jimhester/covr#221
       after_success:
         - Rscript -e 'covr::codecov(quiet=FALSE)'
       env:
