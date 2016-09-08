@@ -9,6 +9,7 @@
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
+#' @param globals (optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.
 #' @param pathname A BatchJobs template file (\pkg{brew} formatted).
 #' @param resources A named list passed to the BatchJobs template (available as variable \code{resources}).
 #' @param job.delay (optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.
@@ -30,46 +31,46 @@
 #' @export
 #' @rdname batchjobs_template
 #' @name batchjobs_template
-batchjobs_lsf <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
+batchjobs_lsf <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
-  batchjobs_by_template(expr, envir=envir, substitute=FALSE, pathname=pathname, type="lsf", resources=resources, job.delay=job.delay, ...)
+  batchjobs_by_template(expr, envir=envir, substitute=FALSE, globals=globals, pathname=pathname, type="lsf", resources=resources, job.delay=job.delay, ...)
 }
 class(batchjobs_lsf) <- c("batchjobs_lsf", "batchjobs", "multiprocess", "future", "function")
 
 #' @export
 #' @rdname batchjobs_template
-batchjobs_openlava <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
+batchjobs_openlava <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
-  batchjobs_by_template(expr, envir=envir, substitute=FALSE, pathname=pathname, type="openlava", resources=resources, job.delay=job.delay, ...)
+  batchjobs_by_template(expr, envir=envir, substitute=FALSE, globals=globals, pathname=pathname, type="openlava", resources=resources, job.delay=job.delay, ...)
 }
 class(batchjobs_openlava) <- c("batchjobs_openlava", "batchjobs", "multiprocess", "future", "function")
 
 #' @export
 #' @rdname batchjobs_template
-batchjobs_sge <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
+batchjobs_sge <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
-  batchjobs_by_template(expr, envir=envir, substitute=FALSE, pathname=pathname, type="sge", resources=resources, job.delay=job.delay, ...)
+  batchjobs_by_template(expr, envir=envir, substitute=FALSE, globals=globals, pathname=pathname, type="sge", resources=resources, job.delay=job.delay, ...)
 }
 class(batchjobs_sge) <- c("batchjobs_sge", "batchjobs", "multiprocess", "future", "function")
 
 #' @export
 #' @rdname batchjobs_template
-batchjobs_slurm <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
+batchjobs_slurm <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
-  batchjobs_by_template(expr, envir=envir, substitute=FALSE, pathname=pathname, type="slurm", resources=resources, job.delay=job.delay, ...)
+  batchjobs_by_template(expr, envir=envir, substitute=FALSE, globals=globals, pathname=pathname, type="slurm", resources=resources, job.delay=job.delay, ...)
 }
 class(batchjobs_slurm) <- c("batchjobs_slurm", "batchjobs", "multiprocess", "future", "function")
 
 #' @export
 #' @rdname batchjobs_template
-batchjobs_torque <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
+batchjobs_torque <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, pathname=NULL, resources=list(), job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
-  batchjobs_by_template(expr, envir=envir, substitute=FALSE, pathname=pathname, type="torque", resources=resources, job.delay=job.delay, ...)
+  batchjobs_by_template(expr, envir=envir, substitute=FALSE, globals=globals, pathname=pathname, type="torque", resources=resources, job.delay=job.delay, ...)
 }
 class(batchjobs_torque) <- c("batchjobs_torque", "batchjobs", "multiprocess", "future", "function")
 
@@ -78,7 +79,7 @@ class(batchjobs_torque) <- c("batchjobs_torque", "batchjobs", "multiprocess", "f
 #' @importFrom BatchJobs makeClusterFunctionsSGE
 #' @importFrom BatchJobs makeClusterFunctionsSLURM
 #' @importFrom BatchJobs makeClusterFunctionsTorque
-batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, pathname=NULL, type=c("lsf", "openlava", "sge", "slurm", "torque"), resources=list(), job.delay=FALSE, ...) {
+batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, pathname=NULL, type=c("lsf", "openlava", "sge", "slurm", "torque"), resources=list(), job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
   type <- match.arg(type)
 
@@ -118,6 +119,7 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, p
   cluster.functions <- makeCFs(pathname)
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
+                            globals=globals,
                             cluster.functions=cluster.functions,
 			    resources=resources,
 			    job.delay=job.delay, ...)

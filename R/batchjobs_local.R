@@ -12,6 +12,7 @@
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
+#' @param globals (optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.
 #' @param job.delay (optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
@@ -38,13 +39,14 @@
 #' @importFrom BatchJobs makeClusterFunctionsLocal
 #' @aliases batchjobs_interactive
 #' @export
-batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, job.delay=FALSE, ...) {
+batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
   cf <- makeClusterFunctionsLocal()
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
-                            cluster.functions=cf,
+                            globals=globals,
+			    cluster.functions=cf,
 			    job.delay=job.delay, ...)
 
   future <- run(future)

@@ -5,8 +5,8 @@
 \title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  conf = NULL, cluster.functions = NULL, resources = list(),
-  workers = NULL, job.delay = FALSE,
+  globals = TRUE, conf = NULL, cluster.functions = NULL,
+  resources = list(), workers = NULL, job.delay = FALSE,
   finalize = getOption("future.finalize", TRUE), ...)
 }
 \arguments{
@@ -17,6 +17,8 @@ should be located.}
 
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
+
+\item{globals}{(optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.}
 
 \item{conf}{A BatchJobs configuration environment.}
 

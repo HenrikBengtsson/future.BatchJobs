@@ -9,6 +9,7 @@
 #'              are search from.
 #' @param substitute Controls whether \code{expr} should be
 #'                   \code{substitute()}:d or not.
+#' @param globals (optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.
 #' @param conf A BatchJobs configuration environment.
 #' @param pathname (alternative) Pathname to one or more BatchJobs
 #' configuration files to be loaded in order.  If NULL, then the
@@ -34,7 +35,7 @@
 #' }
 #'
 #' @export
-batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NULL, pathname=NULL, workers=NULL, resources=list(), job.delay=FALSE, ...) {
+batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, conf=NULL, pathname=NULL, workers=NULL, resources=list(), job.delay=FALSE, ...) {
   findConfigs <- importBatchJobs("findConfigs")
   sourceConfFiles <- importBatchJobs("sourceConfFiles")
 
@@ -57,6 +58,7 @@ batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, conf=N
   }
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
+                            globals=globals,
                             conf=conf, workers=workers,
                             resources=resources,
 			    job.delay=job.delay, ...)

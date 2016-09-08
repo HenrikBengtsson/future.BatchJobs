@@ -5,8 +5,8 @@
 \title{BatchJobs multicore futures}
 \usage{
 batchjobs_multicore(expr, envir = parent.frame(), substitute = TRUE,
-  workers = availableCores(constraints = "multicore"), job.delay = FALSE,
-  ...)
+  globals = TRUE, workers = availableCores(constraints = "multicore"),
+  job.delay = FALSE, ...)
 }
 \arguments{
 \item{expr}{An R expression to be evaluated.}
@@ -16,6 +16,8 @@ are search from.}
 
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
+
+\item{globals}{(optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.}
 
 \item{workers}{The number of multicore processes to be
 available for concurrent BatchJobs multicore futures.}

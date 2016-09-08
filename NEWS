@@ -1,7 +1,8 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.13.0-9000 [2016-09-01]
+Version: 0.13.0-9000 [2016-09-07]
+o GLOBALS: Now supporting explicitly specifying globals.
 o Added argument 'job.delay' to batchjobs_*() functions for passing
   it as is to BatchJobs::submitJobs() used when launching futures.
 
