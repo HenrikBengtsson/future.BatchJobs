@@ -6,6 +6,7 @@
 #' @param substitute Controls whether \code{expr} should be
 #' \code{substitute()}:d or not.
 #' @param globals (optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.
+#' @param label (optional) Label of the future (where applicable, becomes the job name for most job schedulers)
 #' @param conf A BatchJobs configuration environment.
 #' @param cluster.functions A BatchJobs \link[BatchJobs]{ClusterFunctions} object.
 #' @param resources A named list passed to the BatchJobs template (available as variable \code{resources}).
@@ -22,9 +23,11 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, globals=TRUE, conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
+  label <- as.character(label)
+  
   if (!is.null(conf)) {
     stopifnot(is.environment(conf))
   }
@@ -57,7 +60,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   gp <- getGlobalsAndPackages(expr, envir=envir, globals=globals)
 
   ## Create BatchJobsFuture object
-  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, workers=workers, ...)
+  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, workers=workers, label=label, ...)
 
   ## LEGACY: /HB 2016-05-20
   backend <- future$backend
@@ -68,11 +71,11 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   future$conf <- conf
 
   ## Create BatchJobs registry
-  reg <- tempRegistry()
+  reg <- tempRegistry(label=future$label)
   if (debug) mprint(reg)
 
   ## BatchJobs configuration
-  config <- list(reg=reg, id=NA_integer_,
+  config <- list(reg=reg, jobid=NA_integer_,
                  cluster.functions=cluster.functions,
                  resources=resources,
                  job.delay=job.delay,
@@ -182,9 +185,9 @@ status.BatchJobsFuture <- function(future, ...) {
   ## Closed and deleted?
   if (!file_test("-d", reg$file.dir)) return(NA_character_)
 
-  id <- config$id
-  if (is.na(id)) return("not submitted")
-  status <- getStatus(reg, ids=id)
+  jobid <- config$jobid
+  if (is.na(jobid)) return("not submitted")
+  status <- getStatus(reg, ids=jobid)
   status <- (unlist(status) == 1L)
   status <- status[status]
   status <- sort(names(status))
@@ -217,8 +220,8 @@ loggedError.BatchJobsFuture <- function(future, ...) {
 
   config <- future$config
   reg <- config$reg
-  id <- config$id
-  msg <- getErrorMessages(reg, ids=id)
+  jobid <- config$jobid
+  msg <- getErrorMessages(reg, ids=jobid)
   msg <- paste(sQuote(msg), collapse=", ")
   msg
 } # loggedError()
@@ -240,8 +243,8 @@ loggedOutput.BatchJobsFuture <- function(future, ...) {
 
   config <- future$config
   reg <- config$reg
-  id <- config$id
-  pathname <- getLogFiles(reg, ids=id)
+  jobid <- config$jobid
+  pathname <- getLogFiles(reg, ids=jobid)
   bfr <- readLines(pathname)
   bfr
 } # loggedOutput()
@@ -448,11 +451,11 @@ run.BatchJobsFuture <- function(future, ...) {
   globals <- NULL
 
   ## 1. Add to BatchJobs for evaluation
-  id <- batchMap(reg, fun=geval, list(expr), more.args=list(substitute=TRUE))
+  jobid <- batchMap(reg, fun=geval, list(expr), more.args=list(substitute=TRUE))
 
   ## 2. Update
-  future$config$id <- id
-  mdebug("Created %s future #%d", class(future)[1], id)
+  future$config$jobid <- jobid
+  mdebug("Created %s future #%d", class(future)[1], jobid)
 
 
   ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
@@ -521,9 +524,9 @@ run.BatchJobsFuture <- function(future, ...) {
   resources$workers <- future$workers
   job.delay <- future$config$job.delay
 
-  submitJobs(reg, ids=id, resources=resources, job.delay=job.delay)
+  submitJobs(reg, ids=jobid, resources=resources, job.delay=job.delay)
   
-  mdebug("Launched future #%d", id)
+  mdebug("Launched future #%d", jobid)
 
   invisible(future)
 } ## run()
@@ -565,7 +568,7 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.
   expr <- future$expr
   config <- future$config
   reg <- config$reg
-  id <- config$id
+  jobid <- config$jobid
 
   ## It appears that occassionally a job can shown as 'expired'
   ## just before becoming 'done'.  It's odd and should be reported
@@ -621,23 +624,26 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.
   if (finished) {
     mdebug("Results:")
     if ("done" %in% stat) {
-      res <- loadResult(reg, id=id)
+      res <- loadResult(reg, id=jobid)
     } else if ("error" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobError: %s", loggedError(future))
       stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
-      msg <- sprintf("BatchJobExpiration: Job of registry '%s' expired: %s", reg$id, reg$file.dir)
+      label <- reg$id
+      msg <- sprintf("BatchJobExpiration: Future ('%s') expired: %s", label, reg$file.dir)
       stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if (isNA(stat)) {
-      msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Job of registry '%s' deleted: %s", reg$id, reg$file.dir)
+      label <- reg$id
+      msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Future ('%s') deleted: %s", label, reg$file.dir)
       stop(BatchJobsFutureError(msg, future=future))
     }
     if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
-    msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchronous evaluation is still running: BatchJobs registry '%s' (%s)", tries-1L, interval, reg$id, reg$file.dir)
+    label <- reg$id
+    msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchronous evaluation for future ('%s') is still running: %s", tries-1L, interval, label, reg$file.dir)
     stop(BatchJobsFutureError(msg, future=future))
   }
 
