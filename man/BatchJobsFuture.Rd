@@ -20,7 +20,7 @@ should be located.}
 
 \item{globals}{(optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.}
 
-\item{label}{(optional) Label of the future (where applicable, becomes the job name for most job schedulers)}
+\item{label}{(optional) Label of the future (where applicable, becomes the job name for most job schedulers).}
 
 \item{conf}{A BatchJobs configuration environment.}
 
