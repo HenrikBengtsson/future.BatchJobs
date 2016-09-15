@@ -7,13 +7,7 @@
 #' be assigned to the calling environment rather than to a local one).
 #' Both types of futures will block until the futures are resolved.
 #'
-#' @param expr An R expression to be evaluated.
-#' @param envir The environment from which global environment
-#'              are search from.
-#' @param substitute Controls whether \code{expr} should be
-#'                   \code{substitute()}:d or not.
-#' @param globals (optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.
-#' @param job.delay (optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.
+#' @inheritParams BatchJobsFuture
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
@@ -39,13 +33,14 @@
 #' @importFrom BatchJobs makeClusterFunctionsLocal
 #' @aliases batchjobs_interactive
 #' @export
-batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, job.delay=FALSE, ...) {
+batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
   cf <- makeClusterFunctionsLocal()
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
                             globals=globals,
+			    label=label,
 			    cluster.functions=cf,
 			    job.delay=job.delay, ...)
 

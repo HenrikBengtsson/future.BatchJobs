@@ -4,12 +4,7 @@
 #' files (R source scripts) to define the BatchJobs configuration
 #' environment, e.g. \file{.BatchJobs.R}.
 #'
-#' @param expr An R expression to be evaluated.
-#' @param envir The environment from which global environment
-#'              are search from.
-#' @param substitute Controls whether \code{expr} should be
-#'                   \code{substitute()}:d or not.
-#' @param globals (optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.
+#' @inheritParams BatchJobsFuture
 #' @param conf A BatchJobs configuration environment.
 #' @param pathname (alternative) Pathname to one or more BatchJobs
 #' configuration files to be loaded in order.  If NULL, then the
@@ -17,7 +12,6 @@
 #' @param workers (optional) Additional specification for the backend
 #' workers.  If NULL, the default is used.
 #' @param resources A named list passed to the BatchJobs template (available as variable \code{resources}).
-#' @param job.delay (optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
@@ -35,7 +29,7 @@
 #' }
 #'
 #' @export
-batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, conf=NULL, pathname=NULL, workers=NULL, resources=list(), job.delay=FALSE, ...) {
+batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", conf=NULL, pathname=NULL, workers=NULL, resources=list(), job.delay=FALSE, ...) {
   findConfigs <- importBatchJobs("findConfigs")
   sourceConfFiles <- importBatchJobs("sourceConfFiles")
 
@@ -59,6 +53,7 @@ batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, global
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
                             globals=globals,
+			    label=label,
                             conf=conf, workers=workers,
                             resources=resources,
 			    job.delay=job.delay, ...)
