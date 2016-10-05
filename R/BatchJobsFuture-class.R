@@ -123,6 +123,10 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
 print.BatchJobsFuture <- function(x, ...) {
   printf("%s:\n", class(x)[1L])
 
+  label <- x$label
+  if (is.null(label)) label <- "<none>"
+  printf("Label: %s\n", sQuote(label))
+  
   printf("Expression:\n")
   code <- captureOutput(print(x$expr))
   code <- paste(sprintf("  %s", code), collapse="\n")
