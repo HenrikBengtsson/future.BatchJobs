@@ -162,7 +162,7 @@ automatically located and loaded when doing:
 ```r
 > plan(batchjobs_torque)
 ```
-Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 12 cores (one a single machine) and up to  5 GiB of RAM, use:
+Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 12 cores (one a single machine) and up to  5 GiB of memory, use:
 ```r
 > plan(batchjobs_torque, resources=list(nodes="1:ppn=12", vmem="5gb"))
 ```
@@ -174,7 +174,7 @@ plan(list(
   multiprocess
 ))
 ```
-causes the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of RAM per job.  The second level of futures will be evaluated using multiprocessing using the 12 cores given to each job by the scheduler.
+causes the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of memory per job.  The second level of futures will be evaluated using multiprocessing using the 12 cores given to each job by the scheduler.
 
 A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be named `.BatchJobs.slurm.tmpl` in order for
 ```r
@@ -233,8 +233,8 @@ This will install the package from source.
 
 ## Software status
 
-| Resource:     | CRAN        | Travis CI      | Appveyor         |
-| ------------- | ------------------- | -------------- | ---------------- |
-| _Platforms:_  | _Multiple_          | _Linux & OS X_ | _Windows_        |
-| R CMD check   | <a href="http://cran.r-project.org/web/checks/check_results_future.BatchJobs.html"><img border="0" src="http://www.r-pkg.org/badges/version/future.BatchJobs" alt="CRAN version"></a> | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>  | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
-| Test coverage |                     | <a href="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs"><img src="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs/branch/develop/graph/badge.svg" alt="Coverage Status"/></a>    |                  |
+| Resource:     | CRAN        | Travis CI       | Appveyor         |
+| ------------- | ------------------- | --------------- | ---------------- |
+| _Platforms:_  | _Multiple_          | _Linux & macOS_ | _Windows_        |
+| R CMD check   | <a href="http://cran.r-project.org/web/checks/check_results_future.BatchJobs.html"><img border="0" src="http://www.r-pkg.org/badges/version/future.BatchJobs" alt="CRAN version"></a> | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>   | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
+| Test coverage |                     | <a href="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs"><img src="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs/branch/develop/graph/badge.svg" alt="Coverage Status"/></a>     |                  |

@@ -15,7 +15,6 @@ r_check_args: --as-cran
 env: _R_CHECK_FULL_=true  ## Package specific
 latex: false
 r_github_packages:
-  - HenrikBengtsson/globals@develop
   - HenrikBengtsson/future@develop
 
 matrix:
@@ -25,7 +24,6 @@ matrix:
     - os: linux
       r: release
       r_github_packages:
-        - HenrikBengtsson/globals@develop
         - HenrikBengtsson/future@develop
         - jimhester/covr#221
       after_success:
