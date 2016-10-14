@@ -111,6 +111,7 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, g
   }
 
   cluster.functions <- makeCFs(pathname)
+  attr(cluster.functions, "pathname") <- pathname
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
                             globals=globals,
