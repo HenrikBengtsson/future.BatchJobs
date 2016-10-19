@@ -1,6 +1,15 @@
 #' @importFrom R.utils tempvar
 #' @importFrom BatchJobs makeRegistry
 tempRegistry <- local({
+  asValidDirectoryNamePrefix <- function(name) {
+    name
+  }
+
+  asValidRegistryID <- function(id) {
+    stopifnot(grepl("^[a-zA-Z]+[0-9a-zA-Z_]*$", id))
+    id
+  }
+  
   ## All known BatchJobs registries
   regs <- new.env()
 
@@ -24,13 +33,19 @@ tempRegistry <- local({
   function(label="BatchJobs", path=NULL, ...) {
     ## The job label (the name on the job queue) - could be duplicated
     label <- as.character(label)
-
+    stopifnot(length(label) == 1L, nchar(label) > 0L)
+    
     ## This session's path holding all of its future BatchJobs directories
     ##   e.g. .future/<datetimestamp>-<unique_id>/
     if (is.null(path)) path <- futureCachePath()
     
     ## The BatchJobs subfolder for a specific future - must be unique
     prefix <- sprintf("%s_", label)
+    
+    ## FIXME: We need to make sure 'prefix' consists of only valid
+    ## filename characters. /HB 2016-10-19
+    prefix <- asValidDirectoryNamePrefix(prefix)
+    
     unique <- FALSE
     while (!unique) {
       ## The FutureRegistry key for this BatchJobs future - must be unique
@@ -48,6 +63,11 @@ tempRegistry <- local({
     oopts <- options(BatchJobs.load.config=FALSE)
     on.exit(options(oopts), add=TRUE)
 
-    makeRegistry(id=label, file.dir=pathRegistry, ...)
+    ## FIXME: We need to make sure 'label' consists of only valid
+    ## BatchJobs ID characters, i.e. it must match regular
+    ## expression "^[a-zA-Z]+[0-9a-zA-Z_]*$".
+    ## /HB 2016-10-19
+    regId <- asValidRegistryID(label)
+    makeRegistry(id=regId, file.dir=pathRegistry, ...)
   }
 })
