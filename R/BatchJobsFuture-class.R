@@ -26,7 +26,7 @@
 BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
-  label <- as.character(label)
+  if (!is.null(label)) label <- as.character(label)
   
   if (!is.null(conf)) {
     stopifnot(is.environment(conf))

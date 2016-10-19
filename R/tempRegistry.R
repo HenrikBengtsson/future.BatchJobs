@@ -1,15 +1,6 @@
 #' @importFrom R.utils tempvar
 #' @importFrom BatchJobs makeRegistry
-tempRegistry <- local({
-  asValidDirectoryNamePrefix <- function(name) {
-    name
-  }
-
-  asValidRegistryID <- function(id) {
-    stopifnot(grepl("^[a-zA-Z]+[0-9a-zA-Z_]*$", id))
-    id
-  }
-  
+tempRegistry <- local({ 
   ## All known BatchJobs registries
   regs <- new.env()
 
@@ -30,8 +21,9 @@ tempRegistry <- local({
     BatchJobs::makeRegistry(...)
   } ## makeRegistry()
 
-  function(label="BatchJobs", path=NULL, ...) {
-    ## The job label (the name on the job queue) - could be duplicated
+  function(label = "BatchJobs", path=NULL, ...) {
+    if (is.null(label)) label <- "BatchJobs"
+    ## The job label (the name on the job queue) - may be duplicated
     label <- as.character(label)
     stopifnot(length(label) == 1L, nchar(label) > 0L)
     
@@ -71,3 +63,45 @@ tempRegistry <- local({
     makeRegistry(id=regId, file.dir=pathRegistry, ...)
   }
 })
+
+
+
+dropNonValidCharacters <- function(name, pattern, default = "BatchJobs") {
+  if (grepl(pattern, name)) return(name)
+  name <- strsplit(name, split = "", fixed = TRUE)[[1]]
+  name <- name[grepl(pattern, name)]
+  name <- paste(name, collapse = "")
+  if (nchar(name) == 0L) name <- default
+  name
+} ## dropNonValidCharacters()
+
+asValidDirectoryNamePrefix <- function(name) {
+  pattern <- "^[-._a-zA-Z0-9]+$"
+  ## Nothing to do?
+  if (grepl(pattern, name)) return(name)
+
+   name <- strsplit(name, split = "", fixed = TRUE)[[1]]
+   name <- paste(name, collapse = "")
+
+  name <- dropNonValidCharacters(name, pattern = pattern)
+
+  stopifnot(grepl(pattern, name))
+
+  name
+} ## asValidDirectoryNamePrefix()
+
+asValidRegistryID <- function(name) {
+  pattern <- "^[a-zA-Z]+[0-9a-zA-Z_]*$"
+
+  ## Nothing to do?
+  if (grepl(pattern, name)) return(name)
+  
+   name <- strsplit(name, split = "", fixed = TRUE)[[1]]
+   name <- paste(name, collapse = "")
+
+  name <- dropNonValidCharacters(name, pattern = pattern)
+  
+  stopifnot(grepl(pattern, name))
+  
+  name
+} ## asValidRegistryID()
