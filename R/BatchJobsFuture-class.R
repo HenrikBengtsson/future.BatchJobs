@@ -52,9 +52,6 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
 
   stopifnot(is.logical(job.delay) || is.function(job.delay))
 
-  debug <- getOption("future.debug", FALSE)
-  if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
-
   ## Record globals
   getGlobalsAndPackages <- importFuture("getGlobalsAndPackages")
   gp <- getGlobalsAndPackages(expr, envir=envir, globals=globals)
@@ -72,6 +69,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
 
   ## Create BatchJobs registry
   reg <- tempRegistry(label=future$label)
+  debug <- getOption("future.debug", FALSE)
   if (debug) mprint(reg)
 
   ## BatchJobs configuration
@@ -341,8 +339,16 @@ run.BatchJobsFuture <- function(future, ...) {
   assertOwner <- importFuture("assertOwner")
   assertOwner(future)
 
+  ## Temporarily disable BatchJobs output?
+  ## (i.e. messages and progress bars)
   debug <- getOption("future.debug", FALSE)
-  if (!debug) options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+  batchjobsOutput <- getOption("future.BatchJobs.output", debug)
+  if (!batchjobsOutput) {
+    oopts <- options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+  } else {
+    oopts <- list()
+  }
+  on.exit(options(oopts))
 
   expr <- getExpression(future)
 
@@ -465,8 +471,10 @@ run.BatchJobsFuture <- function(future, ...) {
   ## FIXME: This one too here?!?  /HB 2016-03-20 Issue #49
   ## If/when makeRegistry() attaches BatchJobs, we need
   ## to prevent it from overriding configuration already set.
-  oopts <- options(BatchJobs.load.config=FALSE)
-  on.exit(options(oopts))
+  ## Note, this will be reset by the first on.exit() above.
+  oopts2 <- options(BatchJobs.load.config = FALSE)
+  oopts <- c(oopts, oopts2)
+  oopts2 <- NULL
 
   ## 3. Create BatchJobs configuration backend?
   conf <- future$conf

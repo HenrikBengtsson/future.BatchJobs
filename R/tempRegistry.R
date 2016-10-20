@@ -5,18 +5,28 @@ tempRegistry <- local({
   regs <- new.env()
 
   makeRegistry <- function(...) {
-    ## PROBLEM:
-    ## Calling makeRegistry() causes BatchJobs to be attached and
-    ## therefore outputs:
-    ##   Loading required package: BatchJobs
-    ##   Loading required package: BBmisc
-    ## as soon as the first BatchJobs future is created.
-    ## See also: https://github.com/tudo-r/BatchJobs/issues/68
-    ##
-    ## WORKAROUND:
-    ## In order to avoid the above output message (sent to stderr)
-    ## we will attach BatchJobs already here and suppress output.
-    suppressPackageStartupMessages(require("BatchJobs"))
+    ## Temporarily disable BatchJobs output?
+    ## (i.e. messages and progress bars)
+    debug <- getOption("future.debug", FALSE)
+    batchjobsOutput <- getOption("future.BatchJobs.output", debug)
+
+    if (!batchjobsOutput) {
+      oopts <- options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+      on.exit(options(oopts))
+
+      ## PROBLEM:
+      ## Calling makeRegistry() causes BatchJobs to be attached and
+      ## therefore outputs:
+      ##   Loading required package: BatchJobs
+      ##   Loading required package: BBmisc
+      ## as soon as the first BatchJobs future is created.
+      ## See also: https://github.com/tudo-r/BatchJobs/issues/68
+      ##
+      ## WORKAROUND:
+      ## In order to avoid the above output message (sent to stderr)
+      ## we will attach BatchJobs already here and suppress output.
+      suppressPackageStartupMessages(require("BatchJobs"))
+    }
 
     BatchJobs::makeRegistry(...)
   } ## makeRegistry()
