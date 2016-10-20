@@ -220,7 +220,9 @@ loggedError.BatchJobsFuture <- function(future, ...) {
   if (isNA(stat)) return(NULL)
 
   if (!finished(future)) {
-    msg <- sprintf("%s has not finished yet", class(future)[1L])
+    label <- future$label
+    if (is.null(label)) label <- "<none>"
+    msg <- sprintf("%s ('%s') has not finished yet", class(future)[1L], label)
     stop(BatchJobsFutureError(msg, future=future))
   }
 
@@ -243,7 +245,9 @@ loggedOutput.BatchJobsFuture <- function(future, ...) {
   if (isNA(stat)) return(NULL)
 
   if (!finished(future)) {
-    msg <- sprintf("%s has not finished yet", class(future)[1L])
+    label <- future$label
+    if (is.null(label)) label <- "<none>"
+    msg <- sprintf("%s ('%s') has not finished yet", class(future)[1L], label)
     stop(BatchJobsFutureError(msg, future=future))
   }
 
@@ -293,7 +297,9 @@ value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "e
   if (isNA(stat)) {
     onMissing <- match.arg(onMissing)
     if (onMissing == "default") return(default)
-    stop(sprintf("The value no longer exists (or never existed) for Future of class ", paste(sQuote(class(future)), collapse=", ")))
+    label <- future$label
+    if (is.null(label)) label <- "<none>"
+    stop(sprintf("The value no longer exists (or never existed) for Future ('%s') of class %s", label, paste(sQuote(class(future)), collapse=", ")))
   }
 
   tryCatch({
@@ -316,7 +322,9 @@ run <- function(...) UseMethod("run")
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
 run.BatchJobsFuture <- function(future, ...) {
   if (future$state != 'created') {
-    stop("A future can only be launched once.")
+    label <- future$label
+    if (is.null(label)) label <- "<none>"
+    stop(sprintf("A future ('%s') can only be launched once.", label))
   }
   
   mdebug <- importFuture("mdebug")
@@ -647,7 +655,7 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.
       res <- loadResult(reg, id=jobid)
     } else if ("error" %in% stat) {
       cleanup <- FALSE
-      msg <- sprintf("BatchJobError: %s", loggedError(future))
+      msg <- sprintf("BatchJobError in %s ('%s'): %s", class(future)[1], label, loggedError(future))
       stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
@@ -725,7 +733,9 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
   if (!resolved(future)) {
     if (onRunning == "skip") return(invisible(TRUE))
     status <- status(future)
-    msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a non-resolved future (state=%s; BatchJobs status=%s): %s", sQuote(future$state), paste(sQuote(status), collapse=", "), sQuote(path))
+    label <- future$label
+    if (is.null(label)) label <- "<none>"
+    msg <- sprintf("Will not remove BatchJob registry, because is appears to hold a non-resolved future (%s; state=%s; BatchJobs status=%s): %s", sQuote(label), sQuote(future$state), paste(sQuote(status), collapse=", "), sQuote(path))
     mdebug("delete(): %s", msg)
     if (onRunning == "warning") {
       warning(msg)
