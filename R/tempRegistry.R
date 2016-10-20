@@ -36,7 +36,7 @@ tempRegistry <- local({
     
     ## FIXME: We need to make sure 'prefix' consists of only valid
     ## filename characters. /HB 2016-10-19
-    prefix <- asValidDirectoryNamePrefix(prefix)
+    prefix <- asValidDirectoryPrefix(prefix)
     
     unique <- FALSE
     while (!unique) {
@@ -67,39 +67,41 @@ tempRegistry <- local({
 
 
 dropNonValidCharacters <- function(name, pattern, default = "BatchJobs") {
-  if (grepl(pattern, name)) return(name)
-  name <- strsplit(name, split = "", fixed = TRUE)[[1]]
-  name <- name[grepl(pattern, name)]
-  name <- paste(name, collapse = "")
-  if (nchar(name) == 0L) name <- default
+  asString <- (length(name) == 1L)
+  name <- unlist(strsplit(name, split = "", fixed = TRUE), use.names = FALSE)
+  name[!grepl(pattern, name)] <- ""
+  if (length(name) == 0L) return(default)
+  if (asString) name <- paste(name, collapse = "")
   name
 } ## dropNonValidCharacters()
 
-asValidDirectoryNamePrefix <- function(name) {
+asValidDirectoryPrefix <- function(name) {
   pattern <- "^[-._a-zA-Z0-9]+$"
   ## Nothing to do?
   if (grepl(pattern, name)) return(name)
-
-   name <- strsplit(name, split = "", fixed = TRUE)[[1]]
-   name <- paste(name, collapse = "")
-
+  name <- unlist(strsplit(name, split = "", fixed = TRUE), use.names = FALSE)
+  ## All characters must be letters, digits, underscores, dash, or period.
   name <- dropNonValidCharacters(name, pattern = pattern)
-
+  name <- paste(name, collapse = "")
   stopifnot(grepl(pattern, name))
-
   name
-} ## asValidDirectoryNamePrefix()
+} ## asValidDirectoryPrefix()
 
 asValidRegistryID <- function(name) {
   pattern <- "^[a-zA-Z]+[0-9a-zA-Z_]*$"
-
   ## Nothing to do?
   if (grepl(pattern, name)) return(name)
-  
-   name <- strsplit(name, split = "", fixed = TRUE)[[1]]
-   name <- paste(name, collapse = "")
 
-  name <- dropNonValidCharacters(name, pattern = pattern)
+  name <- unlist(strsplit(name, split = "", fixed = TRUE), use.names = FALSE)
+  
+  ## All characters must be letters, digits, or underscores
+  name <- dropNonValidCharacters(name, pattern = "[0-9a-zA-Z_]")
+  name <- name[nzchar(name)]
+
+  ## First character must be a letter :/
+  if (!grepl("^[a-zA-Z]+", name[1])) name[1] <- "z"
+
+  name <- paste(name, collapse = "")
   
   stopifnot(grepl(pattern, name))
   
