@@ -627,6 +627,8 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.
   res <- NULL
   if (finished) {
     mdebug("Results:")
+    label <- future$label
+    if (is.null(label)) label <- "<none>"
     if ("done" %in% stat) {
       res <- loadResult(reg, id=jobid)
     } else if ("error" %in% stat) {
@@ -635,18 +637,15 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.
       stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
-      label <- reg$id
       msg <- sprintf("BatchJobExpiration: Future ('%s') expired: %s", label, reg$file.dir)
       stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if (isNA(stat)) {
-      label <- reg$id
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Future ('%s') deleted: %s", label, reg$file.dir)
       stop(BatchJobsFutureError(msg, future=future))
     }
     if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
-    label <- reg$id
     msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchronous evaluation for future ('%s') is still running: %s", tries-1L, interval, label, reg$file.dir)
     stop(BatchJobsFutureError(msg, future=future))
   }
