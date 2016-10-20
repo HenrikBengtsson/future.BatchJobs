@@ -173,11 +173,17 @@ loggedOutput <- function(...) UseMethod("loggedOutput")
 status.BatchJobsFuture <- function(future, ...) {
   ## WORKAROUND: Avoid warnings on partially matched arguments
   getStatus <- function(...) {
-    oopts <- options(warnPartialMatchArgs=FALSE)
-    keep <- !unlist(lapply(oopts, FUN=function(x) is.null(x) || !x))
-    oopts <- oopts[keep]
-    if (length(oopts) > 0L) on.exit(options(oopts))
-
+    ## Temporarily disable BatchJobs output?
+    ## (i.e. messages and progress bars)
+    debug <- getOption("future.debug", FALSE)
+    batchjobsOutput <- getOption("future.BatchJobs.output", debug)
+    if (!batchjobsOutput) {
+      oopts <- options(BatchJobs.verbose=FALSE, BBmisc.ProgressBar.style="off")
+    } else {
+      oopts <- list()
+    }
+    on.exit(options(oopts))
+    oopts <- c(oopts, options(warnPartialMatchArgs=FALSE))
     BatchJobs::getStatus(...)
   } ## getStatus()
 
