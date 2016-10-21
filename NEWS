@@ -1,16 +1,14 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.13.0-9000 [2016-10-19]
+Version: 0.13.0-9000 [2016-10-20]
 o GLOBALS: Now globals can be specified explicitly.
-o ROBUSTNESS: Now BatchJobs futures accept labels containing any
-  type of characters.  Non-compatible characters are automatically
-  dropped when used when setting up internal BatchJobs directories
-  and BatchJobs registry names.
 o Added argument 'job.delay' to batchjobs_*() futures for passing
   it as is to BatchJobs::submitJobs() used when launching futures.
-o Added argument 'label' to batchjobs_*() futures for specify the
-  job name when using job schedulers.
+o Added argument 'label' to batchjobs_*() futures which are reflected
+  in the job name listed by schedulers.  Because of limitation is
+  BatchJobs, not all characters in the labels are support and are
+  therefore dropped in the job names.
 
 
 Version: 0.13.0 [2016-08-02]
