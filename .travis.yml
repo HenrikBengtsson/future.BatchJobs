@@ -12,8 +12,11 @@ sudo: false
 cache: packages
 warnings_are_errors: false
 r_check_args: --as-cran
-env: _R_CHECK_FULL_=true  ## Package specific
 latex: false
+
+env:
+  global:
+    - _R_CHECK_FULL_=true  ## Package specific
 
 matrix:
   include:
