@@ -203,10 +203,10 @@ demo("mandelbrot", package="future", ask=FALSE)
 ```
 
 
-[BatchJobs]: http://cran.r-project.org/package=BatchJobs
-[brew]: http://cran.r-project.org/package=brew
-[future]: http://cran.r-project.org/package=future
-[future.BatchJobs]: http://cran.r-project.org/package=future.BatchJobs
+[BatchJobs]: https://cran.r-project.org/package=BatchJobs
+[brew]: https://cran.r-project.org/package=brew
+[future]: https://cran.r-project.org/package=future
+[future.BatchJobs]: https://cran.r-project.org/package=future.BatchJobs
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 [TORQUE]: https://en.wikipedia.org/wiki/TORQUE
 [Slurm]: https://en.wikipedia.org/wiki/Slurm_Workload_Manager

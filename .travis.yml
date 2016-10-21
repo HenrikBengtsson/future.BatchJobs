@@ -5,7 +5,7 @@
 # * Travis CI: https://docs.travis-ci.com/user/languages/r
 # * covr: https://github.com/jimhester/covr
 #
-# Validate your .travis.yml file at http://lint.travis-ci.org/
+# Validate your .travis.yml file at https://lint.travis-ci.org/
 #----------------------------------------------------------------
 language: r
 sudo: false
@@ -14,8 +14,6 @@ warnings_are_errors: false
 r_check_args: --as-cran
 env: _R_CHECK_FULL_=true  ## Package specific
 latex: false
-r_github_packages:
-  - HenrikBengtsson/future@develop
 
 matrix:
   include:
@@ -24,7 +22,6 @@ matrix:
     - os: linux
       r: release
       r_github_packages:
-        - HenrikBengtsson/future@develop
         - jimhester/covr#221
       after_success:
         - Rscript -e 'covr::codecov(quiet=FALSE)'
