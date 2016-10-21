@@ -183,7 +183,7 @@ automatically located and loaded when doing:
 ```r
 > plan(batchjobs_torque)
 ```
-Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 12 cores (one a single machine) and up to  5 GiB of RAM, use:
+Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 12 cores (one a single machine) and up to  5 GiB of memory, use:
 ```r
 > plan(batchjobs_torque, resources=list(nodes="1:ppn=12", vmem="5gb"))
 ```
@@ -193,9 +193,9 @@ To specify the `resources` argument at the same time as using nested future stra
 plan(list(
   tweak(batchjobs_torque, resources=list(nodes="1:ppn=12", vmem="5gb")),
   multiprocess
-  ))
+))
 ```
-will cause the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of RAM per job.  The second level of futures will be evaluated using multiprocessing using the 12 cores given to each job by the scheduler.
+causes the first level of futures to be submitted via the TORQUE job scheduler requesting 12 cores and 5 GiB of memory per job.  The second level of futures will be evaluated using multiprocessing using the 12 cores given to each job by the scheduler.
 
 A similar filename format is used for the other types of job schedulers supported.  For instance, for Slurm the template file should be named `.BatchJobs.slurm.tmpl` in order for
 ```r
@@ -224,10 +224,10 @@ demo("mandelbrot", package="future", ask=FALSE)
 ```
 
 
-[BatchJobs]: http://cran.r-project.org/package=BatchJobs
-[brew]: http://cran.r-project.org/package=brew
-[future]: http://cran.r-project.org/package=future
-[future.BatchJobs]: http://cran.r-project.org/package=future.BatchJobs
+[BatchJobs]: https://cran.r-project.org/package=BatchJobs
+[brew]: https://cran.r-project.org/package=brew
+[future]: https://cran.r-project.org/package=future
+[future.BatchJobs]: https://cran.r-project.org/package=future.BatchJobs
 [BatchJobs configuration]: https://github.com/tudo-r/BatchJobs/wiki/Configuration
 [TORQUE]: https://en.wikipedia.org/wiki/TORQUE
 [Slurm]: https://en.wikipedia.org/wiki/Slurm_Workload_Manager

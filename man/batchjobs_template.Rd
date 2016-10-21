@@ -10,32 +10,43 @@
 \title{BatchJobs LSF, OpenLava, SGE, Slurm and Torque futures}
 \usage{
 batchjobs_lsf(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  globals = TRUE, label = "BatchJobs", pathname = NULL,
+  resources = list(), job.delay = FALSE, ...)
 
 batchjobs_openlava(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  globals = TRUE, label = "BatchJobs", pathname = NULL,
+  resources = list(), job.delay = FALSE, ...)
 
 batchjobs_sge(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  globals = TRUE, label = "BatchJobs", pathname = NULL,
+  resources = list(), job.delay = FALSE, ...)
 
 batchjobs_slurm(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  globals = TRUE, label = "BatchJobs", pathname = NULL,
+  resources = list(), job.delay = FALSE, ...)
 
 batchjobs_torque(expr, envir = parent.frame(), substitute = TRUE,
-  pathname = NULL, resources = list(), ...)
+  globals = TRUE, label = "BatchJobs", pathname = NULL,
+  resources = list(), job.delay = FALSE, ...)
 }
 \arguments{
-\item{expr}{An R expression to be evaluated.}
+\item{expr}{The R expression to be evaluated}
 
-\item{envir}{The environment from which global environment
-are search from.}
+\item{envir}{The environment in which global environment
+should be located.}
 
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
 
+\item{globals}{(optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.}
+
+\item{label}{(optional) Label of the future (where applicable, becomes the job name for most job schedulers).}
+
 \item{pathname}{A BatchJobs template file (\pkg{brew} formatted).}
 
-\item{resources}{A named list passed to the BatchJobs template (available as variable `resources`).}
+\item{resources}{A named list passed to the BatchJobs template (available as variable \code{resources}).}
+
+\item{job.delay}{(optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.}
 
 \item{\ldots}{Additional arguments passed to \code{\link{BatchJobsFuture}()}.}
 }

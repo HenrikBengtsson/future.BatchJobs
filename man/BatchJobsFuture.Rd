@@ -5,8 +5,9 @@
 \title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  conf = NULL, cluster.functions = NULL, resources = list(),
-  workers = NULL, finalize = getOption("future.finalize", TRUE), ...)
+  globals = TRUE, label = "BatchJobs", conf = NULL,
+  cluster.functions = NULL, resources = list(), workers = NULL,
+  job.delay = FALSE, finalize = getOption("future.finalize", TRUE), ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
@@ -17,14 +18,20 @@ should be located.}
 \item{substitute}{Controls whether \code{expr} should be
 \code{substitute()}:d or not.}
 
+\item{globals}{(optional) a logical, a character vector, a named list, or a \link[globals]{Globals} object.  If TRUE, globals are identified by code inspection based on \code{expr} and \code{tweak} searching from environment \code{envir}.  If FALSE, no globals are used.  If a character vector, then globals are identified by lookup based their names \code{globals} searching from environment \code{envir}.  If a named list or a Globals object, the globals are used as is.}
+
+\item{label}{(optional) Label of the future (where applicable, becomes the job name for most job schedulers).}
+
 \item{conf}{A BatchJobs configuration environment.}
 
 \item{cluster.functions}{A BatchJobs \link[BatchJobs]{ClusterFunctions} object.}
 
-\item{resources}{A named list passed to the BatchJobs template (available as variable `resources`).}
+\item{resources}{A named list passed to the BatchJobs template (available as variable \code{resources}).}
 
 \item{workers}{(optional) Additional specification for
 the BatchJobs backend.}
+
+\item{job.delay}{(optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.}
 
 \item{finalize}{If TRUE, any underlying registries are
 deleted when this object is garbage collected, otherwise not.}

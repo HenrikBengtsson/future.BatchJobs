@@ -1,6 +1,16 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.13.1 [2016-10-20]
+o GLOBALS: Now globals can be specified explicitly.
+o Added argument 'job.delay' to batchjobs_*() futures for passing
+  it as is to BatchJobs::submitJobs() used when launching futures.
+o Added argument 'label' to batchjobs_*() futures which are reflected
+  in the job name listed by schedulers.  Because of limitation is
+  BatchJobs, not all characters in the labels are support and are
+  therefore dropped in the job names.
+
+
 Version: 0.13.0 [2016-08-02]
 o Added argument 'resources' to batchjobs_*() functions for passing
   it to the BatchJobs template (as variable 'resources').

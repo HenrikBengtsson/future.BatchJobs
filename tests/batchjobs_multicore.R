@@ -12,7 +12,7 @@ for (cores in 1:min(3L, availableCores("multicore"))) {
   options(mc.cores=cores-1L)
 
   if (!supportsMulticore()) {
-    message(sprintf("BatchJobs multicore futures are not supporting on '%s'. Falling back to use synchroneous BatchJobs local futures", .Platform$OS))
+    message(sprintf("BatchJobs multicore futures are not supporting on '%s'. Falling back to use synchroneous BatchJobs local futures", .Platform$OS.type))
   }
 
   for (globals in c(FALSE, TRUE)) {
@@ -47,9 +47,15 @@ for (cores in 1:min(3L, availableCores("multicore"))) {
   ## future.
   a <- 7  ## Make sure globals are frozen
 ##  if ("covr" %in% loadedNamespaces()) v <- 0 else ## WORKAROUND
-  v <- value(f)
-  print(v)
-  stopifnot(v == 0)
+  if (globals) {
+    v <- value(f)
+    print(v)
+    stopifnot(v == 0)
+  } else {
+    res <- tryCatch({ value(f) }, error=identity)
+    print(res)
+    stopifnot(inherits(res, "simpleError"))
+  }
 
 
   message(sprintf("*** batchjobs_multicore(..., globals=%s) with globals and blocking", globals))
@@ -60,9 +66,13 @@ for (cores in 1:min(3L, availableCores("multicore"))) {
   }
   message(sprintf(" - Resolving %d batchjobs_multicore futures", length(x)))
 ##  if ("covr" %in% loadedNamespaces()) v <- 1:4 else ## WORKAROUND
-  v <- sapply(x, FUN=value)
-  stopifnot(all(v == 1:4))
-
+  if (globals) {
+    v <- sapply(x, FUN=value)
+    stopifnot(all(v == 1:4))
+  } else {
+    v <- lapply(x, FUN=function(f) tryCatch(value(f), error=identity))
+    stopifnot(all(sapply(v, FUN=inherits, "simpleError")))
+  }
 
   message(sprintf("*** batchjobs_multicore(..., globals=%s) and errors", globals))
   f <- batchjobs_multicore({

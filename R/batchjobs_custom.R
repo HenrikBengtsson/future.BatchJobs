@@ -4,18 +4,14 @@
 #' files (R source scripts) to define the BatchJobs configuration
 #' environment, e.g. \file{.BatchJobs.R}.
 #'
-#' @param expr An R expression to be evaluated.
-#' @param envir The environment from which global environment
-#'              are search from.
-#' @param substitute Controls whether \code{expr} should be
-#'                   \code{substitute()}:d or not.
+#' @inheritParams BatchJobsFuture
 #' @param conf A BatchJobs configuration environment.
 #' @param pathname (alternative) Pathname to one or more BatchJobs
 #' configuration files to be loaded in order.  If NULL, then the
 #' \pkg{BatchJobs} package will search for such configuration files.
 #' @param workers (optional) Additional specification for the backend
 #' workers.  If NULL, the default is used.
-#' @param resources A named list passed to the BatchJobs template (available as variable `resources`).
+#' @param resources A named list passed to the BatchJobs template (available as variable \code{resources}).
 #' @param \ldots Additional arguments passed to \code{\link{BatchJobsFuture}()}.
 #'
 #' @return An object of class \code{BatchJobsFuture}.
@@ -33,7 +29,7 @@
 #' }
 #'
 #' @export
-batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, conf=NULL, pathname=NULL, workers=NULL, resources=list(), ...) {
+batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", conf=NULL, pathname=NULL, workers=NULL, resources=list(), job.delay=FALSE, ...) {
   findConfigs <- importBatchJobs("findConfigs")
   sourceConfFiles <- importBatchJobs("sourceConfFiles")
 
@@ -56,8 +52,11 @@ batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, conf=N
   }
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,
+                            globals=globals,
+			    label=label,
                             conf=conf, workers=workers,
-                            resources=resources, ...)
+                            resources=resources,
+			    job.delay=job.delay, ...)
   future$pathname <- pathname
   future <- run(future)
 
