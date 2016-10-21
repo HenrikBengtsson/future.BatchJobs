@@ -30,7 +30,6 @@ matrix:
         - Rscript -e 'covr::codecov(quiet=FALSE)'
       env:
         - NB='w/ covr'  ## Just a label
-        - _R_CHECK_FULL_=true
     - os: linux
       r: devel
     - os: osx
