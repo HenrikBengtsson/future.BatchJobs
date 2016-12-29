@@ -468,6 +468,9 @@ run.BatchJobsFuture <- function(future, ...) {
     ## Not needed anymore
     globalsToDecode <- NULL
 
+    ## WORKAROUND: BatchJobs (> 1.6) and globals (<= 0.7.1)
+    globals <- unclass(globals)
+
     ## Export via BatchJobs
     batchExport(reg, li=globals)
   }

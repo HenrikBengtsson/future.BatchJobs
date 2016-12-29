@@ -223,7 +223,7 @@ install.packages('future.BatchJobs')
 
 ### Pre-release version
 
-To install the pre-release version that is available in branch `develop`, use:
+To install the pre-release version that is available in Git branch `develop` on GitHub, use:
 ```r
 source('http://callr.org/install#HenrikBengtsson/future.BatchJobs@develop')
 ```
