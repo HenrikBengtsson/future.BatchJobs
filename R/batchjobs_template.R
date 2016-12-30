@@ -120,7 +120,10 @@ batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, g
 			    resources=resources,
 			    job.delay=job.delay, ...)
 
-  future <- run(future)
+  ## BACKWARD COMPATIBILTY: future (<= 1.2.0)
+  if (is.null(future$lazy)) future$lazy <- FALSE
+  
+  if (!future$lazy) future <- run(future)
 
   future
 } ## batchjobs_by_template()

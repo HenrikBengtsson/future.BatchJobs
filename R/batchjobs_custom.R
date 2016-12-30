@@ -58,7 +58,11 @@ batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, global
                             resources=resources,
 			    job.delay=job.delay, ...)
   future$pathname <- pathname
-  future <- run(future)
+  
+  ## BACKWARD COMPATIBILTY: future (<= 1.2.0)
+  if (is.null(future$lazy)) future$lazy <- FALSE
+  
+  if (!future$lazy) future <- run(future)
 
   future
 }
