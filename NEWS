@@ -2,265 +2,423 @@ Package: future.BatchJobs
 =========================
 
 Version: 0.13.1-9000 [2016-12-28]
-o WORKAROUND: Futures with globals would give an error when using the
-  developers version of BatchJobs (> 1.6) and globals (<= 0.7.1).
+
+BUG FIX:
+
+ o Futures with globals would give an error when using the developers
+   version of BatchJobs (> 1.6) with globals (<= 0.7.1).
 
 
 Version: 0.13.1 [2016-10-20]
-o GLOBALS: Now globals can be specified explicitly.
-o Added argument 'job.delay' to batchjobs_*() futures for passing
-  it as is to BatchJobs::submitJobs() used when launching futures.
-o Added argument 'label' to batchjobs_*() futures which are reflected
-  in the job name listed by schedulers.  Because of limitation is
-  BatchJobs, not all characters in the labels are support and are
-  therefore dropped in the job names.
+
+NEW FEATURES:
+
+ o Added argument 'job.delay' to batchjobs_*() futures for passing
+   it as is to BatchJobs::submitJobs() used when launching futures.
+   
+ o Added argument 'label' to batchjobs_*() futures which are reflected
+   in the job name listed by schedulers.  Because of limitation is
+   BatchJobs, not all characters in the labels are support and are
+   therefore dropped in the job names.
+
+GLOBAL VARIABLES:
+
+ o GLOBALS: Now globals can be specified explicitly.
 
 
 Version: 0.13.0 [2016-08-02]
-o Added argument 'resources' to batchjobs_*() functions for passing
-  it to the BatchJobs template (as variable 'resources').
-o ROBUSTNESS: value() now launches the future iff not already done.
-  Added protection from launching a future more than once.
+
+NEW FEATURES:
+
+ o Added argument 'resources' to batchjobs_*() functions for passing
+   it to the BatchJobs template (as variable 'resources').
+   
+ o ROBUSTNESS: value() now launches the future iff not already done.
+   Added protection from launching a future more than once.
 
 
 Version: 0.12.1 [2016-06-26]
-o Advicing against _multicore BatchJobs_ futures, because there
-  is a risk for long waiting times due to starvation.
-  This is a limitation of the BatchJobs package.
-o BUG FIX: Multicore BatchJobs futures are not supported on Solaris
-  Unix and falls back to local BatchJobs futures (as on Windows).
-  This is a limitation of the BatchJobs package.
+
+DOCUMENTATION:
+
+ o Advising against _multicore BatchJobs_ futures, because there
+   is a risk for long waiting times due to starvation.
+   This is a limitation of the BatchJobs package.
+
+BUG FIX:
+
+ o Multicore BatchJobs futures are not supported on Solaris Unix and
+   now falls back to local BatchJobs futures (as on Windows).
+   This is a limitation of the BatchJobs package.
 
 
 Version: 0.12.0 [2016-06-25]
-o Added predefined batchjobs_local(), batchjobs_interactive(),
-  batchjobs_multicore(), batchjobs_lsf(), batchjobs_openlava(),
-  batchjobs_sge(), batchjobs_slurm(), batchjobs_torque() and
-  batchjobs_custom() futures.
-o Added nbrOfWorkers() for BatchJobs futures.
-o CLEANUP: Removed non-used completed(), failed() and expired() for
-  BatchJobs objects.
-o CLEANUP: Now "Loading required package: BatchJobs [...]", which is
-  outputted when the first BatchJobs future is created, is suppressed.
-o CLEANUP: Deprecated backend().
+
+NEW FEATURES:
+
+ o Added predefined batchjobs_local(), batchjobs_interactive(),
+   batchjobs_multicore(), batchjobs_lsf(), batchjobs_openlava(),
+   batchjobs_sge(), batchjobs_slurm(), batchjobs_torque() and
+   batchjobs_custom() futures.
+   
+ o Added nbrOfWorkers() for BatchJobs futures.
+
+ o CLEANUP: Now "Loading required package: BatchJobs [...]", which is
+   outputted when the first BatchJobs future is created, is suppressed.
+
+DEPRECATED AND DEFUNCT:
+
+ o Removed non-used completed(), failed() and expired() for BatchJobs objects.
+
+ o Deprecated backend().
 
 
 Version: 0.11.0 [2016-05-16]
-o Add package vignette.
-o Now BatchJobsFutureError extends FutureError.
-o WORKAROUND: The BatchJobs multicore cluster functions are designed
-  to give some leeway for other processes on the local machine.
-  Unfortunately, this may result in endless or extremeley long waiting
-  for free resources before BatchJobs multicore jobs can be submitted.
-  One reason is that BatchJobs tries to keep the average CPU load
-  below a threshold that is calculated based on the number of cores.
-  Unfortunately, this can result in starvation due to other processes,
-  especially if the number of cores on the machine is small and/or if
-  mc.cores is set to a small number.  Because of this, we disable this
-  mechanism (by using BatchJobs parameter max.load=+Inf).
-o backend("multicore=1") or other multicore specifications that
-  result in single-core processing will use backend("local") instead.
-o BUG FIX: backend("multicore-3") was interpreted as backend("multicore").
+
+NEW FEATURES:
+
+ o backend("multicore=1") or other multicore specifications that
+   result in single-core processing will use backend("local") instead.
+
+ o WORKAROUND: The BatchJobs multicore cluster functions are designed
+   to give some leeway for other processes on the local machine.
+   Unfortunately, this may result in endless or extremeley long waiting
+   for free resources before BatchJobs multicore jobs can be submitted.
+   One reason is that BatchJobs tries to keep the average CPU load
+   below a threshold that is calculated based on the number of cores.
+   Unfortunately, this can result in starvation due to other processes,
+   especially if the number of cores on the machine is small and/or if
+   mc.cores is set to a small number.  Because of this, we disable this
+   mechanism (by using BatchJobs parameter max.load=+Inf).
+
+ o Now BatchJobsFutureError extends FutureError.
+   
+DOCUMENTATION:
+
+ o Add package vignette.
+
+BUG FIX:
+
+ o BUG FIX: backend("multicore-3") was interpreted as backend("multicore").
 
 
 Version: 0.10.0 [2016-05-03]
-o Now the BatchJobsFutureError records the captured BatchJobs
-  output to further simplify post mortem troubleshooting.
-o Now delete() for BatchJobsFuture will not remove the BatchJobs
-  registry files if the BatchJobs has status 'error' or 'expired'
-  and (new) option 'future.delete' is not set to FALSE (which it
-  is if running in interactive mode).  The new setup is useful
-  for troubleshooting failed BatchJobs futures in non-interactive
-  R sessions, which otherwise would be cleaned out when the R
-  session terminates (due to garbage collection calling delete()).
-o BUG FIX: resolved() on a BatchJobs future could return FALSE
-  even after value() was called.  Added package test.
+
+NEW FEATURES:
+
+ o Now the BatchJobsFutureError records the captured BatchJobs
+   output to further simplify post mortem troubleshooting.
+   
+ o delete() for BatchJobsFuture will no longer remove the BatchJobs
+   registry files if the BatchJobs has status 'error' or 'expired'
+   and (new) option 'future.delete' is not set to FALSE (which it
+   is if running in interactive mode).  The new setup is useful
+   for troubleshooting failed BatchJobs futures in non-interactive
+   R sessions, which otherwise would be cleaned out when the R
+   session terminates (due to garbage collection calling delete()).
+
+BUG FIX:
+
+ o resolved() on a BatchJobs future could return FALSE even after
+   value() was called.  Added package test.
 
 
 Version: 0.9.0 [2016-04-15]
-o Package renamed to future.BatchJobs (was async).
-o Package requires R (>= 3.2.0) just so Mandelbrot demo works.
-o STANDARIZATION Now using option and environment names already defined
-  by the future package, i.e. future.maxTries, future.interval, and
-  R_FUTURE_MAXTRIES (used to be named async::* and R_ASYNC_*).
-o STANDARIZATION: Directories for BatchJobs are now created under
-  .future/<session>/ of the current directory (was .async/<session>/).
-  Also, those subdirectories now use prefix 'BatchJobs_' (was 'async').
-  This was done to have a common directory structure also for other
-  future backends that needs to keep files on the file system.
-o CLEANUP: Renamed AsyncTaskError to BatchJobsFutureError.
-o CLEANUP: Dropping AsyncListEnv.
+
+NEW FEATURES:
+
+ o Package renamed to future.BatchJobs (was async).
+
+ o Package requires R (>= 3.2.0) just so Mandelbrot demo works.
+
+ o STANDARIZATION Now using option and environment names already defined
+   by the future package, i.e. future.maxTries, future.interval, and
+   R_FUTURE_MAXTRIES (used to be named async::* and R_ASYNC_*).
+   
+ o STANDARIZATION: Directories for BatchJobs are now created under
+   .future/<session>/ of the current directory (was .async/<session>/).
+   Also, those subdirectories now use prefix 'BatchJobs_' (was 'async').
+   This was done to have a common directory structure also for other
+   future backends that needs to keep files on the file system.
+
+DEPRECATED AND DEFUNCT:
+
+ o CLEANUP: Renamed AsyncTaskError to BatchJobsFutureError.
+
+ o CLEANUP: Dropping AsyncListEnv.
 
 
 Version: 0.8.0 [2016-04-14]
-o batchjobs() function gained class attribute.
-o Renamed BatchJobsAsyncTask to BatchJobsFuture.
-o CLEANUP: Removed no-longer needed asyncBatchEvalQ() because
-  BatchJobsFuture is now self sufficient.
-o BUG FIX: Global variables with the same name as objects in the
-  base or the BatchJobs package would be overridden by the
-  latter, e.g. a global variable 'col' would be masked by
-  'base::col'. (Issue #55)
+
+NEW FEATURES:
+
+ o batchjobs() function gained class attribute.
+ 
+ o Renamed BatchJobsAsyncTask to BatchJobsFuture.
+ 
+ o CLEANUP: Removed no-longer needed asyncBatchEvalQ() because
+   BatchJobsFuture is now self sufficient.
+
+BUG FIX:
+
+ o Global variables with the same name as objects in the base or the
+   BatchJobs package would be overridden by the latter, e.g. a global
+   variable 'col' would be masked by 'base::col'. (Issue #55)
 
 
 Version: 0.7.1 [2016-01-04]
-o BUG FIX: New BatchJobs work directories would encode 08:03 as
-  ' 803' instead of '0803' resulting in a BatchJobs assertion
-  error on invalid pathnames.
+
+BUG FIX:
+
+ o New BatchJobs work directories would encode 08:03 as ' 803' instead
+   of '0803' resulting in a BatchJobs assertion error on invalid pathnames.
 
 
 Version: 0.7.0 [2016-01-02]
-o Now value() for BatchJobsAsyncTask removes associated BatchJobs
-  subdirectories upon success.  Previously, such cleanup was only
-  happening when the object was garbage collected.
-o Each R session that load the async package now uses a unique
-  subdirectory under .async/, e.g. .async/20160102_154202-IVBRy1/.
-  It is in turn under that session-specific subdirectory that the
-  individual BatchJobs subdirectories corresponding to a specific
-  future lives.  Note that, although, the each of latter is removed
-  when calling value() for its future, the session-specific async
-  directory is not removed.  In order to remove the latter, make
-  sure to resolve all futures.  Then call unloadNamespace("async"),
-  which will try to remove the directory.
+
+NEW FEATURES:
+
+ o Now value() for BatchJobsAsyncTask removes associated BatchJobs
+   subdirectories upon success.  Previously, such cleanup was only
+   happening when the object was garbage collected.
+   
+ o Each R session that load the async package now uses a unique
+   subdirectory under .async/, e.g. .async/20160102_154202-IVBRy1/.
+   It is in turn under that session-specific subdirectory that the
+   individual BatchJobs subdirectories corresponding to a specific
+   future lives.  Note that, although, the each of latter is removed
+   when calling value() for its future, the session-specific async
+   directory is not removed.  In order to remove the latter, make
+   sure to resolve all futures.  Then call unloadNamespace("async"),
+   which will try to remove the directory.
 
 
 Version: 0.6.2 [2015-11-21]
-o BUG FIX: asyncBatchEvalQ() would not export globals that belongs
-  to a package but are not exported.
+
+BUG FIX:
+
+ o asyncBatchEvalQ() would not export globals that belongs to a package
+   but are not exported.
 
 
 Version: 0.6.1 [2015-10-20]
-o CLEANUP: Package no longer attaches listenv.
-o BUG FIX: Globals that were copies of package objects
-  were not exported to the future environments.
+
+NEW FEATURES:
+
+ o CLEANUP: Package no longer attaches listenv.
+
+BUG FIX:
+
+ o Globals that were copies of package objects were not exported to the
+   future environments.
 
 
 Version: 0.6.0 [2015-10-05]
-o batchjobs(sum(x, ...), globals=TRUE) now handles `...` properly.
-o ROBUSTNESS: asyncBatchEvalQ() gives an informative error when
-  a global variables starting with a period needs to be exported;
-  these are currently not supported due to limitations in the
-  BatchJobs package.
-o WORKAROUND: Global variables with names starting with a period
-  ort that does not match pattern '[a-zA-Z0-9._-]+' could not be
-  exported due to BatchJobs limitation.  Until resolved by BatchJobs,
-  this package encode and decode such variable names automatically.
-o ROBUSTNESS: Package test coverage is 88%.
-o BUG FIX: resolved() for AsyncFuture:s would always give FALSE
-  unless value() of the future has been called first.
+
+GLOBAL VARIABLES:
+
+ o batchjobs(sum(x, ...), globals=TRUE) now handles `...` properly.
+
+ o ROBUSTNESS: asyncBatchEvalQ() gives an informative error when
+   a global variables starting with a period needs to be exported;
+   these are currently not supported due to limitations in the
+   BatchJobs package.
+
+BUG FIX:
+
+ o resolved() for AsyncFuture:s would always give FALSE unless value()
+   of the future has been called first.
+
+ o WORKAROUND: Global variables with names starting with a period
+   ort that does not match pattern '[a-zA-Z0-9._-]+' could not be
+   exported due to BatchJobs limitation.  Until resolved by BatchJobs,
+   this package encode and decode such variable names automatically.
 
 
 Version: 0.5.2 [2015-07-30]
-o CLEANUP: Dropped %backend% - use %plan% backend(...) instead.
-o BUG FIX: batchjobs(..., backend="interactive") changed
-  also the default backend.
+
+DEPRECATED AND DEFUNCT:
+
+ o CLEANUP: Dropped %backend% - use %plan% backend(...) instead.
+
+BUG FIX:
+
+ o batchjobs(..., backend="interactive") changed also the default backend.
 
 
 Version: 0.5.1 [2015-07-29]
-o Adjusted to future (>= 0.7.0).
-o CLEANUP: Dropped functions and tests that are now in the
-  future package.
+
+ o Adjusted to future (>= 0.7.0).
+
+ o CLEANUP: Dropped functions and tests that are now in the
+   future package.
 
 
 Version: 0.5.0 [2015-06-19]
-o Adjusted to future (>= 0.5.1).
+
+ o Adjusted to future (>= 0.5.1).
 
 
 Version: 0.4.2 [2015-06-14]
-o Added demo("mandelbrot", package="async").
-o Added run() for BatchJobsAsyncTask.
-o CLEANUP: BatchJobsAsyncTask no longer registers/submits jobs.
-o CLEANUP: Dropped asyncEvalQ().
-o CLEANUP: Dropped async() - now batchjobs().
-o CLEANUP: Dropped makeClusterFunctionsRscript().
-o CLEANUP: Dropped delayed assignment %<-% infix operator.
+
+NEW FEATURES:
+
+ o Added run() for BatchJobsAsyncTask.
+
+DOCUMENTATION:
+
+ o Added demo("mandelbrot", package="async").
+
+DEPRECATED AND DEFUNCT:
+
+ o CLEANUP: BatchJobsAsyncTask no longer registers/submits jobs.
+
+ o CLEANUP: Dropped asyncEvalQ().
+
+ o CLEANUP: Dropped async() - now batchjobs().
+ 
+ o CLEANUP: Dropped makeClusterFunctionsRscript().
+ 
+ o CLEANUP: Dropped delayed assignment %<-% infix operator.
 
 
 Version: 0.4.1 [2015-06-14]
-o Add batchjobs() allowing for plan(batchjobs, backend="multicore").
-o BatchJobsAsyncTask() and internal tempRegistry() gained
-  argument 'backend'.
+
+NEW FEATURES:
+
+ o Add batchjobs() allowing for plan(batchjobs, backend="multicore").
+
+ o BatchJobsAsyncTask() and internal tempRegistry() gained
+   argument 'backend'.
 
 
 Version: 0.4.0 [2015-06-08]
-o CLEANUP: Extract Future API and moved to new package 'future'.
-o Now delayedAsyncAssign() returns a Future.
-o BUG FIX: The existance of .BatchJobs.R would override
-  whatever backend was already set by backend().
-o BUG FIX: Asynchroneous evaluation of { a <<- 1 } no longer
-  identifies 'a' as a global variable that needs to be exported.
+
+ o CLEANUP: Extract Future API and moved to new package 'future'.
+
+ o Now delayedAsyncAssign() returns a Future.
+
+BUG FIX:
+
+ o The existance of .BatchJobs.R would override whatever backend was
+   already set by backend().
+   
+ o Asynchronous evaluation of { a <<- 1 } no longer identifies 'a' as
+   a global variable that needs to be exported.
 
 
 Version: 0.3.1 [2015-05-23]
-o CLEANUP: Moved more internal code to the 'listenv' package.
+
+ o CLEANUP: Moved more internal code to the 'listenv' package.
 
 
 Version: 0.3.0 [2015-05-21]
-o Now inspect(envir=x) returns all tasks if only the environment
-  is specified, e.g. inspect(envir=x) vs inspect(x$a).
-o Added completed() and failed(), expired().
-o Any flavor of backend("multicore") is based on availableCores().
-o Added availableCores() for identifying the number of available cores.
-  The default is to acknowledged the assigned number of cores by
-  queing systems such as Torque/PBS, before using detectCores() of
-  the 'parallel' package.
-o CLEANUP: Moved identification of globals to new 'globals' package.
-o CLEANUP: Moved list environments to new 'listenv' package.
-o ROBUSTNESS: Asynchroneous tasks that still run when R exists
-  will not be stopped and not deleted.  This will allow the tasks
-  running on job clusters to complete.
-o BUG FIX: AsyncTask objects were not assigned to the listenv.
+
+NEW FEATURES:
+
+ o Now inspect(envir=x) returns all tasks if only the environment
+   is specified, e.g. inspect(envir=x) vs inspect(x$a).
+
+ o Added completed() and failed(), expired().
+
+ o Any flavor of backend("multicore") is based on availableCores().
+
+ o Added availableCores() for identifying the number of available cores.
+   The default is to acknowledged the assigned number of cores by
+   queing systems such as Torque/PBS, before using detectCores() of
+   the 'parallel' package.
+
+ o ROBUSTNESS: Asynchronous tasks that still run when R exists
+   will not be stopped and not deleted.  This will allow the tasks
+   running on job clusters to complete.
+
+ o CLEANUP: Moved list environments to new 'listenv' package.
+
+ o CLEANUP: Moved identification of globals to new 'globals' package.
+
+BUG FIX:
+
+ o AsyncTask objects were not assigned to the listenv.
 
 
 Version: 0.2.0 [2015-05-11]
-o Functions AsyncTask() and delayedAsyncAssign() gained argument
-  'substitute' for controlling whether the expression/value
-  should  be substitute():d or not.
-o ROBUSTNESS: Added package tests for delayedAsyncAssign().
-o ROBUSTNESS: Package test coverage is 77%.
-o CLEANUP: Internal restructuring with more informative classes.
+
+NEW FEATURES:
+
+ o Functions AsyncTask() and delayedAsyncAssign() gained argument
+   'substitute' for controlling whether the expression/value
+   should  be substitute():d or not.
+
+ o ROBUSTNESS: Added package tests for delayedAsyncAssign().
+
+ o CLEANUP: Internal restructuring with more informative classes.
 
 
 Version: 0.1.4 [2015-05-02]
-o Added print() for listenv:s.
-o CLEANUP: Using tempvar() of R.utils.
+
+NEW FEATURES:
+
+ o Added print() for listenv:s.
+
+ o CLEANUP: Using tempvar() of R.utils.
 
 
 Version: 0.1.3 [2015-04-26]
-o Added AsyncListEnv.
-o ROBUSTNESS: Add protection for trying to evaluating asynchroneous
-  expressions with global objects that are "too large" and therefore
-  introduces lots of overhead in exporting to, and importing from
-  workers.  The size limit of the maximum allowed total export size
-  is controlled by option 'async::maxSizeOfGlobals'.
+
+NEW FEATURES:
+
+ o Added AsyncListEnv.
+
+GLOBAL VARIABLES:
+
+ o ROBUSTNESS: Add protection for trying to evaluating asynchronous
+   expressions with global objects that are "too large" and therefore
+   introduces lots of overhead in exporting to, and importing from
+   workers.  The size limit of the maximum allowed total export size
+   is controlled by option 'async::maxSizeOfGlobals'.
 
 
 Version: 0.1.2 [2015-04-21]
-o Now status(), finished() etc. for AsyncTask returns NA in case
-  task backend registry is deleted.  print() does a better job
-  too in this case.
-o Now inspect() also accepts complex input such as inspect(a$x),
-  inspect(a[["x"]]) and inspect(a[[1]]).  It also accepts a
-  character name such as inspect("x", envir=a).
-o Now await() for AsyncTask gives an more informative error message
-  in case the backend registry was preemptively deleted.
-o Added error classes AsyncError and AsyncTaskError with more
-  informative error messages simplifying troubleshooting.
-o CLEANUP: Now async BatchJobs registries are created in ./.async/
-o BUG FIX: Delayed (synchroneous and asynchroneous) assignments to
-  listenv:s did not update the internal name-to-variable map, which
-  effectively made such listenv:s object empty (although the assign
-  value was stored internally).
+
+NEW FEATURES:
+
+ o Now status(), finished() etc. for AsyncTask returns NA in case
+   task backend registry is deleted.  print() does a better job
+   too in this case.
+
+ o Now inspect() also accepts complex input such as inspect(a$x),
+   inspect(a[["x"]]) and inspect(a[[1]]).  It also accepts a
+   character name such as inspect("x", envir=a).
+
+ o Now await() for AsyncTask gives an more informative error message
+   in case the backend registry was preemptively deleted.
+
+ o Added error classes AsyncError and AsyncTaskError with more
+   informative error messages simplifying troubleshooting.
+
+ o CLEANUP: Now async BatchJobs registries are created in ./.async/
+
+BUG FIX:
+
+ o Delayed (synchronous and asynchronous) assignments to listenv:s did
+   not update the internal name-to-variable map, which effectively made
+   such listenv:s object empty (although the assign value was stored
+   internally).
 
 
 Version: 0.1.1 [2015-04-07]
-o BUG FIX: asyncBatchEvalQ() would given "Error in packageVersion(pkg) :
-  package 'R_GlobalEnv'" if the expression had a global function defined
-  in the global environment.  Now asyncBatchEvalQ() does a better jobs
-  in identifying package names.  Added package tests for this case.
+
+BUG FIX:
+
+ o asyncBatchEvalQ() would given "Error in packageVersion(pkg) : package
+   'R_GlobalEnv'" if the expression had a global function defined in the
+   global environment.  Now asyncBatchEvalQ() does a better jobs in
+   identifying package names.  Added package tests for this case.
 
 
 Version: 0.1.0 [2015-02-07]
-o First prototype of an old idea of asynchronous evaluations with
-  delayed assignments.
-o Created.
+
+ o First prototype of an old idea of asynchronous evaluations with
+   delayed assignments.
+
+ o Created.
