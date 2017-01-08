@@ -119,30 +119,25 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
 #' @export
 #' @keywords internal
 print.BatchJobsFuture <- function(x, ...) {
-  printf("%s:\n", class(x)[1L])
+  NextMethod("print")
 
-  label <- x$label
-  if (is.null(label)) label <- "<none>"
-  printf("Label: %s\n", sQuote(label))
+  ## BatchJobs specific
   
-  printf("Expression:\n")
-  code <- captureOutput(print(x$expr))
-  code <- paste(sprintf("  %s", code), collapse="\n")
-  printf("%s\n", code)
-
+  ## Type of BatchJobs future
+  config <- x$config
+  printf("BatchJobs cluster functions: %s\n", sQuote(config$cluster.functions$name))
+  
   ## Ask for status once
   status <- status(x)
-  printf("Status: %s\n", paste(sQuote(status), collapse=", "))
+  printf("BatchJobs status: %s\n", paste(sQuote(status), collapse=", "))
   if ("error" %in% status) printf("Error: %s\n", loggedError(x))
 
-  printf("BatchJobs configuration:\n")
-  config <- x$config
   reg <- config$reg
-  if (isNA(status(x))) {
-    printf("%s: Not found (happens when finished and deleted)\n", class(reg))
+  if (isNA(status)) {
+    printf("BatchJobs %s: Not found (happens when finished and deleted)\n", class(reg))
   } else {
+    printf("BatchJobs Registry:\n  ")
     print(reg)
-    printf("Cluster functions: %s\n", sQuote(config$cluster.functions$name))
   }
 }
 
