@@ -70,6 +70,8 @@ DEPRECATED AND DEFUNCT:
 
  o Removed non-used completed(), failed() and expired() for BatchJobs objects.
 
+ o Deprecated plan(batchjobs, backend=...).
+
  o Deprecated backend().
 
 
