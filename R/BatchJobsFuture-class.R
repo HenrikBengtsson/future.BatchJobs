@@ -563,7 +563,7 @@ await <- function(...) UseMethod("await")
 #' @param future The future.
 #' @param cleanup If TRUE, the registry is completely removed upon
 #' success, otherwise not.
-#' @param times The number of tries before giving up.
+#' @param timeout Total time (in seconds) waiting before generating an error.
 #' @param delta The number of seconds to wait the first time.
 #' @param alpha A factor to scale up the waiting time in each iteration
 #' such that the waiting time in the k:th iteration is \code{alpha^k*delta}.
@@ -581,10 +581,10 @@ await <- function(...) UseMethod("await")
 #' @export
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @keywords internal
-await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.wait.times", 1000L), delta=getOption("future.wait.interval", 1.0), alpha=getOption("future.wait.alpha", 1.01), ...) {
+await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("future.wait.timeout", 30*24*60*60), delta=getOption("future.wait.interval", 0.2), alpha=getOption("future.wait.alpha", 1.01), ...) {
   mdebug <- importFuture("mdebug")
-  
-  times <- as.integer(times)
+  stopifnot(is.finite(timeout), timeout >= 0)
+  stopifnot(is.finite(alpha), alpha > 0)
 
   debug <- getOption("future.debug", FALSE)
   mdebug("Polling...")
@@ -603,17 +603,20 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.
   final_state_prev <- NULL
   finish_states <- c("done", "error", "expired")
 
-  stat <- NULL
-  tries <- 1L
+  t0 <- Sys.time()
+  dt <- 0
+  iter <- 1L
   interval <- delta
+  stat <- NULL
   finished <- FALSE
-  while (tries <= times) {
+  while (dt <= timeout) {
     stat <- status(future)
-    mdebug(" Status %d: %s\n", tries, paste(stat, collapse=", "))
     if (isNA(stat)) {
       finished <- TRUE
       break
     }
+    mdebug(sprintf("Poll #%d (%s): status = %s", iter, format(round(dt, digits = 2L)), stat))
+    
     if (any(finish_states %in% stat)) {
       final_state <- intersect(stat, finish_states)
 
@@ -639,9 +642,13 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.
         break
       }
     }
+
+    ## Wait
     Sys.sleep(interval)
     interval <- alpha*interval
-    tries <- tries + 1L
+
+    iter <- iter + 1L
+    dt <- difftime(Sys.time(), t0)
   }
 
   res <- NULL
@@ -666,7 +673,7 @@ await.BatchJobsFuture <- function(future, cleanup=TRUE, times=getOption("future.
     if (debug) { mstr(res) }
   } else {
     cleanup <- FALSE
-    msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchronous evaluation for future ('%s') is still running: %s", tries-1L, interval, label, reg$file.dir)
+    msg <- sprintf("AsyncNotReadyError: Polled for results %d times every %g seconds, but asynchronous evaluation for future ('%s') is still running: %s", iter-1L, interval, label, reg$file.dir)
     stop(BatchJobsFutureError(msg, future=future))
   }
 

@@ -1,7 +1,13 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.13.1-9000 [2016-12-28]
+Version: 0.13.1-9000 [2017-02-02]
+
+NEW FEATURES:
+
+ o Option 'future.wait.timeout' (replaces 'future.wait.times') specifies
+   the maximum waiting time for BatchJobs futures to finish before
+   generating a timeout error.
 
 BUG FIX:
 
