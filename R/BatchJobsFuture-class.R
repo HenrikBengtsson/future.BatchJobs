@@ -608,14 +608,15 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
   iter <- 1L
   interval <- delta
   stat <- NULL
+  expired_countdown <- 0L
   finished <- FALSE
-  while (dt <= timeout) {
+  while (dt <= timeout || expired_countdown > 0) {
     stat <- status(future)
     if (isNA(stat)) {
       finished <- TRUE
       break
     }
-    mdebug(sprintf("Poll #%d (%s): status = %s", iter, format(round(dt, digits = 2L)), stat))
+    mdebug(sprintf("Poll #%d (%s): status = %s", iter, format(round(dt, digits = 2L)), paste(stat, collapse = ", ")))
     
     if (any(finish_states %in% stat)) {
       final_state <- intersect(stat, finish_states)
@@ -626,13 +627,12 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
       if ("expired" %in% final_state) {
         if (!identical(final_state, final_state_prev)) {
           final_state_prev <- final_state
-    	  final_countdown <- 5L
+    	  expired_countdown <- 20L
           interval <- delta
-  	  times <- times + final_countdown
         } else {
-          final_countdown <- final_countdown - 1L
-          mdebug(" 'expired' status countdown: %d", final_countdown)
-          if (final_countdown == 0L) {
+          expired_countdown <- expired_countdown - 1L
+          mdebug(" 'expired' status countdown: %d", expired_countdown)
+          if (expired_countdown == 0L) {
             finished <- TRUE
             break
   	  }

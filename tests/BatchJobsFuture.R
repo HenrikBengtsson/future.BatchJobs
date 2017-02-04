@@ -105,8 +105,9 @@ message("*** BatchJobsFuture() - timeout ...")
 
 if (fullTest && availableCores(constraints="multicore") > 1) {
   plan(batchjobs_multicore)
-  
-  options(future.wait.times=1L, future.wait.interval=0.1)
+
+  ## Wait only one iteration
+  options(future.wait.timeout=0.15, future.wait.interval = 0.1)
   
   f <- future({
     Sys.sleep(5)
