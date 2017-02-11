@@ -1,5 +1,4 @@
 source("incl/start.R")
-library("listenv")
 
 message("*** batchjobs_template() ...")
 
