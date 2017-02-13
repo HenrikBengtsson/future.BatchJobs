@@ -24,7 +24,7 @@ NEW FEATURES:
    
  o Added argument 'label' to batchjobs_*() futures which are reflected
    in the job name listed by schedulers.  Because of limitation is
-   BatchJobs, not all characters in the labels are support and are
+   BatchJobs, not all characters in the labels are supported and are
    therefore dropped in the job names.
 
 GLOBAL VARIABLES:
