@@ -45,3 +45,8 @@ Rplots.pdf$
 ^[.]BatchJobs[.]R$
 [.]future
 
+#----------------------------
+# packrat
+#----------------------------
++^packrat/
++^\.Rprofile$
