@@ -48,5 +48,5 @@ Rplots.pdf$
 #----------------------------
 # packrat
 #----------------------------
-+^packrat/
-+^\.Rprofile$
+^packrat/
+^\.Rprofile$
