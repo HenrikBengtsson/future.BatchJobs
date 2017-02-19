@@ -29,4 +29,3 @@ An object of class \code{BatchJobsFuture}.
 \description{
 A BatchJobs future represents a future that is resolved by one of the many BatchJobs backends
 }
-

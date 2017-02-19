@@ -13,4 +13,3 @@ BatchJobsFutureError(...)
 FutureError class for errors related to BatchJobsFuture:s
 }
 \keyword{internal}
-

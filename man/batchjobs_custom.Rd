@@ -56,4 +56,3 @@ configuration files (if they exist):
  \item \code{.BatchJobs.R} (in the current directory)
 }
 }
-

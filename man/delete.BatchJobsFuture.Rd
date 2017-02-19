@@ -35,4 +35,3 @@ for each failed try.}
 Removes a BatchJobs future
 }
 \keyword{internal}
-

@@ -74,4 +74,3 @@ that is how the term "multicore processing" is typically used
 in the R world).
 }
 \keyword{internal}
-

@@ -38,4 +38,3 @@ and will no longer available in subsequent calls.  If called
 again, an error may be thrown.
 }
 \keyword{internal}
-
