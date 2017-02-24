@@ -100,9 +100,6 @@ batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, glo
                             cluster.functions=cf,
 			    job.delay=job.delay, ...)
 
-  ## BACKWARD COMPATIBILTY: future (<= 1.2.0)
-  if (is.null(future$lazy)) future$lazy <- FALSE
-  
   if (!future$lazy) future <- run(future)
 
   future

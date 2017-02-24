@@ -59,9 +59,6 @@ batchjobs <- function(expr, envir=parent.frame(), substitute=TRUE, backend=NULL,
                             backend=backend, workers=workers, ...)
 
   ## 2. Launch
-  ## BACKWARD COMPATIBILTY: future (<= 1.2.0)
-  if (is.null(future$lazy)) future$lazy <- FALSE
-  
   if (!future$lazy) future <- run(future)
 
   future
