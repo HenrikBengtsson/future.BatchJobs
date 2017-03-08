@@ -3,11 +3,9 @@ ovars <- ls()
 oopts <- options(warn=1L, mc.cores=2L, future.debug=TRUE)
 oopts$future.delete <- getOption("future.delete")
 oplan <- future::plan()
-obackend <- future.BatchJobs::backend()
 
 ## Use local BatchJobs futures by default
 future::plan(future.BatchJobs:::batchjobs_local)
-future.BatchJobs::backend("local")
 
 fullTest <- (Sys.getenv("_R_CHECK_FULL_") != "")
 

@@ -78,7 +78,7 @@ message("*** nbrOfWorkers() - conf ...")
 
 n <- nbrOfWorkers(batchjobs_custom)
 message("Number of workers: ", n)
-stopifnot(n == 1)
+stopifnot(is.infinite(n), n > 0)
 
 n <- nbrOfWorkers(tweak(batchjobs_custom, workers=2L))
 message("Number of workers: ", n)
@@ -89,25 +89,6 @@ print(res)
 stopifnot(inherits(res, "try-error"))
 
 message("*** nbrOfWorkers() - conf ... DONE")
-
-
-message("*** nbrOfWorkers() - backend() ...")
-
-backend("interactive")
-n <- nbrOfWorkers(batchjobs)
-message("Number of workers: ", n)
-stopifnot(n == 1)
-
-backend(".BatchJobs.R")
-n <- nbrOfWorkers(batchjobs)
-message("Number of workers: ", n)
-stopifnot(is.infinite(n) || n == 1)
-
-n <- nbrOfWorkers(tweak(batchjobs, backend="local"))
-message("Number of workers: ", n)
-stopifnot(n == 1)
-
-message("*** nbrOfWorkers() - backend() ... DONE")
 
 
 message("*** nbrOfWorkers() ... DONE")

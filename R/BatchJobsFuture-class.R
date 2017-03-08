@@ -165,6 +165,7 @@ loggedOutput <- function(...) UseMethod("loggedOutput")
 #' @export loggedError
 #' @export loggedOutput
 #' @importFrom BatchJobs getStatus
+#' @importFrom utils file_test
 status.BatchJobsFuture <- function(future, ...) {
   ## WORKAROUND: Avoid warnings on partially matched arguments
   getStatus <- function(...) {
@@ -490,21 +491,7 @@ run.BatchJobsFuture <- function(future, ...) {
   if (is.null(conf)) {
     ## 3. Create BatchJobs backend configuration
     cluster.functions <- future$config$cluster.functions
-    if (is.null(cluster.functions)) {
-      ## Set backend here? (legacy code)
-      ## Use a non-default backend?
-      backend <- future$config$backend ### FIXME: /HB 2016-03-20 Issue #49
-      if (!is.null(backend)) {
-        obackend <- backend()
-        on.exit(backend(obackend), add=TRUE)
-        backend(backend)
-      }
-
-      ## Record
-      cluster.functions <- getClusterFunctions()
-      future$config$cluster.functions <- cluster.functions
-    }
-
+    stopifnot(!is.null(cluster.functions))
     conf <- makeBatchJobsConf(cluster.functions)
   }
 
@@ -701,6 +688,7 @@ delete <- function(...) UseMethod("delete")
 #'
 #' @export
 #' @importFrom BatchJobs removeRegistry
+#' @importFrom utils file_test
 #' @keywords internal
 delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip"), onFailure=c("error", "warning", "ignore"), onMissing=c("ignore", "warning", "error"), times=10L, delta=getOption("future.wait.interval", 1.0), alpha=getOption("future.wait.alpha", 1.01), ...) {
   mdebug <- importFuture("mdebug")

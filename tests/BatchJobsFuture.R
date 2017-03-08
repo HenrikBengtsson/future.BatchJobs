@@ -25,7 +25,7 @@ print(res)
 stopifnot(inherits(res, "warning"))
 
 ## Printing a deleted future
-f <- batchjobs(42L)
+f <- batchjobs_local(42L)
 print(f)
 v <- value(f)
 print(v)

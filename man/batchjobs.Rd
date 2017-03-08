@@ -27,5 +27,7 @@ workers.  If NULL, the default is used.}
 An object of class \code{BatchJobsFuture}.
 }
 \description{
-A BatchJobs future represents a future that is resolved by one of the many BatchJobs backends
+\emph{This function is defunct.  Please use \code{plan()} with one
+of the available \code{batchjobs_*} future strategies.}
 }
+\keyword{internal}

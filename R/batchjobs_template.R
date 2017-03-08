@@ -73,6 +73,7 @@ class(batchjobs_torque) <- c("batchjobs_torque", "batchjobs", "multiprocess", "f
 #' @importFrom BatchJobs makeClusterFunctionsSGE
 #' @importFrom BatchJobs makeClusterFunctionsSLURM
 #' @importFrom BatchJobs makeClusterFunctionsTorque
+#' @importFrom utils file_test
 batchjobs_by_template <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, pathname=NULL, type=c("lsf", "openlava", "sge", "slurm", "torque"), resources=list(), label="BatchJobs", job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
   type <- match.arg(type)
