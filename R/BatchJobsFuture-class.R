@@ -92,9 +92,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
       if (length(unknown) > 0) {
         stop("Detected non-supported field name in argument 'args'. The BatchJobs backend only supports 'resources': ", paste(sQuote(unknown), collapse=", "))
       }
-      for (name in names) {
-        config[[name]] <- args[[name]]
-      }
+      for (name in names) config[[name]] <- args[[name]]
       .Deprecated(msg="Argument 'args' is deprecated in future.BatchJobs (>= 0.13.0). Please use argument 'resources' instead.")
     }
   }
