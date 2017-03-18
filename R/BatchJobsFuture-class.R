@@ -525,7 +525,6 @@ run.BatchJobsFuture <- function(future, ...) {
   future$state <- 'running'
   resources <- future$config$resources
   if (is.null(resources)) resources <- list()
-  resources$workers <- future$workers
   job.delay <- future$config$job.delay
 
   submitJobs(reg, ids=jobid, resources=resources, job.delay=job.delay)
