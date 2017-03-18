@@ -40,8 +40,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   if (!is.null(workers)) {
     stopifnot(length(workers) >= 1)
     if (is.numeric(workers)) {
-      stopifnot(all(is.finite(workers)), all(workers >= 1),
-                is.finite(prod(workers)))
+      stopifnot(!anyNA(workers), all(workers >= 1))
     } else if (is.character(workers)) {
     } else {
       stopifnot("Argument 'workers' should be either numeric or character: ", mode(workers))
@@ -306,7 +305,7 @@ value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "e
     future$state <- 'failed'
     future$value <- ex
   })
-
+  
   NextMethod("value")
 } # value()
 
@@ -523,7 +522,6 @@ run.BatchJobsFuture <- function(future, ...) {
       envs
     }, error = function(ex) list())
   }
-
 
   ## 5. Submit
   future$state <- 'running'

@@ -5,6 +5,13 @@ Version: 0.13.1-9000 [2017-03-07]
 
 NEW FEATURES:
 
+ o The number of jobs one can add to the queues of HPC schedulers is in
+   principle unlimited, which is why the number of available workers for
+   such batchjobs_* backends is reported as +Inf.  However, as the number
+   of workers is used by future_lapply() to decide how many futures should
+   be used to best partition the elements, this means that future_lapply()
+   will always use one future per element.
+ 
  o Option 'future.wait.timeout' (replaces 'future.wait.times') specifies
    the maximum waiting time for BatchJobs futures to finish before
    generating a timeout error.

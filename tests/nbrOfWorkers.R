@@ -1,5 +1,4 @@
 source("incl/start.R")
-library("listenv")
 
 message("*** nbrOfWorkers() ...")
 
@@ -71,6 +70,20 @@ n <- nbrOfWorkers(batchjobs_torque)
 message("Number of workers: ", n)
 stopifnot(is.infinite(n))
 
+plan(batchjobs_torque)
+n <- nbrOfWorkers()
+message("Number of workers: ", n)
+stopifnot(is.infinite(n))
+
+n <- nbrOfWorkers(tweak(batchjobs_torque, workers = 2L))
+message("Number of workers: ", n)
+stopifnot(n == 2L)
+
+plan(batchjobs_torque, workers = 2L)
+n <- nbrOfWorkers()
+message("Number of workers: ", n)
+stopifnot(n == 2L)
+
 message("*** nbrOfWorkers() - templates ... DONE")
 
 
@@ -82,7 +95,7 @@ stopifnot(is.infinite(n), n > 0)
 
 n <- nbrOfWorkers(tweak(batchjobs_custom, workers=2L))
 message("Number of workers: ", n)
-stopifnot(n == 2)
+stopifnot(n == 2L)
 
 res <- try(n <- nbrOfWorkers(tweak(batchjobs_custom, workers=FALSE)), silent=TRUE)
 print(res)

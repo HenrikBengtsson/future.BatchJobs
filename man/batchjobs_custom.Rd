@@ -6,7 +6,7 @@
 \usage{
 batchjobs_custom(expr, envir = parent.frame(), substitute = TRUE,
   globals = TRUE, label = "BatchJobs", conf = NULL, pathname = NULL,
-  workers = NULL, resources = list(), job.delay = FALSE, ...)
+  workers = Inf, resources = list(), job.delay = FALSE, ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}

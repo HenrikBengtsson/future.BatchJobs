@@ -11,23 +11,23 @@
 \usage{
 batchjobs_lsf(expr, envir = parent.frame(), substitute = TRUE,
   globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), job.delay = FALSE, ...)
+  resources = list(), workers = Inf, job.delay = FALSE, ...)
 
 batchjobs_openlava(expr, envir = parent.frame(), substitute = TRUE,
   globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), job.delay = FALSE, ...)
+  resources = list(), workers = Inf, job.delay = FALSE, ...)
 
 batchjobs_sge(expr, envir = parent.frame(), substitute = TRUE,
   globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), job.delay = FALSE, ...)
+  resources = list(), workers = Inf, job.delay = FALSE, ...)
 
 batchjobs_slurm(expr, envir = parent.frame(), substitute = TRUE,
   globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), job.delay = FALSE, ...)
+  resources = list(), workers = Inf, job.delay = FALSE, ...)
 
 batchjobs_torque(expr, envir = parent.frame(), substitute = TRUE,
   globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), job.delay = FALSE, ...)
+  resources = list(), workers = Inf, job.delay = FALSE, ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
@@ -45,6 +45,9 @@ should be located.}
 \item{pathname}{A BatchJobs template file (\pkg{brew} formatted).}
 
 \item{resources}{A named list passed to the BatchJobs template (available as variable \code{resources}).}
+
+\item{workers}{(optional) Additional specification for
+the BatchJobs backend.}
 
 \item{job.delay}{(optional) Passed as is to \code{\link[BatchJobs]{submitJobs}()}.}
 
