@@ -45,4 +45,3 @@ A BatchJobsFuture object
 A BatchJobs future is a future whose value will be resolved via BatchJobs
 }
 \keyword{internal}
-

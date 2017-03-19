@@ -34,7 +34,7 @@ sum_fcns$D <- function(x, y) {
 }
 
 
-for (strategy in c("eager", "lazy", "multiprocess", "batchjobs")) {
+for (strategy in c("eager", "lazy", "multiprocess", "batchjobs_local")) {
   plan(strategy, substitute=FALSE)
 
   for (name in names(sum_fcns)) {

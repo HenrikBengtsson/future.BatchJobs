@@ -18,4 +18,3 @@ the current strategy.}
 Temporarily tweaks the resources for the current BatchJobs strategy
 }
 \keyword{internal}
-

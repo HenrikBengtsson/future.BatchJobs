@@ -33,7 +33,7 @@
 #' @importFrom BatchJobs makeClusterFunctionsLocal
 #' @aliases batchjobs_interactive
 #' @export
-batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", job.delay=FALSE, ...) {
+batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", workers=1L, job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
   cf <- makeClusterFunctionsLocal()
@@ -42,9 +42,10 @@ batchjobs_local <- function(expr, envir=parent.frame(), substitute=TRUE, globals
                             globals=globals,
 			    label=label,
 			    cluster.functions=cf,
+                            workers=workers,
 			    job.delay=job.delay, ...)
 
-  future <- run(future)
+  if (!future$lazy) future <- run(future)
 
   future
 }

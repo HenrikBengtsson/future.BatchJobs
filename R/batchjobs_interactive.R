@@ -2,7 +2,7 @@
 #'
 #' @importFrom BatchJobs makeClusterFunctionsInteractive
 #' @export
-batchjobs_interactive <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", job.delay=FALSE, ...) {
+batchjobs_interactive <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", workers=1L, job.delay=FALSE, ...) {
   if (substitute) expr <- substitute(expr)
 
   cf <- makeClusterFunctionsInteractive()
@@ -11,9 +11,10 @@ batchjobs_interactive <- function(expr, envir=parent.frame(), substitute=TRUE, g
                             globals=globals,
 			    label=label,
 			    cluster.functions=cf,
+                            workers=workers,
 			    job.delay=job.delay, ...)
 
-  future <- run(future)
+  if (!future$lazy) future <- run(future)
 
   future
 }

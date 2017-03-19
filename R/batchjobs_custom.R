@@ -29,7 +29,7 @@
 #' }
 #'
 #' @export
-batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", conf=NULL, pathname=NULL, workers=NULL, resources=list(), job.delay=FALSE, ...) {
+batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", conf=NULL, pathname=NULL, workers=Inf, resources=list(), job.delay=FALSE, ...) {
   findConfigs <- importBatchJobs("findConfigs")
   sourceConfFiles <- importBatchJobs("sourceConfFiles")
 
@@ -58,7 +58,8 @@ batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, global
                             resources=resources,
 			    job.delay=job.delay, ...)
   future$pathname <- pathname
-  future <- run(future)
+  
+  if (!future$lazy) future <- run(future)
 
   future
 }

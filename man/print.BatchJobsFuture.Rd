@@ -15,4 +15,3 @@
 Prints a BatchJobs future
 }
 \keyword{internal}
-

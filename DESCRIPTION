@@ -1,8 +1,8 @@
 Package: future.BatchJobs
-Version: 0.13.1
+Version: 0.14.0
 Depends:
     R (>= 3.2.0),
-    future (>= 1.1.1)
+    future (>= 1.4.0)
 Imports:
     BatchJobs (>= 1.6),
     R.utils
@@ -11,15 +11,17 @@ Suggests:
     markdown,
     R.rsp
 VignetteBuilder: R.rsp
-Title: A Future for BatchJobs
+Title: A Future API for Parallel and Distributed Processing using BatchJobs
 Authors@R: c(person("Henrik", "Bengtsson", role=c("aut", "cre", "cph"),
                                           email = "henrikb@braju.com"))
-Description: Simple parallel and distributed processing using futures
-    that utilizes the 'BatchJobs' framework,
-    e.g. 'fit %<-% { lm(y ~ x) }'.
-    This package implements the Future API of the 'future' package.
+Description: Implements of the Future API on top of the 'BatchJobs' package.
+    This allows you to process futures, as defined by the 'future' package,
+    in parallel out of the box, not only on your local machine or ad-hoc
+    cluster of machines, but also via high-performance compute ('HPC') job
+    schedulers such as 'LFS', 'OpenLava', 'Slurm', 'SGE', and 'TORQUE' / 'PBS',
+    e.g. 'y <- future_lapply(files, FUN = process)'.
 License: LGPL (>= 2.1)
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/future.BatchJobs
 BugReports: https://github.com/HenrikBengtsson/future.BatchJobs/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
