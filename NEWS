@@ -1,9 +1,13 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.14.0-9000 [2017-03-18]
+Version: 0.14.0-9000 [2017-03-19]
 
  o ...
+
+DOCUMENTATION:
+
+ o Removing remaining references to 'eager' (now using 'sequential').
  
 
 Version: 0.14.0 [2017-03-18]
