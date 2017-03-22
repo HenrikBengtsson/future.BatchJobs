@@ -1,7 +1,9 @@
 source("incl/start.R")
 library("listenv")
 
-strategies <- c("sequential", "multisession", "batchjobs_local")
+strategies <- c("sequential", "multisession",
+                "batchjobs_interactive", "batchjobs_local")
+
 message("*** future_lapply() ...")
 
 message("- future_lapply(x, FUN=vector, ...) ...")
