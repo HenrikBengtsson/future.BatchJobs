@@ -1,7 +1,7 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.14.0-9000 [2017-03-21]
+Version: 0.14.0-9000 [2017-05-28]
 
  o ...
 
@@ -12,6 +12,8 @@ DOCUMENTATION:
 SOFTWARE QUALITY:
 
  o Testing future_lapply() for batchjobs backends.
+
+ o TESTS: No longer testing with (deprecated) 'lazy' or 'eager' backends.
  
 
 Version: 0.14.0 [2017-03-18]
