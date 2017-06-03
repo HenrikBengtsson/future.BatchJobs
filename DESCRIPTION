@@ -1,8 +1,8 @@
 Package: future.BatchJobs
-Version: 0.14.0
+Version: 0.14.1
 Depends:
     R (>= 3.2.0),
-    future (>= 1.4.0)
+    future (>= 1.5.0)
 Imports:
     BatchJobs (>= 1.6),
     R.utils
@@ -18,7 +18,7 @@ Description: Implements of the Future API on top of the 'BatchJobs' package.
     This allows you to process futures, as defined by the 'future' package,
     in parallel out of the box, not only on your local machine or ad-hoc
     cluster of machines, but also via high-performance compute ('HPC') job
-    schedulers such as 'LFS', 'OpenLava', 'Slurm', 'SGE', and 'TORQUE' / 'PBS',
+    schedulers such as 'LSF', 'OpenLava', 'Slurm', 'SGE', and 'TORQUE' / 'PBS',
     e.g. 'y <- future_lapply(files, FUN = process)'.
 License: LGPL (>= 2.1)
 LazyLoad: TRUE

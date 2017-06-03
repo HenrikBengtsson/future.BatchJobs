@@ -14,7 +14,6 @@ await <- future.BatchJobs:::await
 delete <- future.BatchJobs:::delete
 importBatchJobs <- future.BatchJobs:::importBatchJobs
 importFuture <- future.BatchJobs:::importFuture
-isFALSE <- future.BatchJobs:::isFALSE
 isNA <- future.BatchJobs:::isNA
 isOS <- future.BatchJobs:::isOS
 hpaste <- future.BatchJobs:::hpaste

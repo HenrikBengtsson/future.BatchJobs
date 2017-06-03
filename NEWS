@@ -1,6 +1,19 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.14.1 [2017-05-30]
+
+DOCUMENTATION:
+
+ o Removing remaining references to 'eager' (now using 'sequential').
+
+SOFTWARE QUALITY:
+
+ o Testing future_lapply() for batchjobs backends.
+
+ o TESTS: No longer testing with (deprecated) 'lazy' or 'eager' backends.
+ 
+
 Version: 0.14.0 [2017-03-18]
 
 NEW FEATURES:

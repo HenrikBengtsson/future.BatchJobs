@@ -98,11 +98,11 @@ bams <- as.list(bams)
 ```
 Note that a user who do not have access to a cluster could use the same script processing samples sequentially and chromosomes in parallel on a single machine using:
 ```r
-plan(list(eager, multiprocess))
+plan(list(sequential, multiprocess))
 ```
 or samples in parallel and chromosomes sequentially using:
 ```r
-plan(list(multiprocess, eager))
+plan(list(multiprocess, sequential))
 ```
 
 For an introduction as well as full details on how to use futures,
