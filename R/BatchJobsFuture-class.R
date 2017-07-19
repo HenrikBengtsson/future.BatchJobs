@@ -58,6 +58,12 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   ## Create BatchJobsFuture object
   future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, workers=workers, label=label, ...)
 
+  ## Additional arguments to be available for the BatchJobs template?
+  ## NOTE: Support for 'args' will be removed soon. /HB 2016-07-15
+  if (is.element("args", names(future))) {
+    .Defunct(msg = "Argument 'args' is defunct in future.BatchJobs (>= 0.15.0). Please use argument 'resources' instead.")
+  }
+
   ## LEGACY: /HB 2016-05-20
   backend <- future$backend
   future$backend <- NULL
@@ -79,24 +85,6 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
                  backend=backend)
 
 
-  ## Additional arguments to be available for the BatchJobs template?
-  ## NOTE: Support for 'args' will be removed soon. /HB 2016-07-15
-  if (is.element("args", names(future))) {
-    args <- future$args
-    future$args <- NULL ## Cleanup
-    
-    stopifnot(is.list(args))
-    if (length(args) > 0) {
-      names <- names(args)
-      unknown <- setdiff(names, "resources")
-      if (length(unknown) > 0) {
-        stop("Detected non-supported field name in argument 'args'. The BatchJobs backend only supports 'resources': ", paste(sQuote(unknown), collapse=", "))
-      }
-      for (name in names) config[[name]] <- args[[name]]
-      .Deprecated(msg="Argument 'args' is deprecated in future.BatchJobs (>= 0.13.0). Please use argument 'resources' instead.")
-    }
-  }
-  
   future$config <- config
  
   future <- structure(future, class=c("BatchJobsFuture", class(future)))

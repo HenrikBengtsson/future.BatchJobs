@@ -27,6 +27,8 @@ DEPRECATED AND DEFUNCT:
 
  o Removed defunct batchjobs() and backend() functions.
 
+ o Passing hidden argument 'args' to BatchJobsFuture is now defunct.
+ 
 
 Version: 0.14.1 [2017-05-30]
 
