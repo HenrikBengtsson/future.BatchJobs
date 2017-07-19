@@ -244,8 +244,6 @@ loggedOutput.BatchJobsFuture <- function(future, ...) {
     stop(BatchJobsFutureError(msg, future=future))
   }
 
-  if (!"error" %in% stat) return(NULL)
-
   config <- future$config
   reg <- config$reg
   jobid <- config$jobid
