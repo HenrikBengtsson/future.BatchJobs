@@ -136,6 +136,8 @@ print.BatchJobsFuture <- function(x, ...) {
     printf("BatchJobs Registry:\n  ")
     print(reg)
   }
+
+  invisible(x)
 }
 
 
