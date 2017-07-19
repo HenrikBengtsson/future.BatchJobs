@@ -641,8 +641,19 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
       stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
-      msg <- sprintf("BatchJobExpiration: Future ('%s') expired: %s", label, reg$file.dir)
-      stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
+      msg <- sprintf("BatchJobsExpiration: Future ('%s') expired (registry path %s).", label, reg$file.dir)
+      output <- loggedOutput(future)
+      hint <- unlist(strsplit(output, split = "\n", fixed = TRUE))
+      hint <- hint[nzchar(hint)]
+      hint <- tail(hint, n = 6L)
+      if (length(hint) > 0) {
+        hint <- paste(hint, collapse = "\n")
+        msg <- sprintf("%s. The last few lines of the logged output:\n%s",
+                       msg, hint)
+      } else {
+        msg <- sprintf("%s. No logged output exist.", msg)
+      }
+      stop(BatchJobsFutureError(msg, future=future, output=output))
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Future ('%s') deleted: %s", label, reg$file.dir)
       stop(BatchJobsFutureError(msg, future=future))
