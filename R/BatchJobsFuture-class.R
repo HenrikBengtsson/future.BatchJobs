@@ -559,6 +559,7 @@ await <- function(...) UseMethod("await")
 #'
 #' @export
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
+#' @importFrom utils tail
 #' @keywords internal
 await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("future.wait.timeout", 30*24*60*60), delta=getOption("future.wait.interval", 0.2), alpha=getOption("future.wait.alpha", 1.01), ...) {
   mdebug <- importFuture("mdebug")
