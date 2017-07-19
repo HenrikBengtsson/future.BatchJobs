@@ -23,6 +23,10 @@ BUG FIXES:
  o loggedOutput() for BatchtoolsFuture would always return NULL unless an error
    had occured.
 
+DEPRECATED AND DEFUNCT:
+
+ o Removed defunct batchjobs() and backend() functions.
+
 
 Version: 0.14.1 [2017-05-30]
 
