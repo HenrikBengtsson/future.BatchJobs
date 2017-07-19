@@ -63,7 +63,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   future$backend <- NULL
 
   future$globals <- gp$globals
-  future$packages <- unique(packages, gp$packages)
+  future$packages <- unique(c(packages, gp$packages))
   future$conf <- conf
 
   ## Create BatchJobs registry
