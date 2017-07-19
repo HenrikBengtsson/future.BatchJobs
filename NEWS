@@ -1,6 +1,16 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.14.1-9000 [2017-07-19]
+
+BUG FIXES:
+
+o Calling future_lapply() with functions containing globals part of non-default
+  packages would when using batchtools futures give an error complaining that
+  the global is missing. This was due to updates in future (>= 1.4.0) that
+  broke this package.
+
+
 Version: 0.14.1 [2017-05-30]
 
 DOCUMENTATION:
