@@ -5,7 +5,7 @@
 \title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
 BatchJobsFuture(expr = NULL, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs", conf = NULL,
+  globals = TRUE, packages = NULL, label = "BatchJobs", conf = NULL,
   cluster.functions = NULL, resources = list(), workers = NULL,
   job.delay = FALSE, finalize = getOption("future.finalize", TRUE), ...)
 }

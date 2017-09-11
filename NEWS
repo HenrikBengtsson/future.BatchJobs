@@ -1,6 +1,35 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.15.0 [2017-09-10]
+
+NEW FEATURES:
+
+ o The error message for expired BatchJobs futures now include the last few
+   lines of the logged output, which sometimes includes clues on why the future
+   expired.  For instance, if a TORQUE / PBS job use more than the allocated
+   amount of memory it might be terminated by the scheduler leaving the message
+   "PBS: job killed: vmem 1234000 exceeded limit 1048576" in the output.
+
+ o print() for BatchtoolsFuture returns the object invisibly.
+
+BUG FIXES:
+
+ o Calling future_lapply() with functions containing globals part of non-default
+   packages would when using batchtools futures give an error complaining that
+   the global is missing. This was due to updates in future (>= 1.4.0) that
+   broke this package.
+
+ o loggedOutput() for BatchtoolsFuture would always return NULL unless an error
+   had occured.
+
+DEPRECATED AND DEFUNCT:
+
+ o Removed defunct batchjobs() and backend() functions.
+
+ o Passing hidden argument 'args' to BatchJobsFuture is now defunct.
+ 
+
 Version: 0.14.1 [2017-05-30]
 
 DOCUMENTATION:

@@ -14,11 +14,6 @@
 %\VignetteEngine{R.rsp::rsp}
 %\VignetteTangle{FALSE}
 --------------------------------------------------------------------"%>
-<%
-library("R.utils")
-options("withCapture/newline"=FALSE)
-options(mc.cores=2L)
-%>
 # A Future for BatchJobs
 
 ## Introduction
@@ -236,4 +231,4 @@ demo("mandelbrot", package="future", ask=FALSE)
 [OpenLava]: https://en.wikipedia.org/wiki/OpenLava
 
 ---
-Copyright Henrik Bengtsson, 2015-2016
+Copyright Henrik Bengtsson, 2015-2017

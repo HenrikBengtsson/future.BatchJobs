@@ -23,7 +23,7 @@
 #' @importFrom future Future
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
-BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, globals=TRUE, label="BatchJobs", conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
+BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, globals=TRUE, packages=NULL, label="BatchJobs", conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
   if (!is.null(label)) label <- as.character(label)
@@ -58,12 +58,18 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   ## Create BatchJobsFuture object
   future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, workers=workers, label=label, ...)
 
+  ## Additional arguments to be available for the BatchJobs template?
+  ## NOTE: Support for 'args' will be removed soon. /HB 2016-07-15
+  if (is.element("args", names(future))) {
+    .Defunct(msg = "Argument 'args' is defunct in future.BatchJobs (>= 0.15.0). Please use argument 'resources' instead.")
+  }
+
   ## LEGACY: /HB 2016-05-20
   backend <- future$backend
   future$backend <- NULL
 
   future$globals <- gp$globals
-  future$packages <- gp$packages
+  future$packages <- unique(c(packages, gp$packages))
   future$conf <- conf
 
   ## Create BatchJobs registry
@@ -79,24 +85,6 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
                  backend=backend)
 
 
-  ## Additional arguments to be available for the BatchJobs template?
-  ## NOTE: Support for 'args' will be removed soon. /HB 2016-07-15
-  if (is.element("args", names(future))) {
-    args <- future$args
-    future$args <- NULL ## Cleanup
-    
-    stopifnot(is.list(args))
-    if (length(args) > 0) {
-      names <- names(args)
-      unknown <- setdiff(names, "resources")
-      if (length(unknown) > 0) {
-        stop("Detected non-supported field name in argument 'args'. The BatchJobs backend only supports 'resources': ", paste(sQuote(unknown), collapse=", "))
-      }
-      for (name in names) config[[name]] <- args[[name]]
-      .Deprecated(msg="Argument 'args' is deprecated in future.BatchJobs (>= 0.13.0). Please use argument 'resources' instead.")
-    }
-  }
-  
   future$config <- config
  
   future <- structure(future, class=c("BatchJobsFuture", class(future)))
@@ -136,6 +124,8 @@ print.BatchJobsFuture <- function(x, ...) {
     printf("BatchJobs Registry:\n  ")
     print(reg)
   }
+
+  invisible(x)
 }
 
 
@@ -243,8 +233,6 @@ loggedOutput.BatchJobsFuture <- function(future, ...) {
     msg <- sprintf("%s ('%s') has not finished yet", class(future)[1L], label)
     stop(BatchJobsFutureError(msg, future=future))
   }
-
-  if (!"error" %in% stat) return(NULL)
 
   config <- future$config
   reg <- config$reg
@@ -559,6 +547,7 @@ await <- function(...) UseMethod("await")
 #'
 #' @export
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
+#' @importFrom utils tail
 #' @keywords internal
 await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("future.wait.timeout", 30*24*60*60), delta=getOption("future.wait.interval", 0.2), alpha=getOption("future.wait.alpha", 1.01), ...) {
   mdebug <- importFuture("mdebug")
@@ -643,8 +632,19 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
       stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
     } else if ("expired" %in% stat) {
       cleanup <- FALSE
-      msg <- sprintf("BatchJobExpiration: Future ('%s') expired: %s", label, reg$file.dir)
-      stop(BatchJobsFutureError(msg, future=future, output=loggedOutput(future)))
+      msg <- sprintf("BatchJobsExpiration: Future ('%s') expired (registry path %s).", label, reg$file.dir)
+      output <- loggedOutput(future)
+      hint <- unlist(strsplit(output, split = "\n", fixed = TRUE))
+      hint <- hint[nzchar(hint)]
+      hint <- tail(hint, n = 6L)
+      if (length(hint) > 0) {
+        hint <- paste(hint, collapse = "\n")
+        msg <- sprintf("%s. The last few lines of the logged output:\n%s",
+                       msg, hint)
+      } else {
+        msg <- sprintf("%s. No logged output exist.", msg)
+      }
+      stop(BatchJobsFutureError(msg, future=future, output=output))
     } else if (isNA(stat)) {
       msg <- sprintf("BatchJobDeleted: Cannot retrieve value. Future ('%s') deleted: %s", label, reg$file.dir)
       stop(BatchJobsFutureError(msg, future=future))
