@@ -20,7 +20,7 @@
 #' @return A BatchJobsFuture object
 #'
 #' @export
-#' @importFrom future Future
+#' @importFrom future Future getGlobalsAndPackages
 #' @importFrom BatchJobs submitJobs
 #' @keywords internal
 BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, globals=TRUE, packages=NULL, label="BatchJobs", conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
@@ -52,7 +52,6 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   stopifnot(is.logical(job.delay) || is.function(job.delay))
 
   ## Record globals
-  getGlobalsAndPackages <- importFuture("getGlobalsAndPackages")
   gp <- getGlobalsAndPackages(expr, envir=envir, globals=globals)
 
   ## Create BatchJobsFuture object
