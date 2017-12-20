@@ -395,22 +395,6 @@ run.BatchJobsFuture <- function(future, ...) {
       mdebug(msg)
     }
 
-    ## COMMENTS:
-    ## * The below can be removed with fail (>= 1.3) AND
-    ##   BatchJobs (>= 1.7) /HB 2015-10-20
-    ## * fail 1.3 is on CRAN but BatchJobs needs to be
-    ##   updated too /HB 2016-05-01
-    ## BatchJobs::loadExports() ignores exported variables that
-    ## start with a period.
-    ## Details: https://github.com/tudo-r/BatchJobs/issues/103
-    bad <- grepl("^[.]", names(globals))
-    if (any(bad)) {
-      names <- names(globals)[bad]
-      globalsToEncode <- c(globalsToEncode, names)
-      msg <- sprintf("WORKAROUND: BatchJobs does not support exported variables that start with a period (see https://github.com/tudo-r/BatchJobs/issues/103). Encoding/decoding the following global variables: %s", hpaste(sQuote(names)))
-      mdebug(msg)
-    }
-
     ## Does any globals need to be encoded/decoded to workaround
     ## the limitations of BatchJobs?
     if (length(globalsToEncode) > 0L) {

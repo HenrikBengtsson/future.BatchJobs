@@ -2,9 +2,9 @@ Package: future.BatchJobs
 Version: 0.15.0-9000
 Depends:
     R (>= 3.2.0),
-    future (>= 1.6.1)
+    future (>= 1.6.2)
 Imports:
-    BatchJobs (>= 1.6),
+    BatchJobs (>= 1.7),
     R.utils
 Suggests:
     listenv,

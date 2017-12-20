@@ -1,10 +1,14 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.15.0-9000 [2017-09-11]
+Version: 0.15.0-9000 [2017-12-20]
 
  o ...
 
+SOFTWARE QUALITY:
+
+ o Removed internal workaround for BatchJobs (< 1.7).
+ 
 
 Version: 0.15.0 [2017-09-10]
 

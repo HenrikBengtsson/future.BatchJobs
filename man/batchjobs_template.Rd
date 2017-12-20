@@ -66,7 +66,7 @@ These type of BatchJobs futures rely on BatchJobs backends set
 up using the following \pkg{BatchJobs} functions:
 \itemize{
  \item \code{\link[BatchJobs]{makeClusterFunctionsLSF}()} for \href{https://en.wikipedia.org/wiki/Platform_LSF}{Load Sharing Facility (LSF)}
- \item \code{makeClusterFunctionsOpenLava()} for \href{https://en.wikipedia.org/wiki/OpenLava}{OpenLava} (only BatchJobs (>= 1.7.0))
+ \item \code{makeClusterFunctionsOpenLava()} for \href{https://en.wikipedia.org/wiki/OpenLava}{OpenLava}
  \item \code{\link[BatchJobs]{makeClusterFunctionsSGE}()} for \href{https://en.wikipedia.org/wiki/Oracle_Grid_Engine}{Sun/Oracle Grid Engine (SGE)}
  \item \code{\link[BatchJobs]{makeClusterFunctionsSLURM}()} for \href{https://en.wikipedia.org/wiki/Slurm_Workload_Manager}{Slurm}
  \item \code{\link[BatchJobs]{makeClusterFunctionsTorque}()} for \href{https://en.wikipedia.org/wiki/TORQUE}{TORQUE} / PBS
