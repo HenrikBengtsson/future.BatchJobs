@@ -7,6 +7,7 @@ Imports:
     BatchJobs (>= 1.7),
     R.utils
 Suggests:
+    future.apply,
     listenv,
     markdown,
     R.rsp
