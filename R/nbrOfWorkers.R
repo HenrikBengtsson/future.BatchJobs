@@ -17,7 +17,7 @@
 nbrOfWorkers.batchjobs <- function(evaluator) {
   ## Infer from 'workers' argument
   expr <- formals(evaluator)$workers
-  workers <- eval(expr)
+  workers <- eval(expr, enclos = baseenv())
   if (!is.null(workers)) {
     stopifnot(length(workers) >= 1)
     if (is.numeric(workers)) return(prod(workers))
@@ -32,7 +32,7 @@ nbrOfWorkers.batchjobs <- function(evaluator) {
 #' @export
 nbrOfWorkers.batchjobs_multicore <- function(evaluator) {
   expr <- formals(evaluator)$workers
-  workers <- eval(expr)
+  workers <- eval(expr, enclos = baseenv())
   stopifnot(length(workers) == 1, !is.na(workers), workers >= 1, is.finite(workers))
   workers
 }

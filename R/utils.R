@@ -69,7 +69,7 @@ captureOutput <- function(expr, envir=parent.frame(), ...) {
     on.exit(close(file))
     capture.output(expr, file=file)
     rawToChar(rawConnectionValue(file))
-  }, envir=envir, enclos=envir)
+  }, envir=envir, enclos = baseenv())
   unlist(strsplit(res, split="\n", fixed=TRUE), use.names=FALSE)
 }
 
@@ -107,9 +107,9 @@ importBatchJobs <- function(name, default=NULL) {
 ## as small as possible, which is why we use local().  Without,
 ## the environment would be that of the package itself and all of
 ## the package would be exported.
-geval <- local(function(expr, substitute=FALSE, envir=.GlobalEnv, ...) {
+geval <- local(function(expr, substitute=FALSE, envir=.GlobalEnv, enclos = baseenv(), ...) {
   if (substitute) expr <- substitute(expr)
-  eval(expr, envir=envir)
+  eval(expr, envir=envir, enclos = enclos)
 })
 
 
