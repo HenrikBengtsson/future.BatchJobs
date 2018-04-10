@@ -42,13 +42,13 @@ batchjobs_custom <- function(expr, envir=parent.frame(), substitute=TRUE, global
       pathname  <- findConfigs(path)
     }
 
-    stopifnot(length(pathname) >= 1L, is.character(pathname))
+    stop_if_not(length(pathname) >= 1L, is.character(pathname))
     for (pn in pathname) {
       if (!file_test("-f", pn)) stop("File not found: ", sQuote(pn))
     }
     conf <- sourceConfFiles(pathname)
   } else {
-    stopifnot(is.environment(conf))
+    stop_if_not(is.environment(conf))
   }
 
   future <- BatchJobsFuture(expr=expr, envir=envir, substitute=FALSE,

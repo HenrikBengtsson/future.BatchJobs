@@ -29,27 +29,27 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   if (!is.null(label)) label <- as.character(label)
   
   if (!is.null(conf)) {
-    stopifnot(is.environment(conf))
+    stop_if_not(is.environment(conf))
   }
 
   if (!is.null(cluster.functions)) {
-    stopifnot(is.list(cluster.functions))
+    stop_if_not(is.list(cluster.functions))
     conf$cluster.functions <- cluster.functions
   }
 
   if (!is.null(workers)) {
-    stopifnot(length(workers) >= 1)
+    stop_if_not(length(workers) >= 1)
     if (is.numeric(workers)) {
-      stopifnot(!anyNA(workers), all(workers >= 1))
+      stop_if_not(!anyNA(workers), all(workers >= 1))
     } else if (is.character(workers)) {
     } else {
-      stopifnot("Argument 'workers' should be either numeric or character: ", mode(workers))
+      stop_if_not("Argument 'workers' should be either numeric or character: ", mode(workers))
     }
   }
 
-  stopifnot(is.list(resources))
+  stop_if_not(is.list(resources))
 
-  stopifnot(is.logical(job.delay) || is.function(job.delay))
+  stop_if_not(is.logical(job.delay) || is.function(job.delay))
 
   ## Record globals
   gp <- getGlobalsAndPackages(expr, envir=envir, globals=globals)
@@ -350,7 +350,7 @@ run.BatchJobsFuture <- function(future, ...) {
   expr <- substitute(local(expr), list(expr=expr))
 
   reg <- future$config$reg
-  stopifnot(inherits(reg, "Registry"))
+  stop_if_not(inherits(reg, "Registry"))
 
   ## (ii) Attach packages that needs to be attached
   packages <- future$packages
@@ -459,7 +459,7 @@ run.BatchJobsFuture <- function(future, ...) {
   if (is.null(conf)) {
     ## 3. Create BatchJobs backend configuration
     cluster.functions <- future$config$cluster.functions
-    stopifnot(!is.null(cluster.functions))
+    stop_if_not(!is.null(cluster.functions))
     conf <- makeBatchJobsConf(cluster.functions)
   }
 
@@ -534,8 +534,8 @@ await <- function(...) UseMethod("await")
 #' @keywords internal
 await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("future.wait.timeout", 30*24*60*60), delta=getOption("future.wait.interval", 0.2), alpha=getOption("future.wait.alpha", 1.01), ...) {
   mdebug <- importFuture("mdebug")
-  stopifnot(is.finite(timeout), timeout >= 0)
-  stopifnot(is.finite(alpha), alpha > 0)
+  stop_if_not(is.finite(timeout), timeout >= 0)
+  stop_if_not(is.finite(alpha), alpha > 0)
 
   debug <- getOption("future.debug", FALSE)
   mdebug("Polling...")

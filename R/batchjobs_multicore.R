@@ -55,7 +55,7 @@ batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, glo
   if (substitute) expr <- substitute(expr)
 
   if (is.null(workers)) workers <- availableCores(constraints="multicore")
-  stopifnot(length(workers) == 1L, is.numeric(workers),
+  stop_if_not(length(workers) == 1L, is.numeric(workers),
             is.finite(workers), workers >= 1L)
 
   ## Fall back to batchjobs_local if multicore processing is not supported
@@ -69,7 +69,7 @@ batchjobs_multicore <- function(expr, envir=parent.frame(), substitute=TRUE, glo
 
   ncpus0 <- availableCores(constraints="multicore")
   ncpus <- workers
-  stopifnot(ncpus >= 2L)
+  stop_if_not(ncpus >= 2L)
 
   ## PROBLEM:
   ## BatchJobs' multicore cluster functions tries to be responsive to the overall
