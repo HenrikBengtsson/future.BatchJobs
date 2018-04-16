@@ -3,7 +3,7 @@
 #' @usage fassignment \%resources\% tweaks
 #'
 #' @param fassignment The future assignment, e.g.
-#'        \code{x \%<=\% \{ expr \}}.
+#'        \code{x \%<-\% \{ expr \}}.
 #' @param tweaks A named list (or vector) of resource
 #' BatchJobs parameters that should be changed relative to
 #' the current strategy.
