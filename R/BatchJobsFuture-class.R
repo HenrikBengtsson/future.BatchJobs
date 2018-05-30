@@ -103,7 +103,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
 #' @export
 #' @keywords internal
 print.BatchJobsFuture <- function(x, ...) {
-  NextMethod("print")
+  NextMethod()
 
   ## BatchJobs specific
   
@@ -250,7 +250,7 @@ loggedOutput.BatchJobsFuture <- function(future, ...) {
 #' @keywords internal
 resolved.BatchJobsFuture <- function(x, ...) {
   ## Has internal future state already been switched to be resolved
-  resolved <- NextMethod("resolved")
+  resolved <- NextMethod()
   if (resolved) return(TRUE)
 
   ## If not, checks the BatchJobs registry status
@@ -266,7 +266,7 @@ resolved.BatchJobsFuture <- function(x, ...) {
 value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "error"), default=NULL, cleanup=TRUE, ...) {
   ## Has the value already been collected?
   if (future$state %in% c('finished', 'failed', 'interrupted')) {
-    return(NextMethod("value"))
+    return(NextMethod())
   }
 
   if (future$state == 'created') {
@@ -291,7 +291,7 @@ value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "e
     future$value <- ex
   })
   
-  NextMethod("value")
+  NextMethod()
 } # value()
 
 
