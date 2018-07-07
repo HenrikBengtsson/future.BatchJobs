@@ -182,6 +182,7 @@ status.BatchJobsFuture <- function(future, ...) {
   status <- status[status]
   status <- sort(names(status))
   status <- setdiff(status, c("n"))
+  status[status == "done"] <- "finished"
   status
 } # status()
 
@@ -192,7 +193,7 @@ status.BatchJobsFuture <- function(future, ...) {
 finished.BatchJobsFuture <- function(future, ...) {
   status <- status(future)
   if (isNA(status)) return(NA)
-  any(c("done", "error", "expired") %in% status)
+  any(c("finished", "error", "expired") %in% status)
 }
 
 #' @export
@@ -552,7 +553,7 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
   final_countdown <- 5L
   final_state <- NULL
   final_state_prev <- NULL
-  finish_states <- c("done", "error", "expired")
+  finish_states <- c("finished", "error", "expired")
 
   t0 <- Sys.time()
   dt <- 0
@@ -607,7 +608,7 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
     mdebug("Results:")
     label <- future$label
     if (is.null(label)) label <- "<none>"
-    if ("done" %in% stat) {
+    if ("finished" %in% stat) {
       res <- loadResult(reg, id=jobid)
     } else if ("error" %in% stat) {
       cleanup <- FALSE
