@@ -1,14 +1,22 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.15.0-9000 [2017-12-20]
+Version: 0.15.0-9000 [2018-07-06]
 
  o ...
 
 SOFTWARE QUALITY:
 
  o Removed internal workaround for BatchJobs (< 1.7).
- 
+
+CODE REFACTORING:
+
+ o Preparing for standard output captured during evaluation of futures.
+
+ o Preparing for futures to gather a richer set of results from BatchJobs
+   backends.
+
+
 
 Version: 0.15.0 [2017-09-10]
 

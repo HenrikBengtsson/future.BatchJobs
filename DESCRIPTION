@@ -2,7 +2,7 @@ Package: future.BatchJobs
 Version: 0.15.0-9000
 Depends:
     R (>= 3.2.0),
-    future (>= 1.8.0)
+    future (>= 1.8.1)
 Imports:
     BatchJobs (>= 1.7),
     R.utils
@@ -21,6 +21,9 @@ Description: Implementation of the Future API on top of the 'BatchJobs' package.
     cluster of machines, but also via high-performance compute ('HPC') job
     schedulers such as 'LSF', 'OpenLava', 'Slurm', 'SGE', and 'TORQUE' / 'PBS',
     e.g. 'y <- future.apply::future_lapply(files, FUN = process)'.
+    NOTE: The 'BatchJobs' package is deprecated in favor of the 'batchtools'
+    package. Because of this, it is recommended to use the 'future.batchtools'
+    package instead of this package.
 License: LGPL (>= 2.1)
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/future.BatchJobs
