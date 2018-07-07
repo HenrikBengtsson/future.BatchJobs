@@ -55,7 +55,10 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
   gp <- getGlobalsAndPackages(expr, envir=envir, globals=globals)
 
   ## Create BatchJobsFuture object
-  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE, workers=workers, label=label, ...)
+  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE,
+                   workers=workers, label=label,
+                   version = "1.8", .callResult = TRUE,
+                   ...)
 
   ## Additional arguments to be available for the BatchJobs template?
   ## NOTE: Support for 'args' will be removed soon. /HB 2016-07-15
@@ -147,7 +150,6 @@ loggedOutput <- function(...) UseMethod("loggedOutput")
 #' @export
 #' @export status
 #' @export finished
-#' @export value
 #' @export loggedError
 #' @export loggedOutput
 #' @importFrom BatchJobs getStatus
@@ -261,40 +263,38 @@ resolved.BatchJobsFuture <- function(x, ...) {
   resolved
 }
 
-#' @importFrom future value
+#' @importFrom future result
 #' @export
 #' @keywords internal
-value.BatchJobsFuture <- function(future, signal=TRUE, onMissing=c("default", "error"), default=NULL, cleanup=TRUE, ...) {
+result.BatchJobsFuture <- function(future, ...) {
   ## Has the value already been collected?
-  if (future$state %in% c('finished', 'failed', 'interrupted')) {
+  result <- future$result
+  if (inherits(result, "FutureResult")) return(result)
+
+  ## Has the value already been collected? - take two
+  if (future$state %in% c("finished", "failed", "interrupted")) {
     return(NextMethod())
   }
 
-  if (future$state == 'created') {
+  if (future$state == "created") {
     future <- run(future)
   }
 
   stat <- status(future)
   if (isNA(stat)) {
-    onMissing <- match.arg(onMissing)
-    if (onMissing == "default") return(default)
     label <- future$label
     if (is.null(label)) label <- "<none>"
-    stop(sprintf("The value no longer exists (or never existed) for Future ('%s') of class %s", label, paste(sQuote(class(future)), collapse=", ")))
+    stop(sprintf("The result no longer exists (or never existed) for Future ('%s') of class %s", label, paste(sQuote(class(future)), collapse = ", "))) #nolint
   }
 
-  tryCatch({
-    future$value <- await(future, cleanup=FALSE)
-    future$state <- 'finished'
-    if (cleanup) delete(future, ...)
-  }, simpleError = function(ex) {
-    future$state <- 'failed'
-    future$value <- ex
-  })
-  
-  NextMethod()
-} # value()
+  result <- await(future, cleanup = FALSE)
+  stop_if_not(inherits(result, "FutureResult"))
+  future$result <- result
+  future$state <- "finished"
+  delete(future)
 
+  NextMethod()
+}
 
 
 run <- function(...) UseMethod("run")
@@ -603,6 +603,9 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
     dt <- difftime(Sys.time(), t0)
   }
 
+  ## PROTOTYPE RESULTS BELOW:
+  prototype_fields <- NULL
+  
   res <- NULL
   if (finished) {
     mdebug("Results:")
@@ -610,6 +613,15 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
     if (is.null(label)) label <- "<none>"
     if ("finished" %in% stat) {
       res <- loadResult(reg, id=jobid)
+      if (inherits(res, "FutureResult")) {
+        if (is.null(res$stdout)) {
+          prototype_fields <- c(prototype_fields, "stdout")
+          res$stdout <- loggedOutput(future)
+        }
+        if (inherits(res$condition, "error")) {
+          cleanup <- FALSE
+        }
+      }
     } else if ("error" %in% stat) {
       cleanup <- FALSE
       msg <- sprintf("BatchJobError in %s ('%s'): %s", class(future)[1], label, loggedError(future))
@@ -640,6 +652,10 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
     stop(BatchJobsFutureError(msg, future=future))
   }
 
+  if (length(prototype_fields) > 0) {
+    res$PROTOTYPE_WARNING <- sprintf("WARNING: The fields %s should be considered internal and experimental for now, that is, until the Future API for these additional features has been settled. For more information, please see https://github.com/HenrikBengtsson/future/issues/172", hpaste(sQuote(prototype_fields), maxHead = Inf, collapse = ", ", lastCollapse  = " and "))
+  }
+  
   ## Cleanup?
   if (cleanup) {
     delete(future, delta=0.5*delta, alpha=alpha, ...)
@@ -714,12 +730,21 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     }
   }
 
+  ## Make sure to collect the results before deleting
+  ## the internal batchtools registry
+  result <- result(future)
+  stop_if_not(inherits(result, "FutureResult"))
 
   ## To simplify post mortem troubleshooting in non-interactive sessions,
   ## should the BatchJobs registry files be removed or not?
   mdebug("delete(): Option 'future.delete=%s", sQuote(getOption("future.delete", "<NULL>")))
   if (!getOption("future.delete", interactive())) {
     status <- status(future)
+    res <- future$result
+    if (inherits(res, "FutureResult")) {
+      if (inherits(res$condition, "error")) status <- "error"
+    }
+    mdebug("delete(): status = %s", paste(sQuote(status), collapse = ", "))
     if (any(c("error", "expired") %in% status)) {
       msg <- sprintf("Will not remove BatchJob registry, because the status of the BatchJobs was %s and option 'future.delete' is FALSE or running in an interactive session: %s", paste(sQuote(status), collapse=", "), sQuote(path))
       mdebug("delete(): %s", msg)

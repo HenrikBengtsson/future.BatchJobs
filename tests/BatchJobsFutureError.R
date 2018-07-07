@@ -1,5 +1,5 @@
 source("incl/start.R")
-
+#options(future.debug = FALSE)
 message("*** BatchJobsFutureError() ...")
 
 plan(batchjobs_local)
@@ -34,6 +34,8 @@ for (cleanup in c(FALSE, TRUE)) {
 
   reg <- f$config$reg
 
+  print(options("future.delete"))
+  
   ## Force garbage collection of future which will possibly
   ## result in the removal of BatchJobs registry files
   reg.finalizer(f, function(f) {
