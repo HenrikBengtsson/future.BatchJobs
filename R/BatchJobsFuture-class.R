@@ -614,7 +614,7 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
     if ("finished" %in% stat) {
       res <- loadResult(reg, id=jobid)
       if (inherits(res, "FutureResult")) {
-        if (is.null(res$stdout)) {
+        if (is.null(res$stdout) && isTRUE(future$stdout)) {
           prototype_fields <- c(prototype_fields, "stdout")
           res$stdout <- loggedOutput(future)
         }
