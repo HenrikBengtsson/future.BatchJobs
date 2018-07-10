@@ -168,7 +168,9 @@ status.BatchJobsFuture <- function(future, ...) {
     }
     on.exit(options(oopts))
     oopts <- c(oopts, options(warnPartialMatchArgs=FALSE))
-    BatchJobs::getStatus(...)
+    suppressDBIWarnings({
+      BatchJobs::getStatus(...)
+    })
   } ## getStatus()
 
   config <- future$config
@@ -440,7 +442,10 @@ run.BatchJobsFuture <- function(future, ...) {
   globals <- NULL
 
   ## 1. Add to BatchJobs for evaluation
-  jobid <- batchMap(reg, fun=geval, list(expr), more.args=list(substitute=TRUE))
+  suppressDBIWarnings({
+    jobid <- batchMap(reg, fun=geval, list(expr),
+                      more.args=list(substitute=TRUE))
+  })
 
   ## 2. Update
   future$config$jobid <- jobid

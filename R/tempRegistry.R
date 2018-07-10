@@ -28,7 +28,9 @@ tempRegistry <- local({
       on.exit(options(oopts))
     }
 
-    BatchJobs::makeRegistry(...)
+    suppressDBIWarnings({
+      BatchJobs::makeRegistry(...)
+    })
   } ## makeRegistry()
 
   function(label = "BatchJobs", path=NULL, ...) {

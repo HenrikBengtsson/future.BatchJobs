@@ -153,3 +153,17 @@ isOS <- function(name) {
     grepl(paste0("^", name), R.version$os)
   }
 } ## isOS()
+
+
+## Suppress:
+##   "Warning in result_fetch(res@ptr, n = n) :
+##    Don't need to call dbFetch() for statements, only for queries"
+## from DBI::dbFetch() when called by BatchJobs::makeRegistry().
+## This is because BatchJobs has not been updated according to the
+## updates in DBI.
+suppressDBIWarnings <- function(expr) {
+  ops <- options(warn = -1L)
+  on.exit(options(ops))
+  withCallingHandlers(expr,
+                      warning = function(w) invokeRestart("muffleWarning"))
+}
