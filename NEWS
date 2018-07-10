@@ -24,6 +24,9 @@ CODE REFACTORING:
  o Preparing for futures to gather a richer set of results from BatchJobs
    backends.
 
+DEPRECATED AND DEFUNCT:
+
+ o Removed defunct and hidden argument 'args' to BatchJobsFuture.
 
 
 Version: 0.15.0 [2017-09-10]

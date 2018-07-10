@@ -60,12 +60,6 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
                    version = "1.8", .callResult = TRUE,
                    ...)
 
-  ## Additional arguments to be available for the BatchJobs template?
-  ## NOTE: Support for 'args' will be removed soon. /HB 2016-07-15
-  if (is.element("args", names(future))) {
-    .Defunct(msg = "Argument 'args' is defunct in future.BatchJobs (>= 0.15.0). Please use argument 'resources' instead.")
-  }
-
   ## LEGACY: /HB 2016-05-20
   backend <- future$backend
   future$backend <- NULL
