@@ -17,7 +17,7 @@ makeBatchJobsConf <- function(cluster.functions, ...) {
   conf$fs.timeout <- NA_real_
 
   ## Sanity check
-  stopifnot(is.environment(conf))
+  stop_if_not(is.environment(conf))
 
   conf
 } ## makeBatchJobsConf()

@@ -16,6 +16,8 @@
 --------------------------------------------------------------------"%>
 # A Future for BatchJobs
 
+_NOTE: The [BatchJobs](https://cran.r-project.org/package=BatchJobs) package is deprecated in favor of the [batchtools](https://cran.r-project.org/package=batchtools) package. Because of this, it is recommended to use the [future.batchtools](https://cran.r-project.org/package=future.batchtools) package instead of this package. This package will only be updated in order for it to be compliant with updates in R and the [future](https://cran.r-project.org/package=future) package._
+
 ## Introduction
 The [future] package provides a generic API for using futures in R.
 A future is a simple yet powerful mechanism to evaluate an R expression

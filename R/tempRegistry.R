@@ -28,14 +28,16 @@ tempRegistry <- local({
       on.exit(options(oopts))
     }
 
-    BatchJobs::makeRegistry(...)
+    suppressDBIWarnings({
+      BatchJobs::makeRegistry(...)
+    })
   } ## makeRegistry()
 
   function(label = "BatchJobs", path=NULL, ...) {
     if (is.null(label)) label <- "BatchJobs"
     ## The job label (the name on the job queue) - may be duplicated
     label <- as.character(label)
-    stopifnot(length(label) == 1L, nchar(label) > 0L)
+    stop_if_not(length(label) == 1L, nchar(label) > 0L)
     
     ## This session's path holding all of its future BatchJobs directories
     ##   e.g. .future/<datetimestamp>-<unique_id>/
@@ -93,7 +95,7 @@ asValidDirectoryPrefix <- function(name) {
   ## All characters must be letters, digits, underscores, dash, or period.
   name <- dropNonValidCharacters(name, pattern = pattern)
   name <- paste(name, collapse = "")
-  stopifnot(grepl(pattern, name))
+  stop_if_not(grepl(pattern, name))
   name
 } ## asValidDirectoryPrefix()
 
@@ -113,7 +115,7 @@ asValidRegistryID <- function(name) {
 
   name <- paste(name, collapse = "")
   
-  stopifnot(grepl(pattern, name))
+  stop_if_not(grepl(pattern, name))
   
   name
 } ## asValidRegistryID()

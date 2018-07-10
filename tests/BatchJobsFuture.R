@@ -8,7 +8,8 @@ f <- batchjobs_local({ 1L })
 print(f)
 res <- await(f, cleanup=TRUE)
 print(res)
-stopifnot(res == 1L)
+stopifnot(inherits(res, "FutureResult"), res$value == 1L)
+
 
 message("*** BatchJobsFuture() - cleanup ... DONE")
 
@@ -49,12 +50,8 @@ f$state <- "running"
 path <- f$config$reg$file.dir
 unlink(path, recursive=TRUE)
 
-res <- value(f, onMissing="default")
-print(res)
-stopifnot(is.null(res))
-
 res <- tryCatch({
-  value(f, onMissing="error")
+  value(f)
 }, error = function(ex) ex)
 print(res)
 stopifnot(inherits(res, "error"))
