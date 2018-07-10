@@ -223,6 +223,13 @@ R package future.BatchJobs is available on [CRAN](https://cran.r-project.org/pac
 install.packages('future.BatchJobs')
 ```
 
+### Pre-release version
+
+To install the pre-release version that is available in Git branch `develop` on GitHub, use:
+```r
+remotes::install_github('HenrikBengtsson/future.BatchJobs@develop')
+```
+This will install the package from source.  
 
 
 

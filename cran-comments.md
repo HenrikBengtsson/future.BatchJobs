@@ -36,12 +36,6 @@ The package has been verified using `R CMD check --as-cran` on:
 * Platform i386-pc-solaris2.10 (32-bit):
   -  R version 3.5.0 Patched (2018-04-30 r74674)
 
-* Platform i386-w64-mingw32 (32-bit) [Appveyor CI]:
-#  - R Under development (unstable) (2018-06-21 r74928)
-
-* Platform x86_64-w64-mingw32 (64-bit) [Appveyor CI]:
-#  - R Under development (unstable) (2018-06-21 r74928)
-
 * Platform x86_64-w64-mingw32/x64 (64-bit) [win-builder]:
   - R version 3.5.1 (2018-07-02)
   - R Under development (unstable) (2018-07-01 r74950)
