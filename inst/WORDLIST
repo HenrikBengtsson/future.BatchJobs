@@ -1,0 +1,16 @@
+BatchJobs
+BatchJobsFuture
+batchtools
+conf
+FutureError
+globals
+Globals
+HPC
+lapply
+LSF
+multiprocess
+OpenLava
+SGE
+Slurm
+th
+uniprocess
