@@ -71,7 +71,7 @@ message("*** BatchjobsFuture - expired ...")
 plan(batchjobs_local)
 msg <- "Abruptly terminating the future!"
 f <- future({
-  message(msg)
+  cat(file = stderr(), msg)
   quit(save = "no")
 })
 res <- tryCatch({
