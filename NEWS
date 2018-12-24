@@ -18,7 +18,7 @@ FIXES:
  o Since the BatchJobs package is no longer maintained it is has not been
    updated according to the new API of the DBI package. This caused several
    warnings to be produced when using BatchJobs futures.  These warnings
-   are now suppressed (to avoid all the noice from these warnings).
+   are now suppressed (to avoid all the noise from these warnings).
 
 SOFTWARE QUALITY:
 

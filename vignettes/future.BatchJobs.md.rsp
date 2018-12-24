@@ -180,7 +180,7 @@ automatically located and loaded when doing:
 ```r
 > plan(batchjobs_torque)
 ```
-Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 12 cores (one a single machine) and up to  5 GiB of memory, use:
+Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get allotted 12 cores (one a single machine) and up to  5 GiB of memory, use:
 ```r
 > plan(batchjobs_torque, resources=list(nodes="1:ppn=12", vmem="5gb"))
 ```
@@ -233,4 +233,4 @@ demo("mandelbrot", package="future", ask=FALSE)
 [OpenLava]: https://en.wikipedia.org/wiki/OpenLava
 
 ---
-Copyright Henrik Bengtsson, 2015-2017
+Copyright Henrik Bengtsson, 2015-2018

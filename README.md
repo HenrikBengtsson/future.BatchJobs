@@ -164,7 +164,7 @@ automatically located and loaded when doing:
 ```r
 > plan(batchjobs_torque)
 ```
-Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get alloted 12 cores (one a single machine) and up to  5 GiB of memory, use:
+Resource parameters can be specified via argument `resources` which should be a named list and is passed as is to the template file.  For example, to request that each job would get allotted 12 cores (one a single machine) and up to  5 GiB of memory, use:
 ```r
 > plan(batchjobs_torque, resources=list(nodes="1:ppn=12", vmem="5gb"))
 ```
@@ -220,14 +220,14 @@ demo("mandelbrot", package="future", ask=FALSE)
 ## Installation
 R package future.BatchJobs is available on [CRAN](https://cran.r-project.org/package=future.BatchJobs) and can be installed in R as:
 ```r
-install.packages('future.BatchJobs')
+install.packages("future.BatchJobs")
 ```
 
 ### Pre-release version
 
 To install the pre-release version that is available in Git branch `develop` on GitHub, use:
 ```r
-remotes::install_github('HenrikBengtsson/future.BatchJobs@develop')
+remotes::install_github("HenrikBengtsson/future.BatchJobs@develop")
 ```
 This will install the package from source.  
 
