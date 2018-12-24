@@ -6,8 +6,8 @@
 \title{BatchJobs local and interactive futures}
 \usage{
 batchjobs_local(expr, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs", workers = 1L, job.delay = FALSE,
-  ...)
+  globals = TRUE, label = "BatchJobs", workers = 1L,
+  job.delay = FALSE, ...)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
