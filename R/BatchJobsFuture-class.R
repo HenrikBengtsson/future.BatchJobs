@@ -617,9 +617,7 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
           prototype_fields <- c(prototype_fields, "stdout")
           res$stdout <- loggedOutput(future)
         }
-        if (inherits(res$condition, "error")) {
-          cleanup <- FALSE
-        }
+        if (result_has_errors(res)) cleanup <- FALSE
       }
     } else if ("error" %in% stat) {
       cleanup <- FALSE
@@ -741,7 +739,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     status <- status(future)
     res <- future$result
     if (inherits(res, "FutureResult")) {
-      if (inherits(res$condition, "error")) status <- "error"
+      if (result_has_errors(res)) status <- unique(c("error", status))
     }
     mdebug("delete(): status = %s", paste(sQuote(status), collapse = ", "))
     if (any(c("error", "expired") %in% status)) {
