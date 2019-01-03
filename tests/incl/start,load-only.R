@@ -9,6 +9,8 @@ future::plan(future.BatchJobs:::batchjobs_local)
 
 fullTest <- (Sys.getenv("_R_CHECK_FULL_") != "")
 
+isWin32 <- (.Platform$OS.type == "windows" && .Platform$r_arch == "i386")
+
 attachedPackages <- future.BatchJobs:::attachedPackages
 await <- future.BatchJobs:::await
 delete <- future.BatchJobs:::delete

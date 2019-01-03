@@ -1,10 +1,17 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.16.0-9000 [2018-07-10]
+Version: 0.16.0-9000 [2019-01-03]
 
- o ...
- 
+FIXES:
+
+ o Made internal code agile to upcoming changes in the future package on
+   how a captured error is represented.
+
+BUG FIXES:
+
+ o resolve() on a lazy batchtools future would stall and never return.
+
 
 Version: 0.16.0 [2018-07-09]
 
