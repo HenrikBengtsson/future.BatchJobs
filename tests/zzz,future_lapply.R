@@ -6,7 +6,10 @@ if (requireNamespace("future.apply", quietly = TRUE)) {
   
   strategies <- c("sequential", "multisession",
                   "batchjobs_interactive", "batchjobs_local")
-  
+
+  ## CRAN processing times: Don't run these tests on Windows 32-bit
+  if (!fullTest && isWin32) strategies <- character(0L)
+
   message("*** future_lapply() ...")
   
   message("- future_lapply(x, FUN=vector, ...) ...")

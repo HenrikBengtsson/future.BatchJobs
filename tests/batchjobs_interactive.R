@@ -12,8 +12,8 @@ stopifnot(inherits(f, "BatchJobsFuture"))
 
 ## Check whether a batchjobs_interactive future is resolved
 ## or not will force evaluation
-print(resolved(f))
-stopifnot(resolved(f))
+print(is_resolved <- resolved(f))
+stopifnot(is_resolved)
 
 y <- value(f)
 print(y)
