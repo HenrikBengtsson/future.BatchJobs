@@ -102,7 +102,7 @@ if (fullTest && availableCores(constraints="multicore") > 1) {
   options(future.wait.timeout=0.15, future.wait.interval = 0.1)
   
   f <- future({
-    Sys.sleep(5)
+    Sys.sleep(2)
     x <- 1
   })
   
@@ -111,7 +111,6 @@ if (fullTest && availableCores(constraints="multicore") > 1) {
   }, error = function(ex) ex)
   stopifnot(inherits(res, "error"))
 }
-
 
 message("*** BatchJobsFuture() - timeout ... DONE")
 
