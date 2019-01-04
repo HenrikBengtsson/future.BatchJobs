@@ -3,9 +3,13 @@ source("incl/start.R")
 library("datasets") ## cars data set
 library("stats")    ## lm(), poly(), xtabs()
 
+message("*** Globals - formulas ...")
+
 plan(batchjobs_local)
 
-message("*** Globals - formulas ...")
+## CRAN processing times:
+## On Windows 32-bit, don't run these tests
+if (!fullTest && isWin32) plan(sequential)
 
 message("*** Globals - lm(<formula>) ...")
 
@@ -120,7 +124,6 @@ str(y)
 stopifnot(all.equal(y, y0))
 
 message("*** Globals - map(x, ~ expr) ... DONE")
-
 
 message("*** Globals - formulas ... DONE")
 

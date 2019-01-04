@@ -4,8 +4,7 @@ library("listenv")
 if (requireNamespace("future.apply", quietly = TRUE)) {
   future_lapply <- future.apply::future_lapply
   
-  strategies <- c("sequential", "multisession",
-                  "batchjobs_interactive", "batchjobs_local")
+  strategies <- c("sequential", "batchjobs_interactive", "batchjobs_local")
 
   ## CRAN processing times: Don't run these tests on Windows 32-bit
   if (!fullTest && isWin32) strategies <- character(0L)
@@ -14,16 +13,16 @@ if (requireNamespace("future.apply", quietly = TRUE)) {
   
   message("- future_lapply(x, FUN=vector, ...) ...")
   
-  x <- list(a="integer", b="numeric", c="character", c="list")
+  x <- list(a="integer", c="character", c="list")
   str(list(x=x))
   
   y0 <- lapply(x, FUN=vector, length=2L)
   str(list(y0=y0))
   
-  for (scheduling in list(FALSE, TRUE)) {
-    for (strategy in strategies) {
-      message(sprintf("- plan('%s') ...", strategy))
-      plan(strategy)
+  for (strategy in strategies) {
+    message(sprintf("- plan('%s') ...", strategy))
+    plan(strategy)
+    for (scheduling in list(FALSE, TRUE)) {
       y <- future_lapply(x, FUN=vector, length=2L, future.scheduling = scheduling)
       str(list(y=y))
       stopifnot(identical(y, y0))
@@ -33,16 +32,16 @@ if (requireNamespace("future.apply", quietly = TRUE)) {
   
   message("- future_lapply(x, FUN=base::vector, ...) ...")
   
-  x <- list(a="integer", b="numeric", c="character", c="list")
+  x <- list(a="integer", c="character", c="list")
   str(list(x=x))
   
   y0 <- lapply(x, FUN=base::vector, length=2L)
   str(list(y0=y0))
   
-  for (scheduling in list(FALSE, TRUE)) {
-    for (strategy in strategies) {
-      message(sprintf("- plan('%s') ...", strategy))
-      plan(strategy)
+  for (strategy in strategies) {
+    message(sprintf("- plan('%s') ...", strategy))
+    plan(strategy)
+    for (scheduling in list(FALSE, TRUE)) {
       y <- future_lapply(x, FUN=base::vector, length=2L, future.scheduling = scheduling)
       str(list(y=y))
       stopifnot(identical(y, y0))
@@ -57,10 +56,10 @@ if (requireNamespace("future.apply", quietly = TRUE)) {
   y0 <- lapply(x, FUN=future:::hpaste, collapse="; ", maxHead=3L)
   str(list(y0=y0))
   
-  for (scheduling in list(FALSE, TRUE)) {
-    for (strategy in strategies) {
-      message(sprintf("- plan('%s') ...", strategy))
-      plan(strategy)
+  for (strategy in strategies) {
+    message(sprintf("- plan('%s') ...", strategy))
+    plan(strategy)
+    for (scheduling in list(FALSE, TRUE)) {
       y <- future_lapply(x, FUN=future:::hpaste, collapse="; ", maxHead=3L, future.scheduling = scheduling)
       str(list(y=y))
       stopifnot(identical(y, y0))
@@ -86,10 +85,10 @@ if (requireNamespace("future.apply", quietly = TRUE)) {
   y0 <- lapply(x, FUN=listenv::map)
   str(list(y0=y0))
   
-  for (scheduling in list(FALSE, TRUE)) {
-    for (strategy in strategies) {
-      message(sprintf("- plan('%s') ...", strategy))
-      plan(strategy)
+  for (strategy in strategies) {
+    message(sprintf("- plan('%s') ...", strategy))
+    plan(strategy)
+    for (scheduling in list(FALSE, TRUE)) {
       y <- future_lapply(x, FUN=listenv::map, future.scheduling = scheduling)
       str(list(y=y))
       stopifnot(identical(y, y0))
@@ -117,7 +116,6 @@ if (requireNamespace("future.apply", quietly = TRUE)) {
     y <- future_lapply("abc.txt", FUN = my_ext)
     stopifnot(identical(y, y_truth))
   }
-  
   
   message("*** future_lapply() ... DONE")
 }
