@@ -23,7 +23,7 @@ for (cores in 1:min(2L, availableCores("multicore"))) {
     f <- batchjobs_multicore({
       42L
     }, globals=globals)
-    stopifnot(inherits(f, "BatchJobsFuture") || ((cores == 1 || !supportsMulticore()) && inherits(f, "EagerFuture")))
+    stopifnot(inherits(f, "BatchJobsFuture") || ((cores == 1 || !supportsMulticore()) && inherits(f, "SequentialFuture")))
   
     print(resolved(f))
     y <- value(f)
