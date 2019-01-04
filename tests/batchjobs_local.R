@@ -12,8 +12,8 @@ stopifnot(inherits(f, "BatchJobsFuture"))
 
 ## Check whether a batchjobs_local future is resolved
 ## or not will force evaluation
-print(resolved(f))
-stopifnot(resolved(f))
+print(is_resolved <- resolved(f))
+stopifnot(is_resolved)
 
 y <- value(f)
 print(y)
@@ -46,9 +46,9 @@ stopifnot(v == 0)
 
 message("*** batchjobs_local() with globals (tricky)")
 x <- listenv()
-for (ii in 1:5) x[[ii]] <- batchjobs_local({ ii }, globals=TRUE)
+for (ii in 1:2) x[[ii]] <- batchjobs_local({ ii }, globals=TRUE)
 v <- sapply(x, FUN=value)
-stopifnot(all(v == 1:5))  ## Make sure globals are frozen
+stopifnot(all(v == 1:2))  ## Make sure globals are frozen
 
 
 message("*** batchjobs_local() and errors")

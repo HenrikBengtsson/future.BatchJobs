@@ -71,7 +71,7 @@ message("*** BatchjobsFuture - expired ...")
 plan(batchjobs_local)
 msg <- "Abruptly terminating the future!"
 f <- future({
-  message(msg)
+  cat(file = stderr(), msg)
   quit(save = "no")
 })
 res <- tryCatch({
@@ -91,7 +91,7 @@ if (fullTest) {
   plan(batchjobs_multicore)
   
   f <- future({
-    Sys.sleep(5)
+    Sys.sleep(2)
     42L
   })
   

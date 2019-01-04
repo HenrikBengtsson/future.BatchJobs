@@ -1,6 +1,11 @@
 ## Record original state
 ovars <- ls()
-oopts <- options(warn=1L, mc.cores=2L, future.debug=TRUE)
+oopts <- options(
+  warn = 1L,
+  mc.cores = 2L,
+  future.debug = FALSE,
+  future.wait.interval = 0.1  ## Speed up await() and delete()
+)
 oopts$future.delete <- getOption("future.delete")
 oplan <- future::plan()
 
@@ -8,6 +13,8 @@ oplan <- future::plan()
 future::plan(future.BatchJobs:::batchjobs_local)
 
 fullTest <- (Sys.getenv("_R_CHECK_FULL_") != "")
+
+isWin32 <- (.Platform$OS.type == "windows" && .Platform$r_arch == "i386")
 
 attachedPackages <- future.BatchJobs:::attachedPackages
 await <- future.BatchJobs:::await

@@ -167,3 +167,17 @@ suppressDBIWarnings <- function(expr) {
   withCallingHandlers(expr,
                       warning = function(w) invokeRestart("muffleWarning"))
 }
+
+
+result_has_errors <- function(result) {
+  stop_if_not(inherits(result, "FutureResult"))
+
+  ## BACKWARD COMPATIBILITY: future (< 1.11.0)
+  if (inherits(result$condition, "error")) return(TRUE)
+  
+  for (c in result$conditions) {
+    if (inherits(c$condition, "error")) return(TRUE)
+  }
+  
+  FALSE
+}

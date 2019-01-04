@@ -7,6 +7,10 @@ strategies <- supportedStrategies()
 strategies <- setdiff(strategies, "multiprocess")
 strategies <- c("batchjobs_local")
 
+## CRAN processing times:
+## On Windows 32-bit, don't run these tests
+if (!fullTest && isWin32) strategies <- character(0L)
+
 for (strategy in strategies) {
   message(sprintf("- plan('%s') ...", strategy))
   plan(strategy)

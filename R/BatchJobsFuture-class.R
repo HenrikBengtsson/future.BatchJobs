@@ -262,7 +262,7 @@ resolved.BatchJobsFuture <- function(x, ...) {
 #' @importFrom future result
 #' @export
 #' @keywords internal
-result.BatchJobsFuture <- function(future, ...) {
+result.BatchJobsFuture <- function(future, cleanup = TRUE, ...) {
   ## Has the value already been collected?
   result <- future$result
   if (inherits(result, "FutureResult")) return(result)
@@ -287,16 +287,15 @@ result.BatchJobsFuture <- function(future, ...) {
   stop_if_not(inherits(result, "FutureResult"))
   future$result <- result
   future$state <- "finished"
-  delete(future)
+  if (cleanup) delete(future)
 
   NextMethod()
 }
 
 
-run <- function(...) UseMethod("run")
-
-#' @importFrom future getExpression
+#' @importFrom future run getExpression
 #' @importFrom BatchJobs addRegistryPackages batchExport batchMap
+#' @export
 run.BatchJobsFuture <- function(future, ...) {
   if (future$state != 'created') {
     label <- future$label
@@ -617,9 +616,7 @@ await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("f
           prototype_fields <- c(prototype_fields, "stdout")
           res$stdout <- loggedOutput(future)
         }
-        if (inherits(res$condition, "error")) {
-          cleanup <- FALSE
-        }
+        if (result_has_errors(res)) cleanup <- FALSE
       }
     } else if ("error" %in% stat) {
       cleanup <- FALSE
@@ -731,7 +728,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
 
   ## Make sure to collect the results before deleting
   ## the internal batchtools registry
-  result <- result(future)
+  result <- result(future, cleanup = FALSE)
   stop_if_not(inherits(result, "FutureResult"))
 
   ## To simplify post mortem troubleshooting in non-interactive sessions,
@@ -741,7 +738,7 @@ delete.BatchJobsFuture <- function(future, onRunning=c("warning", "error", "skip
     status <- status(future)
     res <- future$result
     if (inherits(res, "FutureResult")) {
-      if (inherits(res$condition, "error")) status <- "error"
+      if (result_has_errors(res)) status <- unique(c("error", status))
     }
     mdebug("delete(): status = %s", paste(sQuote(status), collapse = ", "))
     if (any(c("error", "expired") %in% status)) {

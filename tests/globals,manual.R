@@ -2,6 +2,10 @@ source("incl/start.R")
 
 plan(batchjobs_local)
 
+## CRAN processing times:
+## On Windows 32-bit, don't run these tests
+if (!fullTest && isWin32) plan(sequential)
+
 message("*** Globals - manually ...")
 
 message("*** Globals manually specified as named list ...")
@@ -58,7 +62,7 @@ f <- future({
 print(f)
 rm(list=names(globals))
 y <- tryCatch(value(f), error = identity)
-if (!inherits(f, c("EagerFuture", "MulticoreFuture"))) {
+if (!inherits(f, c("SequentialFuture", "MulticoreFuture"))) {
   stopifnot(inherits(y, "simpleError"))
 }
 
