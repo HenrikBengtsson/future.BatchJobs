@@ -4,7 +4,9 @@ library("listenv")
 
 message("*** batchjobs_multicore() ...")
 
-for (cores in 1:min(3L, availableCores("multicore"))) {
+for (cores in 1:min(2L, availableCores("multicore"))) {
+  if (!supportsMulticore()) next
+  
   ## FIXME: 
   if (!fullTest && cores > 1) next
 
@@ -14,10 +16,6 @@ for (cores in 1:min(3L, availableCores("multicore"))) {
 
   message(sprintf("Testing with %d cores ...", cores))
   options(mc.cores=cores-1L)
-
-  if (!supportsMulticore()) {
-    message(sprintf("BatchJobs multicore futures are not supporting on '%s'. Falling back to use synchroneous BatchJobs local futures", .Platform$OS.type))
-  }
 
   for (globals in c(FALSE, TRUE)) {
     message(sprintf("*** batchjobs_multicore(..., globals=%s) without globals", globals))

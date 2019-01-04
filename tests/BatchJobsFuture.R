@@ -5,7 +5,6 @@ message("*** BatchJobsFuture() ...")
 message("*** BatchJobsFuture() - cleanup ...")
 
 f <- batchjobs_local({ 1L })
-print(f)
 res <- await(f, cleanup=TRUE)
 print(res)
 stopifnot(inherits(res, "FutureResult"), res$value == 1L)
@@ -18,7 +17,6 @@ message("*** BatchJobsFuture() - deleting exceptions ...")
 
 ## Deleting a non-resolved future
 f <- BatchJobsFuture({ x <- 1 })
-print(f)
 res <- tryCatch({
   delete(f)
 }, warning = function(w) w)
@@ -43,7 +41,6 @@ message("*** BatchJobsFuture() - registry exceptions ...")
 
 ## Non-existing BatchJobs registry
 f <- BatchJobsFuture({ x <- 1 })
-print(f)
 
 ## Hack to emulate where BatchJobs registry is deleted or fails
 f$state <- "running"
@@ -68,7 +65,6 @@ message("*** BatchJobsFuture() - registry exceptions ... DONE")
 message("*** BatchJobsFuture() - exceptions ...")
 
 f <- BatchJobsFuture({ 42L })
-print(f)
 res <- tryCatch({
   loggedError(f)
 }, error = function(ex) ex)
@@ -76,7 +72,6 @@ print(res)
 stopifnot(inherits(res, "error"))
 
 f <- BatchJobsFuture({ 42L })
-print(f)
 res <- tryCatch({
   loggedOutput(f)
 }, error = function(ex) ex)
@@ -110,7 +105,6 @@ if (fullTest && availableCores(constraints="multicore") > 1) {
     Sys.sleep(5)
     x <- 1
   })
-  print(f)
   
   res <- tryCatch({
     value(f)
