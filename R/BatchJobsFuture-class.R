@@ -42,9 +42,9 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
     stop_if_not(length(workers) >= 1)
     if (is.numeric(workers)) {
       stop_if_not(!anyNA(workers), all(workers >= 1))
-    } else if (is.character(workers)) {
     } else {
-      stop("Argument 'workers' should be either numeric or character: ", mode(workers))
+      stop("Argument 'workers' should be either a numeric or a function: ",
+           mode(workers))
     }
   }
 
