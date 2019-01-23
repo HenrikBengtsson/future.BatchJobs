@@ -3,7 +3,9 @@ Package: future.BatchJobs
 
 Version: 0.16.1-9000 [2019-01-04]
 
- * ...
+BUG FIXES:
+
+ * Argument 'workers' could not be a function.
  
 
 Version: 0.16.1 [2019-01-03]

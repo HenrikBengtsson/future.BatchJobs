@@ -37,6 +37,7 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
     conf$cluster.functions <- cluster.functions
   }
 
+  if (is.function(workers)) workers <- workers()
   if (!is.null(workers)) {
     stop_if_not(length(workers) >= 1)
     if (is.numeric(workers)) {
