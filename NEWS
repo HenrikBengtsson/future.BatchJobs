@@ -1,8 +1,12 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.16.1-9000 [2019-01-22]
+Version: 0.16.1-9000 [2019-03-15]
 
+EW FEATURES:
+
+ * Debug messages are now prepended with a timestamp.
+ 
 BUG FIXES:
 
  * Argument 'workers' could not be a function.

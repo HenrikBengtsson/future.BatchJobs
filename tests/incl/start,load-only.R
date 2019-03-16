@@ -24,8 +24,8 @@ importFuture <- future.BatchJobs:::importFuture
 isNA <- future.BatchJobs:::isNA
 isOS <- future.BatchJobs:::isOS
 hpaste <- future.BatchJobs:::hpaste
-mcat <- future.BatchJobs:::mcat
-mprintf <- future.BatchJobs:::mprintf
+mcat <- function(...) message(..., appendLF=FALSE)
+mprintf <- function(...) message(sprintf(...), appendLF=FALSE)
 mprint <- future.BatchJobs:::mprint
 mstr <- future.BatchJobs:::mstr
 printf <- future.BatchJobs:::printf
