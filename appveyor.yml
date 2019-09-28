@@ -1,6 +1,7 @@
 #----------------------------------------------------------------
 # AppVeyor CI for R Packages
 # https://github.com/krlmlr/r-appveyor
+# https://raw.githubusercontent.com/krlmlr/r-appveyor/master/r-travis/scripts/travis-tool.sh
 # Validator: https://ci.appveyor.com/tools/validate-yaml
 #----------------------------------------------------------------
 environment:
@@ -25,11 +26,10 @@ init:
 install:
   ps: |
         Bootstrap
-        InstallRtools
 
 cache:
   - C:\RLibrary -> appveyor.yml
-  
+
 build_script:
   - echo Current directory=%CD%
   - travis-tool.sh install_r BatchJobs future R.utils
