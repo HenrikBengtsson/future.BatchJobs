@@ -1,24 +1,24 @@
-#' @importFrom R.utils isDirectory mkdirs
-#' @importFrom utils sessionInfo
+#' @importFrom utils file_test sessionInfo
 futureCachePath <- local({
-  ## The path used for this session
-  path <- NULL
+  ## The subfolder used for this session
+  dir <- NULL
 
-  function(rootPath=".future", absolute=TRUE, create=TRUE) {
-    if (is.null(path)) {
+  function(root_path = Sys.getenv("R_FUTURE_CACHE_PATH", ".future"), absolute = TRUE, create = TRUE) {
+    if (is.null(dir)) {
       id <- basename(tempdir())
-      id <- gsub("Rtmp", "", id, fixed=TRUE)
-      timestamp <- format(Sys.time(), format="%Y%m%d_%H%M%S")
-      dir <- sprintf("%s-%s", timestamp, id)
-      pathT <- file.path(rootPath, dir)
-      if (create && !isDirectory(pathT)) {
-        mkdirs(pathT)
-        pathnameT <- file.path(pathT, "sessioninfo.txt")
-        writeLines(captureOutput(print(sessionInfo())), con=pathnameT)
-      }
-      path <<- pathT
+      id <- gsub("Rtmp", "", id, fixed = TRUE)
+      timestamp <- format(Sys.time(), format = "%Y%m%d_%H%M%S")
+      dir <<- sprintf("%s-%s", timestamp, id)
     }
-    if (absolute) path <- file.path(getwd(), path)
+    
+    path <- file.path(root_path, dir)
+    if (create && !file_test("-d", path)) {
+      dir.create(path, recursive = TRUE)
+      pathname <- file.path(path, "sessioninfo.txt")
+      writeLines(capture.output(print(sessionInfo())), con = pathname)
+    }
+
+    if (absolute) path <- normalizePath(path, mustWork = FALSE)
 
     path
   }

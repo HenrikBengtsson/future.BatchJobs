@@ -19,21 +19,6 @@ stop_if_not <- function(...) {
   
   NULL
 }
-stop_if_not <- function(...) {
-  res <- list(...)
-  for (ii in 1L:length(res)) {
-    res_ii <- .subset2(res, ii)
-    if (length(res_ii) != 1L || is.na(res_ii) || !res_ii) {
-        mc <- match.call()
-        call <- deparse(mc[[ii + 1]], width.cutoff = 60L)
-        if (length(call) > 1L) call <- paste(call[1L], "....")
-        stop(sprintf("%s is not TRUE", sQuote(call)),
-             call. = FALSE, domain = NA)
-    }
-  }
-  
-  NULL
-}
 
 attachedPackages <- function() {
   pkgs <- search()
@@ -44,22 +29,34 @@ attachedPackages <- function() {
 
 printf <- function(...) cat(sprintf(...))
 
-mcat <- function(...) message(..., appendLF=FALSE)
-
-mprintf <- function(...) message(sprintf(...), appendLF=FALSE)
-
-mprint <- function(...) {
-  bfr <- captureOutput(print(...))
-  bfr <- paste(c(bfr, ""), collapse="\n")
-  message(bfr, appendLF=FALSE)
+now <- function(x = Sys.time(), format = "[%H:%M:%OS3] ") {
+  ## format(x, format = format) ## slower
+  format(as.POSIXlt(x, tz = ""), format = format)
 }
 
-#' @importFrom utils str
-mstr <- function(...) {
-  bfr <- captureOutput(str(...))
-  bfr <- paste(c(bfr, ""), collapse="\n")
-  message(bfr, appendLF=FALSE)
+mdebug <- function(..., debug = getOption("future.debug", FALSE)) {
+  if (!debug) return()
+  message(now(), ...)
 }
+
+mdebugf <- function(..., appendLF = TRUE,
+                    debug = getOption("future.debug", FALSE)) {
+  if (!debug) return()
+  message(now(), sprintf(...), appendLF = appendLF)
+}
+
+#' @importFrom utils capture.output
+mprint <- function(..., appendLF = TRUE, debug = getOption("future.debug", FALSE)) {
+  if (!debug) return()
+  message(paste(now(), capture.output(print(...)), sep = "", collapse = "\n"), appendLF = appendLF)
+}
+
+#' @importFrom utils capture.output str
+mstr <- function(..., appendLF = TRUE, debug = getOption("future.debug", FALSE)) {
+  if (!debug) return()
+  message(paste(now(), capture.output(str(...)), sep = "", collapse = "\n"), appendLF = appendLF)
+}
+
 
 ## From R.utils 2.0.2 (2015-05-23)
 hpaste <- function(..., sep="", collapse=", ", lastCollapse=NULL, maxHead=if (missing(lastCollapse)) 3 else Inf, maxTail=if (is.finite(maxHead)) 1 else Inf, abbreviate="...") {
@@ -172,12 +169,24 @@ suppressDBIWarnings <- function(expr) {
 result_has_errors <- function(result) {
   stop_if_not(inherits(result, "FutureResult"))
 
-  ## BACKWARD COMPATIBILITY: future (< 1.11.0)
-  if (inherits(result$condition, "error")) return(TRUE)
-  
   for (c in result$conditions) {
     if (inherits(c$condition, "error")) return(TRUE)
   }
   
   FALSE
+}
+
+import_from <- function(name, default = NULL, package) {
+  ns <- getNamespace(package)
+  if (exists(name, mode = "function", envir = ns, inherits = FALSE)) {
+    get(name, mode = "function", envir = ns, inherits = FALSE)
+  } else if (!is.null(default)) {
+    default
+  } else {
+    stop(sprintf("No such '%s' function: %s()", package, name))
+  }
+}
+
+import_future <- function(name, default = NULL) {
+  import_from(name, default = default, package = "future")
 }

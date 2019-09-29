@@ -1,6 +1,7 @@
 #----------------------------------------------------------------
 # Travis-CI Configuration for R Packages
 # https://docs.travis-ci.com/user/languages/r
+# YAML validated using http://www.yamllint.com/
 #----------------------------------------------------------------
 language: r
 sudo: false
@@ -25,12 +26,19 @@ matrix:
       - R_KEEP_PKG_SOURCE=yes
       - _R_S3_METHOD_LOOKUP_BASEENV_AFTER_GLOBALENV_=true
       - _R_S3_METHOD_LOOKUP_USE_TOPENV_AS_DEFENV_=true
+      - _R_CHECK_CONNECTIONS_LEFT_OPEN_=true
+      - _R_CHECK_LENGTH_1_CONDITION_=true
+      - _R_CHECK_LENGTH_1_LOGIC2_=true
     - os: osx
       r: oldrel
       before_install:
         - Rscript -e 'c(physical = parallel::detectCores(logical = FALSE), logical = parallel::detectCores())'
+        - Rscript -e 'install.packages("future", type = "source")'
     - os: osx
       r: release
+      before_install:
+        - Rscript -e 'c(physical = parallel::detectCores(logical = FALSE), logical = parallel::detectCores())'
+        - Rscript -e 'install.packages("future", type = "source")'
     - os: linux
       r: release
       r_packages:
@@ -38,9 +46,19 @@ matrix:
       r_check_args: --no-codoc --no-examples --no-tests --ignore-vignettes
       after_success:
         - Rscript -e 'covr::codecov(quiet=FALSE)'
-      env:
-        - NB='w/ covr' ## Just a label
-    
+      env: NB='w/ covr' ## Just a label
+    - os: linux
+      r: release
+      r_packages:
+        - lintr
+      r_check_args: --no-codoc --no-examples --no-tests --ignore-vignettes
+      after_success:
+        - Rscript -e 'library(lintr); lint_package(linters = with_defaults(commented_code_linter = NULL, closed_curly_linter = closed_curly_linter(allow_single_line = TRUE), open_curly_linter = open_curly_linter(allow_single_line = TRUE)))'
+      env: NB='w/ lintr' ## Just a label
+
+before_install:
+  - Rscript -e 'c(physical = parallel::detectCores(logical = FALSE), logical = parallel::detectCores())'
+
 notifications:
   email:
     on_success: change

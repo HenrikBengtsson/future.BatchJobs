@@ -1,3 +1,10 @@
+.onLoad <- function(libname, pkgname) {
+  inRCmdCheck <- import_future("inRCmdCheck")
+  if (inRCmdCheck()) {
+    Sys.setenv("R_FUTURE_CACHE_PATH" = file.path(tempdir(), ".future"))
+  }
+}
+
 ## covr: skip=all
 #' @importFrom R.utils removeDirectory isFile
 .onUnload <- function(libpath) {

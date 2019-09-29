@@ -12,6 +12,8 @@ oplan <- future::plan()
 ## Use local BatchJobs futures by default
 future::plan(future.BatchJobs:::batchjobs_local)
 
+Sys.setenv("R_FUTURE_CACHE_PATH" = file.path(tempdir(), ".future"))
+
 fullTest <- (Sys.getenv("_R_CHECK_FULL_") != "")
 
 isWin32 <- (.Platform$OS.type == "windows" && .Platform$r_arch == "i386")
@@ -24,8 +26,8 @@ importFuture <- future.BatchJobs:::importFuture
 isNA <- future.BatchJobs:::isNA
 isOS <- future.BatchJobs:::isOS
 hpaste <- future.BatchJobs:::hpaste
-mcat <- future.BatchJobs:::mcat
-mprintf <- future.BatchJobs:::mprintf
+mcat <- function(...) message(..., appendLF=FALSE)
+mprintf <- function(...) message(sprintf(...), appendLF=FALSE)
 mprint <- future.BatchJobs:::mprint
 mstr <- future.BatchJobs:::mstr
 printf <- future.BatchJobs:::printf

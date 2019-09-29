@@ -1,6 +1,20 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.16.2 [2019-09-27]
+
+NEW FEATURES:
+
+ * Debug messages are now prepended with a timestamp.
+ 
+BUG FIXES:
+
+ * Argument 'workers' could not be a function.
+
+ * Argument 'workers' of type character was silently accepted and effectively
+   interpreted as workers = length(workers).
+
+
 Version: 0.16.1 [2019-01-03]
 
 FIXES:
