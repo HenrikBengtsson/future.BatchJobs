@@ -16,7 +16,7 @@ for (type in c("batchjobs_interactive", "batchjobs_local")) {
   message(sprintf("*** plan('%s') ...", type))
 
   plan(type)
-  stopifnot(inherits(plan(), "batchjobs"))
+  stopifnot(inherits(plan("next"), "batchjobs"))
 
   a <- 0
   f <- future({
