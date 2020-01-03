@@ -28,4 +28,4 @@ License: LGPL (>= 2.1)
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/future.BatchJobs
 BugReports: https://github.com/HenrikBengtsson/future.BatchJobs/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

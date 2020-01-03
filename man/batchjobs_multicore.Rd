@@ -4,10 +4,16 @@
 \alias{batchjobs_multicore}
 \title{BatchJobs multicore futures}
 \usage{
-batchjobs_multicore(expr, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs",
+batchjobs_multicore(
+  expr,
+  envir = parent.frame(),
+  substitute = TRUE,
+  globals = TRUE,
+  label = "BatchJobs",
   workers = availableCores(constraints = "multicore"),
-  job.delay = FALSE, ...)
+  job.delay = FALSE,
+  ...
+)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}

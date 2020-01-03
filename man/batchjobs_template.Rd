@@ -9,25 +9,70 @@
 \alias{batchjobs_torque}
 \title{BatchJobs LSF, OpenLava, SGE, Slurm and Torque futures}
 \usage{
-batchjobs_lsf(expr, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), workers = Inf, job.delay = FALSE, ...)
+batchjobs_lsf(
+  expr,
+  envir = parent.frame(),
+  substitute = TRUE,
+  globals = TRUE,
+  label = "BatchJobs",
+  pathname = NULL,
+  resources = list(),
+  workers = Inf,
+  job.delay = FALSE,
+  ...
+)
 
-batchjobs_openlava(expr, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), workers = Inf, job.delay = FALSE, ...)
+batchjobs_openlava(
+  expr,
+  envir = parent.frame(),
+  substitute = TRUE,
+  globals = TRUE,
+  label = "BatchJobs",
+  pathname = NULL,
+  resources = list(),
+  workers = Inf,
+  job.delay = FALSE,
+  ...
+)
 
-batchjobs_sge(expr, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), workers = Inf, job.delay = FALSE, ...)
+batchjobs_sge(
+  expr,
+  envir = parent.frame(),
+  substitute = TRUE,
+  globals = TRUE,
+  label = "BatchJobs",
+  pathname = NULL,
+  resources = list(),
+  workers = Inf,
+  job.delay = FALSE,
+  ...
+)
 
-batchjobs_slurm(expr, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), workers = Inf, job.delay = FALSE, ...)
+batchjobs_slurm(
+  expr,
+  envir = parent.frame(),
+  substitute = TRUE,
+  globals = TRUE,
+  label = "BatchJobs",
+  pathname = NULL,
+  resources = list(),
+  workers = Inf,
+  job.delay = FALSE,
+  ...
+)
 
-batchjobs_torque(expr, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs", pathname = NULL,
-  resources = list(), workers = Inf, job.delay = FALSE, ...)
+batchjobs_torque(
+  expr,
+  envir = parent.frame(),
+  substitute = TRUE,
+  globals = TRUE,
+  label = "BatchJobs",
+  pathname = NULL,
+  resources = list(),
+  workers = Inf,
+  job.delay = FALSE,
+  ...
+)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}
