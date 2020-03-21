@@ -242,8 +242,8 @@ Contributing to this package is easy.  Just send a [pull request](https://help.g
 
 ## Software status
 
-| Resource:     | CRAN        | Travis CI       | AppVeyor         |
-| ------------- | ------------------- | --------------- | ---------------- |
-| _Platforms:_  | _Multiple_          | _Linux & macOS_ | _Windows_        |
-| R CMD check   | <a href="https://cran.r-project.org/web/checks/check_results_future.BatchJobs.html"><img border="0" src="http://www.r-pkg.org/badges/version/future.BatchJobs" alt="CRAN version"></a> | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>   | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
-| Test coverage |                     | <a href="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs"><img src="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs/branch/develop/graph/badge.svg" alt="Coverage Status"/></a>     |                  |
+| Resource      | CRAN        | GitHub Actions      | Travis CI       | Appveyor         |
+| ------------- | ------------------- | ------------------- | --------------- | ---------------- |
+| _Platforms:_  | _Multiple_          | _Multiple_          | _Linux & macOS_ | _Windows_        |
+| R CMD check   | <a href="https://cran.r-project.org/web/checks/check_results_future.BatchJobs.html"><img border="0" src="http://www.r-pkg.org/badges/version/future.BatchJobs" alt="CRAN version"></a> |        | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>   | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
+| Test coverage |                     |                     | <a href="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs"><img src="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs/branch/develop/graph/badge.svg" alt="Coverage Status"/></a>     |                  |
