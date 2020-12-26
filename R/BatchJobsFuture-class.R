@@ -74,16 +74,9 @@ as_BatchJobFuture <- function(future, conf=NULL, cluster.functions=NULL, resourc
 
   stop_if_not(is.logical(job.delay) || is.function(job.delay))
 
-  ## Create BatchJobs registry
-  label <- future$label
-  if (!is.null(label)) label <- as.character(label)
-  reg <- tempRegistry(label = label)
-  debug <- getOption("future.debug", FALSE)
-  if (debug) mprint(reg)
-
   ## BatchJobs configuration
   future$config <- list(
-    reg               = reg,
+    reg               = NULL,
     jobid             = NA_integer_,
     conf              = conf,
     cluster.functions = cluster.functions,
@@ -91,13 +84,8 @@ as_BatchJobFuture <- function(future, conf=NULL, cluster.functions=NULL, resourc
     job.delay         = job.delay,
     finalize          = finalize
   )
- 
-  future <- structure(future, class=c("BatchJobsFuture", class(future)))
 
-  ## Register finalizer?
-  if (finalize) future <- add_finalizer(future)
-
-  future
+  structure(future, class=c("BatchJobsFuture", class(future)))
 }
 
 
@@ -353,7 +341,25 @@ run.BatchJobsFuture <- function(future, ...) {
   ## Always evaluate in local environment
   expr <- substitute(local(expr), list(expr=expr))
 
+  ## (i) Create batchtools registry
   reg <- future$config$reg
+  stop_if_not(is.null(reg) || inherits(reg, "Registry"))
+  if (is.null(reg)) {
+    if (debug) mprint("- Creating BatchJobs registry")
+    config <- future$config
+    stop_if_not(is.list(config))
+
+    ## Create BatchJobs registry
+    label <- future$label
+    if (!is.null(label)) label <- as.character(label)
+    reg <- tempRegistry(label = label)
+    if (debug) mprint(reg)
+    future$config$reg <- reg
+
+    ## Register finalizer?
+    if (config$finalize) future <- add_finalizer(future)
+    config <- NULL
+  }
   stop_if_not(inherits(reg, "Registry"))
 
   ## (ii) Attach packages that needs to be attached

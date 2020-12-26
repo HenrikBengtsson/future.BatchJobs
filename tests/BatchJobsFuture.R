@@ -56,20 +56,6 @@ message("*** BatchJobsFuture() - registry exceptions ... DONE")
 
 message("*** BatchJobsFuture() - exceptions ...")
 
-f <- BatchJobsFuture({ 42L })
-res <- tryCatch({
-  loggedError(f)
-}, error = function(ex) ex)
-print(res)
-stopifnot(inherits(res, "error"))
-
-f <- BatchJobsFuture({ 42L })
-res <- tryCatch({
-  loggedOutput(f)
-}, error = function(ex) ex)
-print(res)
-stopifnot(inherits(res, "error"))
-
 res <- try(f <- BatchJobsFuture(42L, workers=integer(0)), silent=TRUE)
 print(res)
 stopifnot(inherits(res, "try-error"))

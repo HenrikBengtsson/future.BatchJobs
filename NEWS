@@ -3,7 +3,10 @@ Package: future.BatchJobs
 
 Version: 0.16.2-9000 [2020-12-26]
 
- * ...
+SIGNIFICANT CHANGES:
+
+ * Lazy batchjobs futures only creates the internal BatchJobs registry when
+   the future is launched.
  
 
 Version: 0.16.2 [2019-09-27]
