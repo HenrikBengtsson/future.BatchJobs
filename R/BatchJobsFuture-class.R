@@ -74,12 +74,6 @@ as_BatchJobFuture <- function(future, conf=NULL, cluster.functions=NULL, resourc
 
   stop_if_not(is.logical(job.delay) || is.function(job.delay))
 
-  ## LEGACY: /HB 2016-05-20
-  backend <- future$backend
-  future$backend <- NULL
-
-  future$conf <- conf
-
   ## Create BatchJobs registry
   label <- future$label
   if (!is.null(label)) label <- as.character(label)
@@ -91,10 +85,11 @@ as_BatchJobFuture <- function(future, conf=NULL, cluster.functions=NULL, resourc
   future$config <- list(
     reg               = reg,
     jobid             = NA_integer_,
+    conf              = conf,
     cluster.functions = cluster.functions,
     resources         = resources,
     job.delay         = job.delay,
-    backend           = backend
+    finalize          = finalize
   )
  
   future <- structure(future, class=c("BatchJobsFuture", class(future)))
@@ -467,7 +462,7 @@ run.BatchJobsFuture <- function(future, ...) {
   oopts2 <- NULL
 
   ## 3. Create BatchJobs configuration backend?
-  conf <- future$conf
+  conf <- future$config$conf
   if (is.null(conf)) {
     ## 3. Create BatchJobs backend configuration
     cluster.functions <- future$config$cluster.functions
