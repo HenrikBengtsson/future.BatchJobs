@@ -14,4 +14,11 @@
 *.swp
 .covr.rds
 .future
-packrat/lib*/
+.ghi
+.issues
+.make
+.local
+revdep/data.sqlite
+revdep/checks/*
+revdep/library/*
+.github/
