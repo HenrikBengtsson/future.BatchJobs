@@ -26,8 +26,30 @@
 BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, globals=TRUE, packages=NULL, label="BatchJobs", conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
   if (substitute) expr <- substitute(expr)
 
-  if (!is.null(label)) label <- as.character(label)
-  
+  ## Record globals
+  gp <- getGlobalsAndPackages(expr, envir = envir, globals = globals)
+
+  future <- Future(expr = gp$expr, envir = envir, substitute = FALSE,
+                   globals = gp$globals,
+                   packages = unique(c(packages, gp$packages)),
+                   label = label,
+                   ...)
+
+  future <- as_BatchJobFuture(future,
+                             conf=conf,
+                             cluster.functions=cluster.functions,
+                             resources=resources,
+                             workers=workers,
+                             job.delay=job.delay,
+                             finalize=finalize)
+
+  future
+}
+
+
+## Helper function to create a BatchtoolsFuture from a vanilla Future
+#' @importFrom utils file_test
+as_BatchJobFuture <- function(future, conf=NULL, cluster.functions=NULL, resources=list(), workers=NULL, job.delay=FALSE, finalize=getOption("future.finalize", TRUE), ...) {
   if (!is.null(conf)) {
     stop_if_not(is.environment(conf))
   }
@@ -52,37 +74,28 @@ BatchJobsFuture <- function(expr=NULL, envir=parent.frame(), substitute=TRUE, gl
 
   stop_if_not(is.logical(job.delay) || is.function(job.delay))
 
-  ## Record globals
-  gp <- getGlobalsAndPackages(expr, envir=envir, globals=globals)
-
-  ## Create BatchJobsFuture object
-  future <- Future(expr=gp$expr, envir=envir, substitute=FALSE,
-                   workers=workers, label=label,
-                   version = "1.8", .callResult = TRUE,
-                   ...)
-
   ## LEGACY: /HB 2016-05-20
   backend <- future$backend
   future$backend <- NULL
 
-  future$globals <- gp$globals
-  future$packages <- unique(c(packages, gp$packages))
   future$conf <- conf
 
   ## Create BatchJobs registry
-  reg <- tempRegistry(label=future$label)
+  label <- future$label
+  if (!is.null(label)) label <- as.character(label)
+  reg <- tempRegistry(label = label)
   debug <- getOption("future.debug", FALSE)
   if (debug) mprint(reg)
 
   ## BatchJobs configuration
-  config <- list(reg=reg, jobid=NA_integer_,
-                 cluster.functions=cluster.functions,
-                 resources=resources,
-                 job.delay=job.delay,
-                 backend=backend)
-
-
-  future$config <- config
+  future$config <- list(
+    reg               = reg,
+    jobid             = NA_integer_,
+    cluster.functions = cluster.functions,
+    resources         = resources,
+    job.delay         = job.delay,
+    backend           = backend
+  )
  
   future <- structure(future, class=c("BatchJobsFuture", class(future)))
 
