@@ -4,7 +4,6 @@ supportedStrategies <- future:::supportedStrategies
 message("*** Futures - labels ...")
 
 strategies <- supportedStrategies()
-strategies <- setdiff(strategies, "multiprocess")
 strategies <- c("batchjobs_local")
 
 ## CRAN processing times:
