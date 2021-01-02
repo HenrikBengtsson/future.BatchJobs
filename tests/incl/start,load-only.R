@@ -4,7 +4,9 @@ oopts <- options(
   warn = 1L,
   mc.cores = 2L,
   future.debug = FALSE,
-  future.wait.interval = 0.1  ## Speed up await() and delete()
+  ## Speed up await() and delete():
+  future.wait.interval = 0.05,
+  future.wait.alpha = 1.001
 )
 oopts$future.delete <- getOption("future.delete")
 oplan <- future::plan()

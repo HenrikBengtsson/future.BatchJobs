@@ -107,16 +107,6 @@ stopifnot(identical(y, y0))
 
 ## Future assignment
 x <- list()
-y %<-% {
-  x["a"] <- list(1)
-  x
-}
-rm(list="x")
-print(y)
-stopifnot(identical(y, y0))
-
-## Future assignment
-x <- list()
 name <- "a"
 y %<-% {
   x[name] <- list(1)

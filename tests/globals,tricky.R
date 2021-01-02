@@ -54,7 +54,7 @@ flapply <- function(x, FUN, ...) {
   as.list(res)
 }
 
-x <- list(a="integer", b="numeric", c="character", c="list")
+x <- list(a="integer", c="character", c="list")
 str(list(x=x))
 
 y0 <- lapply(x, FUN=base::vector, length=2L)
@@ -83,11 +83,6 @@ message("- flapply(x, FUN=listenv::listenv, ...) ...")
 x <- list()
 
 y <- listenv()
-y$A <- 3L
-x$a <- y
-
-y <- listenv()
-y$A <- 3L
 y$B <- c("hello", b=1:100)
 x$b <- y
 

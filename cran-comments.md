@@ -1,6 +1,6 @@
 # CRAN submission future.BatchJobs 0.17.0
 
-on 2021-01-02
+on 2021-01-04
 
 I've verified this submission have no negative impact on any of the 3 reverse package dependencies available on CRAN.
 
