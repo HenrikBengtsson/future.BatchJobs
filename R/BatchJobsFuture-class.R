@@ -192,6 +192,7 @@ finished.BatchJobsFuture <- function(future, ...) {
 }
 
 #' @export
+#' @importFrom BatchJobs getErrorMessages
 #' @keywords internal
 loggedError.BatchJobsFuture <- function(future, ...) {
   stat <- status(future)
@@ -519,29 +520,8 @@ run.BatchJobsFuture <- function(future, ...) {
 } ## run()
 
 
-#' Awaits the value of a BatchJobs future
-#'
-#' @param future The future.
-#' @param cleanup If TRUE, the registry is completely removed upon
-#' success, otherwise not.
-#' @param timeout Total time (in seconds) waiting before generating an error.
-#' @param delta The number of seconds to wait the first time.
-#' @param alpha A factor to scale up the waiting time in each iteration
-#' such that the waiting time in the k:th iteration is \code{alpha^k*delta}.
-#' @param \ldots Not used.
-#'
-#' @return The value of the evaluated expression.
-#' If an error occurs, an informative Exception is thrown.
-#'
-#' @details
-#' Note that \code{await()} should only be called once, because
-#' after being called the actual asynchronous future may be removed
-#' and will no longer available in subsequent calls.  If called
-#' again, an error may be thrown.
-#'
-#' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
+#' @importFrom BatchJobs loadResult
 #' @importFrom utils tail
-#' @keywords internal
 await <- function(future, cleanup = TRUE, timeout = getOption("future.wait.timeout", 30*24*60*60), delta=getOption("future.wait.interval", 0.2), alpha=getOption("future.wait.alpha", 1.01), ...) {
   stop_if_not(is.finite(timeout), timeout >= 0)
   stop_if_not(is.finite(alpha), alpha > 0)

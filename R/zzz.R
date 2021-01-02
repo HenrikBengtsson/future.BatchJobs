@@ -27,3 +27,8 @@
     try(removeDirectory(path, recursive=FALSE, mustExist=FALSE), silent=TRUE)
   }
 }
+
+
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage("Package 'future.BatchJobs' is deprecated and will be archived on CRAN. Please use 'future.batchtools' instead.")
+}

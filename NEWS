@@ -1,9 +1,12 @@
 Package: future.BatchJobs
 =========================
 
-Version: 0.16.2-9000 [2020-12-26]
+Version: 0.16.2-9000 [2021-01-02]
 
 SIGNIFICANT CHANGES:
+
+ * The 'future.BatchJobs' package is deprecated and will soon be archived on
+   CRAN in favor of the 'future.batchtools' package.
 
  * Lazy batchjobs futures only creates the internal BatchJobs registry when
    the future is launched.
