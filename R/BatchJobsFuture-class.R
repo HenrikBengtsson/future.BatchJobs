@@ -519,8 +519,6 @@ run.BatchJobsFuture <- function(future, ...) {
 } ## run()
 
 
-await <- function(...) UseMethod("await")
-
 #' Awaits the value of a BatchJobs future
 #'
 #' @param future The future.
@@ -541,11 +539,10 @@ await <- function(...) UseMethod("await")
 #' and will no longer available in subsequent calls.  If called
 #' again, an error may be thrown.
 #'
-#' @export
 #' @importFrom BatchJobs getErrorMessages loadResult removeRegistry
 #' @importFrom utils tail
 #' @keywords internal
-await.BatchJobsFuture <- function(future, cleanup = TRUE, timeout = getOption("future.wait.timeout", 30*24*60*60), delta=getOption("future.wait.interval", 0.2), alpha=getOption("future.wait.alpha", 1.01), ...) {
+await <- function(future, cleanup = TRUE, timeout = getOption("future.wait.timeout", 30*24*60*60), delta=getOption("future.wait.interval", 0.2), alpha=getOption("future.wait.alpha", 1.01), ...) {
   stop_if_not(is.finite(timeout), timeout >= 0)
   stop_if_not(is.finite(alpha), alpha > 0)
 
