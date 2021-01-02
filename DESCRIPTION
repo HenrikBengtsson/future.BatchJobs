@@ -1,8 +1,8 @@
 Package: future.BatchJobs
-Version: 0.16.2-9000
+Version: 0.17.0
 Depends:
     R (>= 3.2.0),
-    future (>= 1.15.1)
+    future (>= 1.21.0)
 Imports:
     BatchJobs (>= 1.8),
     R.utils
@@ -27,5 +27,4 @@ Description: Implementation of the Future API on top of the 'BatchJobs' package.
 License: LGPL (>= 2.1)
 LazyLoad: TRUE
 URL: https://github.com/HenrikBengtsson/future.BatchJobs
-BugReports: https://github.com/HenrikBengtsson/future.BatchJobs/issues
 RoxygenNote: 7.1.1
