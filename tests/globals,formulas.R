@@ -51,11 +51,6 @@ tbl <- value(f)
 print(tbl)
 stopifnot(all.equal(tbl, tbl0))
 
-## Future assignment
-tbl %<-% { xtabs(~ x) }
-print(tbl)
-stopifnot(all.equal(tbl, tbl0))
-
 message("*** Globals - one-side formulas, e.g. xtabs(~ x) ... DONE")
 
 
@@ -116,10 +111,6 @@ str(y0)
 
 f <- future({ outer_function(1L) })
 y <- value(f)
-str(y)
-stopifnot(all.equal(y, y0))
-
-y  %<-% { outer_function(1L) }
 str(y)
 stopifnot(all.equal(y, y0))
 

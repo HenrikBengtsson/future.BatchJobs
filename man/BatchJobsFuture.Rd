@@ -4,11 +4,21 @@
 \alias{BatchJobsFuture}
 \title{A BatchJobs future is a future whose value will be resolved via BatchJobs}
 \usage{
-BatchJobsFuture(expr = NULL, envir = parent.frame(),
-  substitute = TRUE, globals = TRUE, packages = NULL,
-  label = "BatchJobs", conf = NULL, cluster.functions = NULL,
-  resources = list(), workers = NULL, job.delay = FALSE,
-  finalize = getOption("future.finalize", TRUE), ...)
+BatchJobsFuture(
+  expr = NULL,
+  envir = parent.frame(),
+  substitute = TRUE,
+  globals = TRUE,
+  packages = NULL,
+  label = "BatchJobs",
+  conf = NULL,
+  cluster.functions = NULL,
+  resources = list(),
+  workers = NULL,
+  job.delay = FALSE,
+  finalize = getOption("future.finalize", TRUE),
+  ...
+)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}

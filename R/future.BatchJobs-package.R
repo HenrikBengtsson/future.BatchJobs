@@ -20,4 +20,5 @@
 #'
 #' @docType package
 #' @name future.BatchJobs
+#' @aliases future.BatchJobs-package
 NULL

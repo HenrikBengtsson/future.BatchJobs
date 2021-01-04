@@ -4,10 +4,19 @@
 \alias{batchjobs_custom}
 \title{BatchJobs conf futures}
 \usage{
-batchjobs_custom(expr, envir = parent.frame(), substitute = TRUE,
-  globals = TRUE, label = "BatchJobs", conf = NULL,
-  pathname = NULL, workers = Inf, resources = list(),
-  job.delay = FALSE, ...)
+batchjobs_custom(
+  expr,
+  envir = parent.frame(),
+  substitute = TRUE,
+  globals = TRUE,
+  label = "BatchJobs",
+  conf = NULL,
+  pathname = NULL,
+  workers = Inf,
+  resources = list(),
+  job.delay = FALSE,
+  ...
+)
 }
 \arguments{
 \item{expr}{The R expression to be evaluated}

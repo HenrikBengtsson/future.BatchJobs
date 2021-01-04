@@ -3,7 +3,7 @@ library("listenv")
 
 message("*** batchjobs_*() - w/ job.delay ...")
 
-strategies <- c("batchjobs_interactive", "batchjobs_local", "batchjobs_custom")
+strategies <- c("batchjobs_interactive", "batchjobs_local")
 
 ## CRAN processing times:
 ## On Windows 32-bit, don't run these tests

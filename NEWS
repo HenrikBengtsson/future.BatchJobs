@@ -1,6 +1,17 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.17.0 [2021-01-02]
+
+SIGNIFICANT CHANGES:
+
+ * The 'future.BatchJobs' package is deprecated and will soon be archived on
+   CRAN in favor of the 'future.batchtools' package.
+
+ * Lazy batchjobs futures only creates the internal BatchJobs registry when
+   the future is launched.
+ 
+
 Version: 0.16.2 [2019-09-27]
 
 NEW FEATURES:
@@ -75,7 +86,7 @@ BUG FIXES:
    broke this package.
 
  * loggedOutput() for BatchtoolsFuture would always return NULL unless an error
-   had occured.
+   had occurred.
 
 DEPRECATED AND DEFUNCT:
 
@@ -201,7 +212,7 @@ NEW FEATURES:
 
  * WORKAROUND: The BatchJobs multicore cluster functions are designed
    to give some leeway for other processes on the local machine.
-   Unfortunately, this may result in endless or extremeley long waiting
+   Unfortunately, this may result in endless or extremely long waiting
    for free resources before BatchJobs multicore jobs can be submitted.
    One reason is that BatchJobs tries to keep the average CPU load
    below a threshold that is calculated based on the number of cores.
@@ -349,7 +360,7 @@ BUG FIX:
    of the future has been called first.
 
  * WORKAROUND: Global variables with names starting with a period
-   ort that does not match pattern '[a-zA-Z0-9._-]+' could not be
+   or that does not match pattern '[a-zA-Z0-9._-]+' could not be
    exported due to BatchJobs limitation.  Until resolved by BatchJobs,
    this package encode and decode such variable names automatically.
 
@@ -419,7 +430,7 @@ Version: 0.4.0 [2015-06-08]
 
 BUG FIX:
 
- * The existance of .BatchJobs.R would override whatever backend was
+ * The existence of .BatchJobs.R would override whatever backend was
    already set by backend().
    
  * Asynchronous evaluation of { a <<- 1 } no longer identifies 'a' as
@@ -444,7 +455,7 @@ NEW FEATURES:
 
  * Added availableCores() for identifying the number of available cores.
    The default is to acknowledged the assigned number of cores by
-   queing systems such as Torque/PBS, before using detectCores() of
+   queueing systems such as Torque/PBS, before using detectCores() of
    the 'parallel' package.
 
  * ROBUSTNESS: Asynchronous tasks that still run when R exists
