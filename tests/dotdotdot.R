@@ -1,7 +1,7 @@
 source("incl/start.R")
 library("listenv")
 
-strategies <- c("sequential", "multiprocess", "batchjobs_local")
+strategies <- c("sequential", "batchjobs_local")
 
 ## CRAN processing times:
 ## On Windows 32-bit, don't run these tests

@@ -4,7 +4,7 @@ library("listenv")
 if (requireNamespace("future.apply", quietly = TRUE)) {
   future_lapply <- future.apply::future_lapply
   
-  strategies <- c("sequential", "batchjobs_interactive", "batchjobs_local")
+  strategies <- c("batchjobs_local")
 
   ## CRAN processing times: Don't run these tests on Windows 32-bit
   if (!fullTest && isWin32) strategies <- character(0L)
@@ -72,11 +72,6 @@ if (requireNamespace("future.apply", quietly = TRUE)) {
   x <- list()
   
   y <- listenv()
-  y$A <- 3L
-  x$a <- y
-  
-  y <- listenv()
-  y$A <- 3L
   y$B <- c("hello", b=1:100)
   x$b <- y
   
