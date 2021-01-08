@@ -1,6 +1,13 @@
 Package: future.BatchJobs
 =========================
 
+Version: 0.17.0-9000 [2021-01-08]
+
+SIGNIFICANT CHANGES:
+
+ * The 'future.BatchJobs' package has been archived on CRAN as of 2021-01-08.
+ 
+
 Version: 0.17.0 [2021-01-02]
 
 SIGNIFICANT CHANGES:
