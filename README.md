@@ -5,8 +5,8 @@
 
 ![Life cycle: superseded](vignettes/imgs/lifecycle-superseded-blue.svg)
 
-_NOTE: The [BatchJobs](https://cran.r-project.org/package=BatchJobs) package is deprecated in favor of the [batchtools](https://cran.r-project.org/package=batchtools) package. Because of this, it is recommended to use the [future.batchtools](https://cran.r-project.org/package=future.batchtools) package instead of this package. This [future.BatchJobs](https://cran.r-project.org/package=future.BatchJobs) package is formally deprecated and will be archive on CRAN._
-
+_NOTE: The [BatchJobs](https://cran.r-project.org/package=BatchJobs) package is deprecated in favor of the [batchtools](https://cran.r-project.org/package=batchtools) package. Because of this, it is recommended to use the [future.batchtools](https://cran.r-project.org/package=future.batchtools) package instead of this package. This [future.BatchJobs](https://cran.r-project.org/package=future.BatchJobs) package is formally deprecated and is archived on CRAN as of 2021-01-08._
+ 
 
 ## Introduction
 
@@ -225,9 +225,9 @@ demo("mandelbrot", package="future", ask=FALSE)
 
 
 ## Installation
-R package future.BatchJobs is available on [CRAN](https://cran.r-project.org/package=future.BatchJobs) and can be installed in R as:
+R package future.BatchJobs is only available via [GitHub](https://github.com/HenrikBengtsson/future.BatchJobs) and can be installed in R as:
 ```r
-install.packages("future.BatchJobs")
+remotes::install_github("HenrikBengtsson/future.BatchJobs", ref="master")
 ```
 
 
@@ -241,7 +241,7 @@ This will install the package from source.
 
 ## Contributions
 
-This Git repository uses the [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/) branching model (the [`git flow`](https://github.com/petervanderdoes/gitflow-avh) extension is useful for this).  The [`develop`](https://github.com/HenrikBengtsson/future.BatchJobs/tree/develop) branch contains the latest contributions and other code that will appear in the next release, and the [`master`](https://github.com/HenrikBengtsson/future.BatchJobs) branch contains the code of the latest release, which is exactly what is currently on [CRAN](https://cran.r-project.org/package=future.BatchJobs).
+This Git repository uses the [Git Flow](https://nvie.com/posts/a-successful-git-branching-model/) branching model (the [`git flow`](https://github.com/petervanderdoes/gitflow-avh) extension is useful for this).  The [`develop`](https://github.com/HenrikBengtsson/future.BatchJobs/tree/develop) branch contains the latest contributions and other code that will appear in the next release, and the [`master`](https://github.com/HenrikBengtsson/future.BatchJobs) branch contains the code of the latest release.
 
 Contributing to this package is easy.  Just send a [pull request](https://help.github.com/articles/using-pull-requests/).  When you send your PR, make sure `develop` is the destination branch on the [future.BatchJobs repository](https://github.com/HenrikBengtsson/future.BatchJobs).  Your PR should pass `R CMD check --as-cran`, which will also be checked by <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs">Travis CI</a> and <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs">AppVeyor CI</a> when the PR is submitted.
 
@@ -250,8 +250,8 @@ We abide to the [Code of Conduct](https://www.contributor-covenant.org/version/2
 
 ## Software status
 
-| Resource      | CRAN        | GitHub Actions      | Travis CI       | AppVeyor CI      |
+| Resource      | GitHub        | GitHub Actions      | Travis CI       | AppVeyor CI      |
 | ------------- | ------------------- | ------------------- | --------------- | ---------------- |
 | _Platforms:_  | _Multiple_          | _Multiple_          | _Linux & macOS_ | _Windows_        |
-| R CMD check   | <a href="https://cran.r-project.org/web/checks/check_results_future.BatchJobs.html"><img border="0" src="http://www.r-pkg.org/badges/version/future.BatchJobs" alt="CRAN version"></a> |        | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>   | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
+| R CMD check   |  |        | <a href="https://travis-ci.org/HenrikBengtsson/future.BatchJobs"><img src="https://travis-ci.org/HenrikBengtsson/future.BatchJobs.svg" alt="Build status"></a>   | <a href="https://ci.appveyor.com/project/HenrikBengtsson/future-batchjobs"><img src="https://ci.appveyor.com/api/projects/status/github/HenrikBengtsson/future.BatchJobs?svg=true" alt="Build status"></a> |
 | Test coverage |                     |                     | <a href="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs"><img src="https://codecov.io/gh/HenrikBengtsson/future.BatchJobs/branch/develop/graph/badge.svg" alt="Coverage Status"/></a>     |                  |
